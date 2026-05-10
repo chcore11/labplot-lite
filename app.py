@@ -2,6 +2,7 @@ from pathlib import Path
 import csv
 import re
 import uuid
+import zipfile
 
 from flask import Flask, render_template, request, send_file
 from openpyxl import Workbook
@@ -833,6 +834,42 @@ def save_fit_report(stats: dict, title: str = ""):
 # =========================
 # 拟合函数与误差指标
 # =========================
+def create_report_package(
+    png_name: str,
+    origin_csv_name: str,
+    full_csv_name: str,
+    fit_report_name: str,
+    chart_title: str,
+):
+    job_id = uuid.uuid4().hex[:8]
+    safe_title = safe_filename_part(chart_title or "chart")
+    zip_name = f"report_package_{safe_title}_{job_id}.zip"
+    zip_path = OUTPUT_DIR / zip_name
+
+    package_files = [
+        ("PNG 图片", png_name),
+        ("绘图数据 CSV", origin_csv_name),
+        ("完整数据 CSV", full_csv_name),
+        ("拟合报告 TXT", fit_report_name),
+    ]
+
+    resolved_files = []
+
+    for label, filename in package_files:
+        path = resolve_safe_file(OUTPUT_DIR, filename)
+
+        if path is None:
+            raise ValueError(f"报告素材包暂未生成：缺少 {label}，请重新生成图像后再试。")
+
+        resolved_files.append(path)
+
+    with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
+        for path in resolved_files:
+            zip_file.write(path, arcname=path.name)
+
+    return zip_name
+
+
 def calc_r_squared(y_true: pd.Series, y_pred):
     ss_res = np.sum((y_true - y_pred) ** 2)
     ss_tot = np.sum((y_true - y_true.mean()) ** 2)
@@ -1186,8 +1223,29 @@ def make_xy_plot(
             stats["fit_c"] = f"{fit_result['c']:.6f}"
 
     fit_report_name = save_fit_report(stats, plot_title)
+    package_zip_name = None
+    package_zip_error = None
 
-    return png_path.name, origin_csv_path.name, full_csv_path.name, fit_report_name, stats
+    try:
+        package_zip_name = create_report_package(
+            png_path.name,
+            origin_csv_path.name,
+            full_csv_path.name,
+            fit_report_name,
+            plot_title,
+        )
+    except Exception as exc:
+        package_zip_error = str(exc)
+
+    return (
+        png_path.name,
+        origin_csv_path.name,
+        full_csv_path.name,
+        fit_report_name,
+        package_zip_name,
+        package_zip_error,
+        stats,
+    )
 
 
 # =========================
@@ -1420,7 +1478,15 @@ def index():
                 if upload_path is None:
                     raise ValueError("上传文件不存在或文件名非法，请重新上传。")
 
-                png_name, origin_csv_name, full_csv_name, fit_report_name, stats = make_xy_plot(
+                (
+                    png_name,
+                    origin_csv_name,
+                    full_csv_name,
+                    fit_report_name,
+                    package_zip_name,
+                    package_zip_error,
+                    stats,
+                ) = make_xy_plot(
                     upload_path,
                     selected_x,
                     selected_y,
@@ -1441,6 +1507,8 @@ def index():
                     "origin_csv_name": origin_csv_name,
                     "full_csv_name": full_csv_name,
                     "fit_report_name": fit_report_name,
+                    "package_zip_name": package_zip_name,
+                    "package_zip_error": package_zip_error,
                     "stats": stats,
                 }
 

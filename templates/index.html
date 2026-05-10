@@ -651,7 +651,11 @@
               <a href="{{ url_for('download', filename=result.full_csv_name) }}">下载完整数据 CSV</a>
               <a href="{{ url_for('download', filename=result.fit_report_name) }}">下载拟合报告 TXT</a>
 
-              <p>后续可升级为：一键下载报告素材包 ZIP。</p>
+              {% if result.package_zip_name %}
+              <a href="{{ url_for('download', filename=result.package_zip_name) }}">下载报告素材包 ZIP</a>
+              {% elif result.package_zip_error %}
+              <p>{{ result.package_zip_error }}</p>
+              {% endif %}
             </div>
           </div>
         </div>
