@@ -498,17 +498,6 @@
             </div>
 
             <div>
-              <label for="y_col">Y 轴数据列</label>
-              <select id="y_col" name="y_col" required>
-                {% for col in numeric_columns %}
-                <option value="{{ col }}" {% if col == selected_y %}selected{% endif %}>
-                  {{ col }}
-                </option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <div>
               <label for="chart_type">图表类型</label>
               <select id="chart_type" name="chart_type" required>
                 {% for value, label in chart_types.items() %}
@@ -519,6 +508,64 @@
               </select>
             </div>
           </div>
+
+          <div class="section-label">曲线配置</div>
+
+          <div class="curve-config-box" id="curveConfigBox">
+            {% set initial_curve_configs = selected_curve_configs if selected_curve_configs else [{"y_col": selected_y or numeric_columns[1], "color": default_curve_colors[0], "line_width": line_width or 1.8, "line_style": line_style or "solid"}] %}
+            {% for curve in initial_curve_configs %}
+            <div class="curve-row">
+              <div>
+                <label>Y 轴数据列</label>
+                <select name="curve_y_cols" required>
+                  {% for col in numeric_columns %}
+                  <option value="{{ col }}" {% if col == curve.y_col %}selected{% endif %}>
+                    {{ col }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div>
+                <label>线条颜色</label>
+                <select name="curve_colors" required>
+                  {% for value, label in curve_colors.items() %}
+                  <option value="{{ value }}" {% if value == curve.color %}selected{% endif %}>
+                    {{ label }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div>
+                <label>线条粗细</label>
+                <input
+                  name="curve_widths"
+                  type="number"
+                  min="0.1"
+                  step="0.1"
+                  value="{{ curve.line_width or 1.8 }}"
+                  required
+                >
+              </div>
+
+              <div>
+                <label>线型</label>
+                <select name="curve_styles" required>
+                  {% for value, label in line_styles.items() %}
+                  <option value="{{ value }}" {% if value == curve.line_style %}selected{% endif %}>
+                    {{ label }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <button type="button" class="curve-remove-button">删除</button>
+            </div>
+            {% endfor %}
+          </div>
+
+          <button type="button" class="btn btn-secondary curve-add-button" id="addCurveButton">添加一条曲线</button>
 
           <details class="advanced-box">
             <summary>高级选项：标题、坐标轴、拟合方式、拟合指标</summary>
@@ -630,10 +677,15 @@
               <h4>拟合与数据摘要</h4>
 
               <div class="summary-row"><span>X 轴</span><strong>{{ result.stats.x_col }}</strong></div>
-              <div class="summary-row"><span>Y 轴</span><strong>{{ result.stats.y_col }}</strong></div>
+              <div class="summary-row"><span>Y 轴</span><strong>{{ result.stats.y_cols_label or result.stats.y_col }}</strong></div>
+              <div class="summary-row"><span>曲线数量</span><strong>{{ result.stats.curve_count }}</strong></div>
               <div class="summary-row"><span>图表类型</span><strong>{{ result.stats.chart_type }}</strong></div>
               <div class="summary-row"><span>拟合方式</span><strong>{{ result.stats.fit_type_label }}</strong></div>
               <div class="summary-row"><span>数据点数</span><strong>{{ result.stats.points }}</strong></div>
+
+              {% if result.stats.multi_y %}
+              <div class="summary-row large"><span>提示</span><strong>{{ result.stats.fit_notice }}</strong></div>
+              {% endif %}
 
               {% if result.stats.has_fit %}
               <div class="summary-row large"><span>拟合方程</span><strong>{{ result.stats.equation }}</strong></div>
@@ -724,6 +776,84 @@
   </main>
 
   <script>
+    (function () {
+      const box = document.getElementById("curveConfigBox");
+      const addButton = document.getElementById("addCurveButton");
+      const defaultColors = {{ default_curve_colors | tojson }};
+
+      if (!box || !addButton) {
+        return;
+      }
+
+      function rows() {
+        return Array.from(box.querySelectorAll(".curve-row"));
+      }
+
+      function updateRemoveButtons() {
+        const currentRows = rows();
+        currentRows.forEach(function (row) {
+          const button = row.querySelector(".curve-remove-button");
+          if (button) {
+            button.disabled = currentRows.length <= 1;
+          }
+        });
+      }
+
+      function chooseNextY(row, index) {
+        const select = row.querySelector('select[name="curve_y_cols"]');
+        if (!select || select.options.length === 0) {
+          return;
+        }
+
+        const optionIndex = Math.min(index + 1, select.options.length - 1);
+        select.selectedIndex = optionIndex;
+      }
+
+      function chooseNextColor(row, index) {
+        const select = row.querySelector('select[name="curve_colors"]');
+        if (!select || !defaultColors.length) {
+          return;
+        }
+
+        select.value = defaultColors[index % defaultColors.length];
+      }
+
+      addButton.addEventListener("click", function () {
+        const currentRows = rows();
+        const source = currentRows[currentRows.length - 1] || box.querySelector(".curve-row");
+
+        if (!source) {
+          return;
+        }
+
+        const clone = source.cloneNode(true);
+        const nextIndex = currentRows.length;
+        chooseNextY(clone, nextIndex);
+        chooseNextColor(clone, nextIndex);
+        box.appendChild(clone);
+        updateRemoveButtons();
+      });
+
+      box.addEventListener("click", function (event) {
+        const button = event.target.closest(".curve-remove-button");
+
+        if (!button) {
+          return;
+        }
+
+        const currentRows = rows();
+        if (currentRows.length <= 1) {
+          updateRemoveButtons();
+          return;
+        }
+
+        button.closest(".curve-row").remove();
+        updateRemoveButtons();
+      });
+
+      updateRemoveButtons();
+    })();
+
     (function () {
       const root = document.documentElement;
       const select = document.getElementById("themeSelect");

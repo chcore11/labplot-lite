@@ -62,6 +62,36 @@ FIT_TYPES = {
     "quadratic": "二次拟合 y = ax² + bx + c",
 }
 
+LINE_STYLES = {
+    "solid": "实线",
+    "dashed": "虚线",
+    "dotted": "点线",
+    "dashdot": "点划线",
+}
+
+LINE_STYLE_VALUES = {
+    "solid": "-",
+    "dashed": "--",
+    "dotted": ":",
+    "dashdot": "-.",
+}
+
+MULTI_Y_FIT_NOTICE = "多曲线模式下暂不进行拟合，如需拟合请只选择一个 Y 列。"
+
+CURVE_COLORS = {
+    "#2563EB": "蓝色",
+    "#F97316": "橙色",
+    "#16A34A": "绿色",
+    "#DC2626": "红色",
+    "#7C3AED": "紫色",
+    "#111827": "黑色",
+    "#6B7280": "灰色",
+}
+
+DEFAULT_CURVE_COLORS = list(CURVE_COLORS.keys())
+
+MULTI_Y_FIT_NOTICE = "多曲线模式下暂不进行拟合，如需拟合请只保留一条曲线。"
+
 METRIC_MODES = {
     "basic": "基础指标（推荐）",
     "custom": "自定义选择",
@@ -349,6 +379,18 @@ def read_raw_dataframe(file_path: Path, nrows: int = 100):
     elif suffix == ".xls":
         df = pd.read_excel(file_path, engine="xlrd", header=None, nrows=nrows)
     else:
+        if stats.get("multi_y"):
+            lines.append(MULTI_Y_FIT_NOTICE)
+            lines.append("")
+            lines.append("Y columns:")
+            lines.append(stats.get("y_cols_label", ""))
+            lines.append(f"Curve count: {stats.get('curve_count', '')}")
+            lines.append("")
+            lines.append("No fit metrics are generated in multi-curve mode.")
+            path.write_text("\n".join(lines), encoding="utf-8")
+
+            return filename
+
         raise ValueError("只支持 CSV、XLS、XLSX 文件。")
 
     return df.fillna("")
@@ -562,6 +604,77 @@ def normalize_metric_mode(metric_mode: str):
         return "basic"
 
     return metric_mode
+
+
+def normalize_line_style(line_style: str):
+    if line_style not in LINE_STYLE_VALUES:
+        return "solid"
+
+    return line_style
+
+
+def parse_line_width(value, default: float = 1.8):
+    if value is None or str(value).strip() == "":
+        return default
+
+    try:
+        line_width = float(value)
+    except ValueError:
+        raise ValueError(f"线条粗细必须是数字：{value}")
+
+    if line_width <= 0:
+        raise ValueError("线条粗细必须大于 0。")
+
+    return line_width
+
+
+def normalize_curve_color(color: str, index: int = 0):
+    color = str(color or "").strip().upper()
+
+    if color in CURVE_COLORS:
+        return color
+
+    return DEFAULT_CURVE_COLORS[index % len(DEFAULT_CURVE_COLORS)]
+
+
+def normalize_curve_configs(
+    curve_y_cols: list[str] | None,
+    curve_colors: list[str] | None = None,
+    curve_widths: list[str] | None = None,
+    curve_styles: list[str] | None = None,
+):
+    curve_y_cols = curve_y_cols or []
+    curve_colors = curve_colors or []
+    curve_widths = curve_widths or []
+    curve_styles = curve_styles or []
+
+    configs = []
+
+    for index, raw_y_col in enumerate(curve_y_cols):
+        y_col = str(raw_y_col or "").strip()
+
+        if not y_col:
+            continue
+
+        configs.append({
+            "y_col": y_col,
+            "color": normalize_curve_color(
+                curve_colors[index] if index < len(curve_colors) else None,
+                index,
+            ),
+            "line_width": parse_line_width(
+                curve_widths[index] if index < len(curve_widths) else None,
+                1.8,
+            ),
+            "line_style": normalize_line_style(
+                curve_styles[index] if index < len(curve_styles) else "solid",
+            ),
+        })
+
+    if not configs:
+        raise ValueError("请选择至少一条曲线。")
+
+    return configs
 
 
 def normalize_selected_metrics(metric_mode: str, selected_metrics: list[str] | None):
@@ -1004,6 +1117,10 @@ def make_xy_plot(
     fit_type: str = "none",
     metric_mode: str = "basic",
     selected_metrics: list[str] | None = None,
+    y_cols: list[str] | None = None,
+    line_width: float = 1.8,
+    line_style: str = "solid",
+    curve_configs: list[dict] | None = None,
 ):
     metric_mode = normalize_metric_mode(metric_mode)
     selected_metrics = normalize_selected_metrics(metric_mode, selected_metrics)
@@ -1015,17 +1132,214 @@ def make_xy_plot(
         data_end_row=data_end_row,
     )
 
+    if curve_configs is None:
+        if y_cols is None:
+            if isinstance(y_col, (list, tuple)):
+                y_cols = list(y_col)
+            else:
+                y_cols = [y_col]
+
+    if curve_configs is not None:
+        y_cols = [config.get("y_col", "") for config in curve_configs]
+
+    y_cols = [str(col).strip() for col in y_cols if str(col).strip()]
+    y_cols = list(dict.fromkeys(y_cols))
+
+    if curve_configs is None:
+        line_width = parse_line_width(line_width)
+        line_style = normalize_line_style(line_style)
+        curve_configs = [
+            {
+                "y_col": current_y_col,
+                "color": normalize_curve_color(None, index),
+                "line_width": line_width,
+                "line_style": line_style,
+            }
+            for index, current_y_col in enumerate(y_cols)
+        ]
+    else:
+        curve_configs = normalize_curve_configs(
+            [config.get("y_col", "") for config in curve_configs],
+            [config.get("color", "") for config in curve_configs],
+            [config.get("line_width", "") for config in curve_configs],
+            [config.get("line_style", "") for config in curve_configs],
+        )
+
+    y_cols = [config["y_col"] for config in curve_configs]
+    unique_y_cols = list(dict.fromkeys(y_cols))
+
+    if not y_cols:
+        raise ValueError("请选择至少一个 Y 轴列。")
+
+    y_col = y_cols[0]
+    is_multi_y = len(curve_configs) > 1
+    first_curve_config = curve_configs[0]
+    line_width = first_curve_config["line_width"]
+    line_style = first_curve_config["line_style"]
+    matplotlib_line_style = LINE_STYLE_VALUES[line_style]
+    curve_color = first_curve_config["color"]
+
     if x_col not in df.columns:
         raise ValueError(f"找不到 X 轴列：{x_col}")
 
-    if y_col not in df.columns:
-        raise ValueError(f"找不到 Y 轴列：{y_col}")
+    for current_y_col in unique_y_cols:
+        if current_y_col not in df.columns:
+            raise ValueError(f"找不到 Y 轴列：{current_y_col}")
 
     if chart_type not in CHART_TYPES:
         raise ValueError(f"不支持的图表类型：{chart_type}")
 
     if fit_type not in FIT_TYPES:
         raise ValueError(f"不支持的拟合方式：{fit_type}")
+
+    if is_multi_y:
+        if x_col in unique_y_cols:
+            raise ValueError("X 轴列不能同时作为 Y 轴列。")
+
+        x = pd.to_numeric(df[x_col], errors="coerce")
+        origin_df = pd.DataFrame({x_col: x})
+
+        for current_y_col in unique_y_cols:
+            origin_df[current_y_col] = pd.to_numeric(df[current_y_col], errors="coerce")
+
+        if origin_df.dropna(how="all", subset=unique_y_cols).empty:
+            raise ValueError("所选 Y 轴列中没有可用的数值数据，请检查表格内容。")
+
+        display_x_label = (x_label or "").strip() or str(x_col)
+        display_y_label = (y_label or "").strip() or " / ".join(unique_y_cols)
+        plot_title = auto_title(title, display_x_label, display_y_label)
+
+        job_id = uuid.uuid4().hex[:8]
+        x_name = safe_filename_part(x_col)
+        prefix = f"multi_y_vs_{x_name}"
+
+        png_path = OUTPUT_DIR / f"{prefix}_{job_id}.png"
+        origin_csv_path = OUTPUT_DIR / f"{prefix}_origin_{job_id}.csv"
+        full_csv_path = OUTPUT_DIR / f"{prefix}_full_data_{job_id}.csv"
+
+        origin_df.to_csv(origin_csv_path, index=False, encoding="utf-8-sig")
+        df.to_csv(full_csv_path, index=False, encoding="utf-8-sig")
+
+        fig, ax = plt.subplots(figsize=(6.5, 4.2), dpi=150)
+        plotted_frames = []
+
+        for curve_config in curve_configs:
+            current_y_col = curve_config["y_col"]
+            curve_df = origin_df[[x_col, current_y_col]].dropna()
+
+            if curve_df.empty:
+                continue
+
+            plotted_frames.append(curve_df.rename(columns={current_y_col: "value"}))
+
+            if chart_type == "scatter":
+                ax.scatter(
+                    curve_df[x_col],
+                    curve_df[current_y_col],
+                    s=28,
+                    color=curve_config["color"],
+                    label=str(current_y_col),
+                )
+            else:
+                marker = "o" if chart_type == "line_marker" else None
+                ax.plot(
+                    curve_df[x_col],
+                    curve_df[current_y_col],
+                    color=curve_config["color"],
+                    linestyle=LINE_STYLE_VALUES[curve_config["line_style"]],
+                    linewidth=curve_config["line_width"],
+                    marker=marker,
+                    markersize=4.5,
+                    label=str(current_y_col),
+                )
+
+        if not plotted_frames:
+            raise ValueError("所选 X/Y 列中没有可用于绘图的成对数值数据。")
+
+        all_plot_values = pd.concat(plotted_frames, ignore_index=True)
+        plot_x = all_plot_values[x_col]
+        plot_y = all_plot_values["value"]
+
+        ax.set_title(plot_title, fontsize=13, pad=10)
+        ax.set_xlabel(display_x_label, fontsize=11)
+        ax.set_ylabel(display_y_label, fontsize=11)
+        ax.tick_params(axis="both", labelsize=9)
+        ax.grid(True, linestyle="--", linewidth=0.5, alpha=0.35)
+        ax.legend(fontsize=9, frameon=True)
+
+        if len(all_plot_values) >= 2:
+            x_margin = (plot_x.max() - plot_x.min()) * 0.05 if plot_x.max() != plot_x.min() else 1
+            y_margin = (plot_y.max() - plot_y.min()) * 0.12 if plot_y.max() != plot_y.min() else 1
+
+            ax.set_xlim(plot_x.min() - x_margin, plot_x.max() + x_margin)
+            ax.set_ylim(plot_y.min() - y_margin, plot_y.max() + y_margin)
+
+        fig.tight_layout()
+        fig.savefig(png_path, dpi=300)
+        plt.close(fig)
+
+        stats = {
+            "x_col": str(x_col),
+            "y_col": " / ".join(unique_y_cols),
+            "y_cols": unique_y_cols,
+            "y_cols_label": " / ".join(unique_y_cols),
+            "curve_count": str(len(curve_configs)),
+            "curve_configs": curve_configs,
+            "multi_y": True,
+            "fit_notice": MULTI_Y_FIT_NOTICE,
+            "fit_enabled": False,
+            "x_label": display_x_label,
+            "y_label": display_y_label,
+            "max_value": f"{plot_y.max():.2f}",
+            "min_value": f"{plot_y.min():.2f}",
+            "avg_value": f"{plot_y.mean():.2f}",
+            "peak_x": f"{all_plot_values.loc[plot_y.idxmax(), x_col]}",
+            "points": str(len(all_plot_values)),
+            "header_row": str(header_row),
+            "data_start_row": str(data_start_row),
+            "data_end_row": str(data_end_row) if data_end_row else "未限制",
+            "chart_type": CHART_TYPES.get(chart_type, chart_type),
+            "fit_type": "none",
+            "fit_type_label": MULTI_Y_FIT_NOTICE,
+            "has_fit": False,
+            "equation": None,
+            "fit_a": None,
+            "fit_b": None,
+            "fit_c": None,
+            "metric_mode": metric_mode,
+            "metric_mode_label": METRIC_MODES.get(metric_mode, metric_mode),
+            "selected_metrics": [],
+            "metric_values": {},
+            "metric_display": [],
+            "line_width": line_width,
+            "line_style": line_style,
+            "line_style_label": LINE_STYLES.get(line_style, line_style),
+        }
+
+        fit_report_name = save_fit_report(stats, plot_title)
+        package_zip_name = None
+        package_zip_error = None
+
+        try:
+            package_zip_name = create_report_package(
+                png_path.name,
+                origin_csv_path.name,
+                full_csv_path.name,
+                fit_report_name,
+                plot_title,
+            )
+        except Exception as exc:
+            package_zip_error = str(exc)
+
+        return (
+            png_path.name,
+            origin_csv_path.name,
+            full_csv_path.name,
+            fit_report_name,
+            package_zip_name,
+            package_zip_error,
+            stats,
+        )
 
     x = pd.to_numeric(df[x_col], errors="coerce")
     y = pd.to_numeric(df[y_col], errors="coerce")
@@ -1106,6 +1420,7 @@ def make_xy_plot(
             x,
             y,
             s=30,
+            color=curve_color,
             label="Data",
         )
 
@@ -1114,7 +1429,9 @@ def make_xy_plot(
         ax.plot(
             fit_result["x_fit"],
             fit_result["y_fit"],
-            linewidth=1.8,
+            color=curve_color,
+            linestyle=matplotlib_line_style,
+            linewidth=line_width,
             label=fit_label,
         )
 
@@ -1145,7 +1462,9 @@ def make_xy_plot(
             ax.plot(
                 x,
                 y,
-                linewidth=1.8,
+                color=curve_color,
+                linestyle=matplotlib_line_style,
+                linewidth=line_width,
                 label=str(y_col),
             )
 
@@ -1154,6 +1473,7 @@ def make_xy_plot(
                 x,
                 y,
                 s=28,
+                color=curve_color,
                 label=str(y_col),
             )
 
@@ -1162,7 +1482,9 @@ def make_xy_plot(
                 x,
                 y,
                 marker="o",
-                linewidth=1.8,
+                color=curve_color,
+                linestyle=matplotlib_line_style,
+                linewidth=line_width,
                 markersize=4.5,
                 label=str(y_col),
             )
@@ -1188,6 +1510,13 @@ def make_xy_plot(
     stats = {
         "x_col": str(x_col),
         "y_col": str(y_col),
+        "y_cols": [str(y_col)],
+        "y_cols_label": str(y_col),
+        "curve_count": "1",
+        "curve_configs": curve_configs,
+        "multi_y": False,
+        "fit_notice": "",
+        "fit_enabled": fit_result is not None,
         "x_label": display_x_label,
         "y_label": display_y_label,
         "max_value": f"{max_value:.2f}",
@@ -1211,6 +1540,10 @@ def make_xy_plot(
         "selected_metrics": selected_metrics,
         "metric_values": metric_values,
         "metric_display": metric_display,
+        "line_width": line_width,
+        "line_style": line_style,
+        "line_style_label": LINE_STYLES.get(line_style, line_style),
+        "color": curve_color,
     }
 
     if fit_result is not None:
@@ -1268,6 +1601,8 @@ def index():
 
     selected_x = None
     selected_y = None
+    selected_y_cols = []
+    selected_curve_configs = []
 
     title = "X-Y Curve"
     x_label = ""
@@ -1275,6 +1610,8 @@ def index():
 
     chart_type = "line_marker"
     fit_type = "none"
+    line_width = 1.8
+    line_style = "solid"
 
     metric_mode = "basic"
     selected_metrics = BASIC_METRICS.copy()
@@ -1326,6 +1663,8 @@ def index():
 
                         selected_x = numeric_columns[0]
                         selected_y = numeric_columns[1]
+                        selected_y_cols = [selected_y]
+                        selected_curve_configs = normalize_curve_configs([selected_y])
 
                     except Exception:
                         columns = None
@@ -1355,6 +1694,8 @@ def index():
 
                 selected_x = numeric_columns[0]
                 selected_y = numeric_columns[1]
+                selected_y_cols = [selected_y]
+                selected_curve_configs = normalize_curve_configs([selected_y])
 
             except Exception as exc:
                 error = str(exc)
@@ -1417,6 +1758,8 @@ def index():
 
                 selected_x = numeric_columns[0]
                 selected_y = created_col if created_col in numeric_columns else numeric_columns[1]
+                selected_y_cols = [selected_y]
+                selected_curve_configs = normalize_curve_configs([selected_y])
 
                 success = f"已生成新列：{created_col}"
 
@@ -1436,7 +1779,29 @@ def index():
                 data_end_row = parse_positive_int(request.form.get("data_end_row"), None)
 
                 selected_x = request.form.get("x_col")
-                selected_y = request.form.get("y_col")
+                curve_y_cols = request.form.getlist("curve_y_cols")
+                curve_colors = request.form.getlist("curve_colors")
+                curve_widths = request.form.getlist("curve_widths")
+                curve_styles = request.form.getlist("curve_styles")
+
+                if curve_y_cols:
+                    selected_curve_configs = normalize_curve_configs(
+                        curve_y_cols,
+                        curve_colors,
+                        curve_widths,
+                        curve_styles,
+                    )
+                else:
+                    selected_y_cols = request.form.getlist("y_cols")
+
+                    if not selected_y_cols:
+                        selected_y = request.form.get("y_col")
+                        selected_y_cols = [selected_y] if selected_y else []
+
+                    selected_curve_configs = normalize_curve_configs(selected_y_cols)
+
+                selected_y_cols = [config["y_col"] for config in selected_curve_configs]
+                selected_y = selected_y_cols[0] if selected_y_cols else None
 
                 title = request.form.get("title", "X-Y Curve").strip()
                 x_label = request.form.get("x_label", "").strip()
@@ -1444,6 +1809,8 @@ def index():
 
                 chart_type = request.form.get("chart_type", "line_marker")
                 fit_type = request.form.get("fit_type", "none")
+                line_width = selected_curve_configs[0]["line_width"]
+                line_style = selected_curve_configs[0]["line_style"]
 
                 metric_mode = normalize_metric_mode(request.form.get("metric_mode", "basic"))
                 selected_metrics = normalize_selected_metrics(
@@ -1454,10 +1821,10 @@ def index():
                 if not saved_filename:
                     raise ValueError("文件状态丢失，请重新上传文件。")
 
-                if not selected_x or not selected_y:
+                if not selected_x or not selected_y_cols:
                     raise ValueError("请选择 X 轴和 Y 轴。")
 
-                if selected_x == selected_y:
+                if selected_x in selected_y_cols:
                     raise ValueError("X 轴和 Y 轴不能选择同一列。")
 
                 if chart_type not in CHART_TYPES:
@@ -1500,6 +1867,7 @@ def index():
                     fit_type=fit_type,
                     metric_mode=metric_mode,
                     selected_metrics=selected_metrics,
+                    curve_configs=selected_curve_configs,
                 )
 
                 result = {
@@ -1531,6 +1899,8 @@ def index():
         saved_filename=saved_filename,
         selected_x=selected_x,
         selected_y=selected_y,
+        selected_y_cols=selected_y_cols,
+        selected_curve_configs=selected_curve_configs,
         title=title,
         x_label=x_label,
         y_label=y_label,
@@ -1541,6 +1911,11 @@ def index():
         chart_types=CHART_TYPES,
         fit_type=fit_type,
         fit_types=FIT_TYPES,
+        line_width=line_width,
+        line_style=line_style,
+        line_styles=LINE_STYLES,
+        curve_colors=CURVE_COLORS,
+        default_curve_colors=DEFAULT_CURVE_COLORS,
         metric_mode=metric_mode,
         metric_modes=METRIC_MODES,
         selected_metrics=selected_metrics,
