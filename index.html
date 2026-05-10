@@ -27,7 +27,7 @@
         <span class="brand-text">LabPlot Lite</span>
       </a>
 
-      <nav class="nav-links">
+      <nav class="nav-links" aria-label="页面导航">
         <a href="#features">功能特点</a>
         <a href="#samples">示例数据</a>
         <a href="#guide-section">使用说明</a>
@@ -54,11 +54,14 @@
           学生实验数据处理工具
         </div>
 
-        <h1>从实验数据到报告图表，只需几步</h1>
+        <h1>
+          <span>从实验数据到</span>
+          <span>报告图表，只需几步</span>
+        </h1>
 
         <p class="hero-desc">
-          上传 Excel / CSV，完成数据整理、图表生成、曲线拟合与结果导出。
-          专注于数据本身，而不是复杂的软件操作。
+          上传 Excel / CSV，确认表头和数据列，生成图表、拟合结果与报告素材。
+          所有处理都在浏览器中完成。
         </p>
 
         <div class="hero-actions">
@@ -114,7 +117,7 @@
               <div><span>R²</span><strong>1.000000</strong></div>
               <div><span>RMSE</span><strong>0.000000</strong></div>
               <div><span>数据点</span><strong>8</strong></div>
-              <button type="button">下载报告素材包</button>
+              <span class="preview-download-pill">导出报告素材包</span>
             </div>
           </div>
         </div>
@@ -124,7 +127,7 @@
     <section class="features" id="features">
       <div class="section-heading">
         <span>为什么选择 LabPlot Lite？</span>
-        <h2>少一点折腾，多一点结果</h2>
+        <h2>按实验报告流程组织数据处理</h2>
       </div>
 
       <div class="feature-grid">
@@ -151,10 +154,10 @@
     <section class="focus-section">
       <div class="focus-copy">
         <div class="focus-label">Data Focus</div>
-        <h2>专注于数据本身</h2>
+        <h2>让关键步骤保持可见</h2>
         <p>
-          减少干扰，让图表、指标和拟合结果更清楚。
-          把复杂的操作压到后台，把图表、指标和结果留在前台。
+          预览、计算、绘图和导出都在同一页面完成。
+          常用设置直接显示，高级选项按需展开。
         </p>
         <a href="#upload-section" class="focus-button">立即开始</a>
       </div>
@@ -258,7 +261,7 @@
         </form>
       </section>
 
-      <section id="statusMessage" class="message is-hidden" role="status"></section>
+      <section id="statusMessage" class="message is-hidden" role="status" aria-live="polite"></section>
 
       <section id="previewSection" class="panel is-hidden">
         <div class="step-head">

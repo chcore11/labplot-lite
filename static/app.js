@@ -87,6 +87,7 @@ const state = {
   data: [],
   numericColumns: [],
   chart: null,
+  lastPlotPayload: null,
   objectUrls: [],
 };
 
@@ -557,8 +558,11 @@ function renderStaticOptions() {
 function createSelectField(labelText, name, options, selectedValue) {
   const wrapper = document.createElement("div");
   const label = document.createElement("label");
+  const id = `${name}-${randomId()}`;
   label.textContent = labelText;
+  label.htmlFor = id;
   const select = document.createElement("select");
+  select.id = id;
   select.name = name;
   select.required = true;
   setOptions(select, options, selectedValue);
@@ -569,8 +573,11 @@ function createSelectField(labelText, name, options, selectedValue) {
 function createInputField(labelText, name, value) {
   const wrapper = document.createElement("div");
   const label = document.createElement("label");
+  const id = `${name}-${randomId()}`;
   label.textContent = labelText;
+  label.htmlFor = id;
   const input = document.createElement("input");
+  input.id = id;
   input.name = name;
   input.type = "number";
   input.min = "0.1";
@@ -1242,10 +1249,13 @@ function makeChartDataset(label, pairs, config, chartType) {
 function getThemeColors() {
   const styles = getComputedStyle(document.documentElement);
   return {
-    text: styles.getPropertyValue("--text-main").trim() || "#0f172a",
-    muted: styles.getPropertyValue("--text-muted").trim() || "#64748b",
-    line: styles.getPropertyValue("--line-soft").trim() || "rgba(148, 163, 184, 0.3)",
-    surface: styles.getPropertyValue("--surface-solid").trim() || "#ffffff",
+    text: styles.getPropertyValue("--text-main").trim() || "rgb(15, 23, 42)",
+    muted: styles.getPropertyValue("--text-muted").trim() || "rgb(88, 101, 125)",
+    line: styles.getPropertyValue("--chart-grid").trim() || "rgba(148, 163, 184, 0.3)",
+    surface: styles.getPropertyValue("--chart-bg").trim() || "rgb(248, 250, 252)",
+    fitLabelBg: styles.getPropertyValue("--chart-label-bg").trim() || "rgba(248, 250, 252, 0.92)",
+    fitLabelText: styles.getPropertyValue("--chart-label-text").trim() || "rgb(15, 23, 42)",
+    fitLabelBorder: styles.getPropertyValue("--chart-label-border").trim() || "rgba(148, 163, 184, 0.42)",
   };
 }
 
@@ -1260,7 +1270,7 @@ function ensureChartPlugin() {
       const { ctx, width, height } = chart;
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
-      ctx.fillStyle = options.color || "#ffffff";
+      ctx.fillStyle = options.color || "rgb(248, 250, 252)";
       ctx.fillRect(0, 0, width, height);
       ctx.restore();
     },
@@ -1284,8 +1294,8 @@ function ensureChartPlugin() {
       const x = chartArea.left + 12;
       const y = chartArea.top + 12;
 
-      ctx.fillStyle = "rgba(255, 255, 255, 0.82)";
-      ctx.strokeStyle = "rgba(148, 163, 184, 0.45)";
+      ctx.fillStyle = options.backgroundColor || "rgba(248, 250, 252, 0.92)";
+      ctx.strokeStyle = options.borderColor || "rgba(148, 163, 184, 0.45)";
       ctx.lineWidth = 1;
       ctx.beginPath();
       if (typeof ctx.roundRect === "function") {
@@ -1296,7 +1306,7 @@ function ensureChartPlugin() {
       ctx.fill();
       ctx.stroke();
 
-      ctx.fillStyle = "#0f172a";
+      ctx.fillStyle = options.color || "rgb(15, 23, 42)";
       lines.forEach((line, index) => {
         ctx.fillText(line, x + padding, y + padding + 12 + (index * lineHeight));
       });
@@ -1359,6 +1369,9 @@ function renderChart(payload) {
         },
         fitLabelBox: {
           text: payload.fitText,
+          backgroundColor: colors.fitLabelBg,
+          borderColor: colors.fitLabelBorder,
+          color: colors.fitLabelText,
         },
         canvasBackground: {
           color: colors.surface,
@@ -1607,6 +1620,7 @@ function renderResult(payload) {
 
 async function handlePlotSubmit() {
   const payload = buildPlotPayload();
+  state.lastPlotPayload = payload;
   renderChart(payload);
   await renderDownloads(payload);
   renderResult(payload);
@@ -1638,6 +1652,19 @@ function setupTheme() {
     return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   }
 
+  async function refreshRenderedResult() {
+    if (!state.lastPlotPayload || qs("#resultSection").classList.contains("is-hidden")) {
+      return;
+    }
+
+    try {
+      renderChart(state.lastPlotPayload);
+      await renderDownloads(state.lastPlotPayload);
+    } catch (error) {
+      showMessage("error", error.message);
+    }
+  }
+
   function applyTheme(mode) {
     const finalMode = mode === "system" ? getSystemTheme() : mode;
     root.setAttribute("data-theme", finalMode);
@@ -1653,9 +1680,13 @@ function setupTheme() {
     if (select) {
       select.value = mode;
     }
+
+    window.requestAnimationFrame(() => {
+      refreshRenderedResult();
+    });
   }
 
-  const saved = localStorage.getItem(storageKey) || "system";
+  const saved = localStorage.getItem(storageKey) || "dark";
   applyTheme(saved);
 
   select.addEventListener("change", () => applyTheme(select.value));
