@@ -1,4 +1,6 @@
-﻿uploads/
+﻿.DS_Store
+.venv/
+uploads/
 output/
 __pycache__/
 *.pyc

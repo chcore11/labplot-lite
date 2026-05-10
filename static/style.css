@@ -2,6 +2,10 @@
   box-sizing: border-box;
 }
 
+.is-hidden {
+  display: none !important;
+}
+
 :root {
   --danger-bg: #fef2f2;
   --danger-border: #fecaca;
@@ -916,7 +920,8 @@ html[data-theme="dark"] .focus-button {
   gap: 14px;
 }
 
-.sample-list a {
+.sample-list a,
+.sample-list button {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -929,9 +934,12 @@ html[data-theme="dark"] .focus-button {
   text-decoration: none;
   font-size: 16px;
   font-weight: 950;
+  text-align: left;
+  cursor: pointer;
 }
 
-.sample-list a:hover {
+.sample-list a:hover,
+.sample-list button:hover {
   background: color-mix(in srgb, var(--brand-main) 14%, transparent);
 }
 
@@ -1363,8 +1371,10 @@ code {
 .plot {
   display: block;
   max-width: 100%;
+  height: auto;
   margin: 0 auto;
   border-radius: 14px;
+  background: var(--surface-solid);
 }
 
 .result-side {
