@@ -475,7 +475,7 @@
           {% endfor %}
         </div>
 
-        <form method="post" class="form-card">
+        <form method="post" class="form-card" action="{{ url_for('index') }}?jump=result">
           <input type="hidden" name="action" value="plot">
           <input type="hidden" name="saved_filename" value="{{ saved_filename }}">
           <input type="hidden" name="upload_name" value="{{ upload_name }}">
@@ -600,6 +600,107 @@
               </div>
             </div>
 
+            <div class="section-label">图像输出设置</div>
+
+            <div class="form-grid compact-grid">
+              <div>
+                <label for="fig_width">图片宽度</label>
+                <input
+                  id="fig_width"
+                  name="fig_width"
+                  type="number"
+                  min="3"
+                  max="20"
+                  step="0.1"
+                  value="{{ fig_width or 6.5 }}"
+                  required
+                >
+              </div>
+
+              <div>
+                <label for="fig_height">图片高度</label>
+                <input
+                  id="fig_height"
+                  name="fig_height"
+                  type="number"
+                  min="2"
+                  max="16"
+                  step="0.1"
+                  value="{{ fig_height or 4.2 }}"
+                  required
+                >
+              </div>
+
+              <div>
+                <label for="fig_dpi">图片 DPI</label>
+                <input
+                  id="fig_dpi"
+                  name="fig_dpi"
+                  type="number"
+                  min="72"
+                  max="600"
+                  step="1"
+                  value="{{ fig_dpi or 150 }}"
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="form-grid compact-grid">
+              <div>
+                <label for="title_fontsize">标题字体大小</label>
+                <input
+                  id="title_fontsize"
+                  name="title_fontsize"
+                  type="number"
+                  min="8"
+                  max="40"
+                  step="1"
+                  value="{{ title_fontsize or 13 }}"
+                  required
+                >
+              </div>
+
+              <div>
+                <label for="label_fontsize">坐标轴字体大小</label>
+                <input
+                  id="label_fontsize"
+                  name="label_fontsize"
+                  type="number"
+                  min="8"
+                  max="32"
+                  step="1"
+                  value="{{ label_fontsize or 11 }}"
+                  required
+                >
+              </div>
+
+              <div>
+                <label for="legend_fontsize">图例字体大小</label>
+                <input
+                  id="legend_fontsize"
+                  name="legend_fontsize"
+                  type="number"
+                  min="6"
+                  max="24"
+                  step="1"
+                  value="{{ legend_fontsize or 9 }}"
+                  required
+                >
+              </div>
+            </div>
+
+            <input type="hidden" name="show_grid" value="off">
+            <label class="checkbox-row single-checkbox">
+              <input
+                type="checkbox"
+                name="show_grid"
+                value="on"
+                {% if show_grid %}checked{% endif %}
+              >
+              显示网格线
+            </label>
+
             <label for="fit_type">拟合方式</label>
             <select id="fit_type" name="fit_type" required>
               {% for value, label in fit_types.items() %}
@@ -654,7 +755,7 @@
 
       <!-- 结果区 -->
       {% if result %}
-      <section class="panel result-panel">
+      <section class="panel result-panel" id="result-section">
         <div class="step-head">
           <span>5</span>
           <div>
@@ -722,6 +823,9 @@
           <div><span>表头行</span><strong>第 {{ result.stats.header_row }} 行</strong></div>
           <div><span>数据起始行</span><strong>第 {{ result.stats.data_start_row }} 行</strong></div>
           <div><span>数据结束行</span><strong>{{ result.stats.data_end_row }}</strong></div>
+          <div><span>图片尺寸</span><strong>{{ result.stats.fig_width }} × {{ result.stats.fig_height }} inch</strong></div>
+          <div><span>图片 DPI</span><strong>{{ result.stats.fig_dpi }}</strong></div>
+          <div><span>网格线</span><strong>{% if result.stats.show_grid %}显示{% else %}隐藏{% endif %}</strong></div>
         </div>
       </section>
       {% endif %}
@@ -776,6 +880,45 @@
   </main>
 
   <script>
+    {% if result %}
+    (function () {
+      function jumpToResult() {
+        const target = document.getElementById("result-section");
+
+        if (!target) {
+          return;
+        }
+
+        if ("scrollRestoration" in history) {
+          history.scrollRestoration = "manual";
+        }
+
+        const oldScrollBehavior = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = "auto";
+
+        target.scrollIntoView({
+          behavior: "auto",
+          block: "start",
+          inline: "nearest"
+        });
+
+        setTimeout(function () {
+          document.documentElement.style.scrollBehavior = oldScrollBehavior;
+        }, 120);
+      }
+
+      if (window.location.search.includes("jump=result")) {
+        window.addEventListener("load", function () {
+          requestAnimationFrame(function () {
+            jumpToResult();
+            setTimeout(jumpToResult, 120);
+            setTimeout(jumpToResult, 300);
+          });
+        });
+      }
+    })();
+    {% endif %}
+
     (function () {
       const box = document.getElementById("curveConfigBox");
       const addButton = document.getElementById("addCurveButton");
