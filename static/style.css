@@ -1323,6 +1323,20 @@ code {
   min-height: auto;
 }
 
+.single-checkbox {
+  width: fit-content;
+  margin-top: 4px;
+}
+
+.single-checkbox input {
+  width: auto;
+  min-height: auto;
+}
+
+.compact-grid {
+  margin-top: 4px;
+}
+
 /* =========================
    Result
 ========================= */

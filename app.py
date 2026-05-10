@@ -628,6 +628,37 @@ def parse_line_width(value, default: float = 1.8):
     return line_width
 
 
+def parse_positive_float(
+    value,
+    default: float,
+    label: str,
+    min_value: float = 0.1,
+    max_value: float | None = None,
+):
+    if value is None or str(value).strip() == "":
+        return default
+
+    try:
+        number = float(value)
+    except ValueError:
+        raise ValueError(f"{label}必须是数字：{value}")
+
+    if number < min_value:
+        raise ValueError(f"{label}不能小于 {min_value}。")
+
+    if max_value is not None and number > max_value:
+        raise ValueError(f"{label}不能大于 {max_value}。")
+
+    return number
+
+
+def parse_bool_checkbox(value, default: bool = True):
+    if value is None:
+        return default
+
+    return str(value).strip().lower() in ["on", "true", "1", "yes"]
+
+
 def normalize_curve_color(color: str, index: int = 0):
     color = str(color or "").strip().upper()
 
@@ -1121,9 +1152,24 @@ def make_xy_plot(
     line_width: float = 1.8,
     line_style: str = "solid",
     curve_configs: list[dict] | None = None,
+    fig_width: float = 6.5,
+    fig_height: float = 4.2,
+    fig_dpi: int = 150,
+    title_fontsize: float = 13,
+    label_fontsize: float = 11,
+    legend_fontsize: float = 9,
+    show_grid: bool = True,
 ):
     metric_mode = normalize_metric_mode(metric_mode)
     selected_metrics = normalize_selected_metrics(metric_mode, selected_metrics)
+
+    fig_width = parse_positive_float(fig_width, 6.5, "图片宽度", 3, 20)
+    fig_height = parse_positive_float(fig_height, 4.2, "图片高度", 2, 16)
+    fig_dpi = int(parse_positive_float(fig_dpi, 150, "图片 DPI", 72, 600))
+    title_fontsize = parse_positive_float(title_fontsize, 13, "标题字体大小", 8, 40)
+    label_fontsize = parse_positive_float(label_fontsize, 11, "坐标轴字体大小", 8, 32)
+    legend_fontsize = parse_positive_float(legend_fontsize, 9, "图例字体大小", 6, 24)
+    show_grid = bool(show_grid)
 
     df = read_data_file(
         data_path,
@@ -1220,7 +1266,7 @@ def make_xy_plot(
         origin_df.to_csv(origin_csv_path, index=False, encoding="utf-8-sig")
         df.to_csv(full_csv_path, index=False, encoding="utf-8-sig")
 
-        fig, ax = plt.subplots(figsize=(6.5, 4.2), dpi=150)
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=fig_dpi)
         plotted_frames = []
 
         for curve_config in curve_configs:
@@ -1260,12 +1306,17 @@ def make_xy_plot(
         plot_x = all_plot_values[x_col]
         plot_y = all_plot_values["value"]
 
-        ax.set_title(plot_title, fontsize=13, pad=10)
-        ax.set_xlabel(display_x_label, fontsize=11)
-        ax.set_ylabel(display_y_label, fontsize=11)
-        ax.tick_params(axis="both", labelsize=9)
-        ax.grid(True, linestyle="--", linewidth=0.5, alpha=0.35)
-        ax.legend(fontsize=9, frameon=True)
+        ax.set_title(plot_title, fontsize=title_fontsize, pad=10)
+        ax.set_xlabel(display_x_label, fontsize=label_fontsize)
+        ax.set_ylabel(display_y_label, fontsize=label_fontsize)
+        ax.tick_params(axis="both", labelsize=max(label_fontsize - 2, 6))
+
+        if show_grid:
+            ax.grid(True, linestyle="--", linewidth=0.5, alpha=0.35)
+        else:
+            ax.grid(False)
+
+        ax.legend(fontsize=legend_fontsize, frameon=True)
 
         if len(all_plot_values) >= 2:
             x_margin = (plot_x.max() - plot_x.min()) * 0.05 if plot_x.max() != plot_x.min() else 1
@@ -1275,7 +1326,7 @@ def make_xy_plot(
             ax.set_ylim(plot_y.min() - y_margin, plot_y.max() + y_margin)
 
         fig.tight_layout()
-        fig.savefig(png_path, dpi=300)
+        fig.savefig(png_path, dpi=fig_dpi)
         plt.close(fig)
 
         stats = {
@@ -1314,6 +1365,13 @@ def make_xy_plot(
             "line_width": line_width,
             "line_style": line_style,
             "line_style_label": LINE_STYLES.get(line_style, line_style),
+            "fig_width": fig_width,
+            "fig_height": fig_height,
+            "fig_dpi": fig_dpi,
+            "title_fontsize": title_fontsize,
+            "label_fontsize": label_fontsize,
+            "legend_fontsize": legend_fontsize,
+            "show_grid": show_grid,
         }
 
         fit_report_name = save_fit_report(stats, plot_title)
@@ -1413,7 +1471,7 @@ def make_xy_plot(
 
     plot_title = auto_title(title, display_x_label, display_y_label)
 
-    fig, ax = plt.subplots(figsize=(6.5, 4.2), dpi=150)
+    fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=fig_dpi)
 
     if fit_result is not None:
         ax.scatter(
@@ -1489,12 +1547,17 @@ def make_xy_plot(
                 label=str(y_col),
             )
 
-    ax.set_title(plot_title, fontsize=13, pad=10)
-    ax.set_xlabel(display_x_label, fontsize=11)
-    ax.set_ylabel(display_y_label, fontsize=11)
-    ax.tick_params(axis="both", labelsize=9)
-    ax.grid(True, linestyle="--", linewidth=0.5, alpha=0.35)
-    ax.legend(fontsize=9, frameon=True)
+    ax.set_title(plot_title, fontsize=title_fontsize, pad=10)
+    ax.set_xlabel(display_x_label, fontsize=label_fontsize)
+    ax.set_ylabel(display_y_label, fontsize=label_fontsize)
+    ax.tick_params(axis="both", labelsize=max(label_fontsize - 2, 6))
+
+    if show_grid:
+        ax.grid(True, linestyle="--", linewidth=0.5, alpha=0.35)
+    else:
+        ax.grid(False)
+
+    ax.legend(fontsize=legend_fontsize, frameon=True)
 
     if len(clean) >= 2:
         x_margin = (x.max() - x.min()) * 0.05 if x.max() != x.min() else 1
@@ -1504,7 +1567,7 @@ def make_xy_plot(
         ax.set_ylim(y.min() - y_margin, y.max() + y_margin)
 
     fig.tight_layout()
-    fig.savefig(png_path, dpi=300)
+    fig.savefig(png_path, dpi=fig_dpi)
     plt.close(fig)
 
     stats = {
@@ -1544,6 +1607,13 @@ def make_xy_plot(
         "line_style": line_style,
         "line_style_label": LINE_STYLES.get(line_style, line_style),
         "color": curve_color,
+        "fig_width": fig_width,
+        "fig_height": fig_height,
+        "fig_dpi": fig_dpi,
+        "title_fontsize": title_fontsize,
+        "label_fontsize": label_fontsize,
+        "legend_fontsize": legend_fontsize,
+        "show_grid": show_grid,
     }
 
     if fit_result is not None:
@@ -1612,6 +1682,14 @@ def index():
     fit_type = "none"
     line_width = 1.8
     line_style = "solid"
+
+    fig_width = 6.5
+    fig_height = 4.2
+    fig_dpi = 150
+    title_fontsize = 13
+    label_fontsize = 11
+    legend_fontsize = 9
+    show_grid = True
 
     metric_mode = "basic"
     selected_metrics = BASIC_METRICS.copy()
@@ -1812,6 +1890,14 @@ def index():
                 line_width = selected_curve_configs[0]["line_width"]
                 line_style = selected_curve_configs[0]["line_style"]
 
+                fig_width = parse_positive_float(request.form.get("fig_width"), 6.5, "图片宽度", 3, 20)
+                fig_height = parse_positive_float(request.form.get("fig_height"), 4.2, "图片高度", 2, 16)
+                fig_dpi = int(parse_positive_float(request.form.get("fig_dpi"), 150, "图片 DPI", 72, 600))
+                title_fontsize = parse_positive_float(request.form.get("title_fontsize"), 13, "标题字体大小", 8, 40)
+                label_fontsize = parse_positive_float(request.form.get("label_fontsize"), 11, "坐标轴字体大小", 8, 32)
+                legend_fontsize = parse_positive_float(request.form.get("legend_fontsize"), 9, "图例字体大小", 6, 24)
+                show_grid = parse_bool_checkbox(request.form.get("show_grid"), True)
+
                 metric_mode = normalize_metric_mode(request.form.get("metric_mode", "basic"))
                 selected_metrics = normalize_selected_metrics(
                     metric_mode,
@@ -1868,6 +1954,13 @@ def index():
                     metric_mode=metric_mode,
                     selected_metrics=selected_metrics,
                     curve_configs=selected_curve_configs,
+                    fig_width=fig_width,
+                    fig_height=fig_height,
+                    fig_dpi=fig_dpi,
+                    title_fontsize=title_fontsize,
+                    label_fontsize=label_fontsize,
+                    legend_fontsize=legend_fontsize,
+                    show_grid=show_grid,
                 )
 
                 result = {
@@ -1913,6 +2006,13 @@ def index():
         fit_types=FIT_TYPES,
         line_width=line_width,
         line_style=line_style,
+        fig_width=fig_width,
+        fig_height=fig_height,
+        fig_dpi=fig_dpi,
+        title_fontsize=title_fontsize,
+        label_fontsize=label_fontsize,
+        legend_fontsize=legend_fontsize,
+        show_grid=show_grid,
         line_styles=LINE_STYLES,
         curve_colors=CURVE_COLORS,
         default_curve_colors=DEFAULT_CURVE_COLORS,
