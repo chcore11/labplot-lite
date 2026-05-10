@@ -1,4 +1,5 @@
 from pathlib import Path
+import csv
 import re
 import uuid
 
@@ -303,19 +304,28 @@ def read_csv_smart(file_path: Path, **kwargs):
     raise last_error
 
 
+def read_raw_csv_dataframe(file_path: Path, nrows: int = 100):
+    encodings = ["utf-8-sig", "utf-8", "gbk"]
+    last_error = None
+
+    for enc in encodings:
+        try:
+            rows = []
+            with file_path.open("r", encoding=enc, newline="") as handle:
+                reader = csv.reader(handle)
+                for row_index, row in enumerate(reader):
+                    if row_index >= nrows:
+                        break
+                    rows.append(row)
+            return pd.DataFrame(rows)
+        except UnicodeDecodeError as exc:
+            last_error = exc
+
+    raise last_error
+
+
 def read_raw_preview(file_path: Path, nrows: int = 15):
-    suffix = file_path.suffix.lower()
-
-    if suffix == ".csv":
-        df = read_csv_smart(file_path, header=None, nrows=nrows)
-    elif suffix == ".xlsx":
-        df = pd.read_excel(file_path, engine="openpyxl", header=None, nrows=nrows)
-    elif suffix == ".xls":
-        df = pd.read_excel(file_path, engine="xlrd", header=None, nrows=nrows)
-    else:
-        raise ValueError("只支持 CSV、XLS、XLSX 文件。")
-
-    df = df.fillna("")
+    df = read_raw_dataframe(file_path, nrows=nrows)
 
     preview = []
 
@@ -326,6 +336,122 @@ def read_raw_preview(file_path: Path, nrows: int = 15):
         })
 
     return preview
+
+
+def read_raw_dataframe(file_path: Path, nrows: int = 100):
+    suffix = file_path.suffix.lower()
+
+    if suffix == ".csv":
+        df = read_raw_csv_dataframe(file_path, nrows=nrows)
+    elif suffix == ".xlsx":
+        df = pd.read_excel(file_path, engine="openpyxl", header=None, nrows=nrows)
+    elif suffix == ".xls":
+        df = pd.read_excel(file_path, engine="xlrd", header=None, nrows=nrows)
+    else:
+        raise ValueError("只支持 CSV、XLS、XLSX 文件。")
+
+    return df.fillna("")
+
+
+HEADER_KEYWORDS = [
+    "时间", "温度", "电压", "电流", "功率", "电阻", "浓度", "吸光度",
+    "位移", "速度", "压力", "转速", "频率",
+    "time", "temp", "temperature", "voltage", "current", "power",
+    "resistance", "concentration", "absorbance", "displacement",
+    "speed", "pressure", "rpm", "frequency",
+]
+
+
+def is_numeric_like(value):
+    text = str(value).strip()
+    if text == "":
+        return False
+    try:
+        float(text)
+        return True
+    except ValueError:
+        return False
+
+
+def analyze_raw_row(row):
+    values = [str(value).strip() for value in row.tolist()]
+    non_empty_values = [value for value in values if value != ""]
+    non_empty_count = len(non_empty_values)
+    numeric_count = sum(1 for value in non_empty_values if is_numeric_like(value))
+    text_count = non_empty_count - numeric_count
+    row_text = " ".join(non_empty_values).lower()
+    keyword_count = sum(1 for keyword in HEADER_KEYWORDS if keyword.lower() in row_text)
+
+    return {
+        "non_empty_count": non_empty_count,
+        "numeric_count": numeric_count,
+        "text_count": text_count,
+        "keyword_count": keyword_count,
+        "numeric_ratio": numeric_count / non_empty_count if non_empty_count else 0,
+    }
+
+
+def guess_header_and_data_rows(file_path: Path):
+    default_result = {
+        "success": False,
+        "header_row": 1,
+        "data_start_row": 2,
+        "message": "暂未可靠识别表头和数据起始行，请根据预览手动填写。",
+    }
+
+    try:
+        df = read_raw_dataframe(file_path, nrows=100)
+    except Exception:
+        return default_result
+
+    analyses = [analyze_raw_row(row) for _, row in df.iterrows()]
+    best = None
+
+    for header_index, header_info in enumerate(analyses):
+        header_non_empty = header_info["non_empty_count"]
+        if (
+            header_non_empty < 2
+            or header_info["text_count"] < 1
+            or header_info["numeric_ratio"] >= 0.7
+        ):
+            continue
+
+        for data_index in range(header_index + 1, min(header_index + 31, len(analyses))):
+            data_info = analyses[data_index]
+            data_non_empty = data_info["non_empty_count"]
+            if (
+                data_non_empty < 2
+                or data_info["numeric_count"] < 2
+                or data_info["numeric_ratio"] < 0.5
+            ):
+                continue
+
+            distance = data_index - header_index
+            column_gap = abs(header_non_empty - data_non_empty)
+            score = 0
+            score += header_info["keyword_count"] * 5
+            score += header_info["text_count"] * 1.5
+            score += data_info["numeric_ratio"] * 8
+            score += max(0, 4 - column_gap)
+            score -= distance * 0.08
+
+            if best is None or score > best["score"]:
+                best = {
+                    "score": score,
+                    "header_row": header_index + 1,
+                    "data_start_row": data_index + 1,
+                }
+            break
+
+    if best is None or best["score"] < 7:
+        return default_result
+
+    return {
+        "success": True,
+        "header_row": best["header_row"],
+        "data_start_row": best["data_start_row"],
+        "message": "系统已自动猜测表头行和数据起始行，如不准确可手动修改。",
+    }
 
 
 def clean_dataframe(df: pd.DataFrame):
@@ -1098,6 +1224,7 @@ def index():
     header_row = 1
     data_start_row = 2
     data_end_row = None
+    header_guess_message = None
 
     if request.method == "POST":
         action = request.form.get("action")
@@ -1125,15 +1252,26 @@ def index():
                     saved_filename = safe_name
                     upload_name = file.filename
 
-                    preview, columns, numeric_columns = load_file_state(
-                        saved_filename,
-                        header_row,
-                        data_start_row,
-                        data_end_row,
-                    )
+                    preview = read_raw_preview(upload_path, nrows=100)
+                    guess = guess_header_and_data_rows(upload_path)
+                    header_row = guess["header_row"]
+                    data_start_row = guess["data_start_row"]
+                    header_guess_message = guess["message"]
 
-                    selected_x = numeric_columns[0]
-                    selected_y = numeric_columns[1]
+                    try:
+                        _, columns, numeric_columns = load_file_state(
+                            saved_filename,
+                            header_row,
+                            data_start_row,
+                            data_end_row,
+                        )
+
+                        selected_x = numeric_columns[0]
+                        selected_y = numeric_columns[1]
+
+                    except Exception:
+                        columns = None
+                        numeric_columns = None
 
                 except Exception as exc:
                     error = str(exc)
@@ -1341,6 +1479,7 @@ def index():
         available_metrics=AVAILABLE_METRICS,
         basic_metrics=BASIC_METRICS,
         calc_templates=CALC_TEMPLATES,
+        header_guess_message=header_guess_message,
     )
 
 
