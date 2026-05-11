@@ -59,6 +59,7 @@
           <small>手动确认数据范围，配置多曲线、计算列、拟合指标和报告素材。</small>
         </button>
       </div>
+      <div id="dependencyMessage" class="message error is-hidden" role="alert"></div>
     </section>
 
     <section class="simple-mode is-hidden" id="simpleMode" aria-labelledby="simpleModeTitle">
@@ -72,7 +73,7 @@
       </div>
 
       <div class="simple-upload-dropzone" id="simpleDropzone">
-        <input id="simpleFileInput" type="file" accept=".csv,.xls,.xlsx">
+        <input id="simpleFileInput" type="file" accept=".csv,.xls,.xlsx" aria-label="选择 CSV、XLSX 或 XLS 文件用于简易模式">
         <div class="simple-upload-copy">
           <strong>拖拽 CSV / XLSX / XLS 文件到这里</strong>
           <span>或点击按钮选择文件，系统会自动识别表头、数值列和基础图。</span>
@@ -239,7 +240,8 @@
             <p id="headerGuessMessage"></p>
           </div>
 
-          <div class="table-wrap">
+          <p class="table-scroll-hint" id="previewTableHint">窄屏可左右滑动查看完整表格。</p>
+          <div class="table-wrap" tabindex="0" aria-describedby="previewTableHint">
             <table class="preview-table">
               <tbody id="previewBody"></tbody>
             </table>
