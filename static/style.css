@@ -8,6 +8,10 @@
 @import "./styles/motion.css";
 
 /* Keep the plot readiness card from squeezing or covering curve controls. */
+#plotForm {
+  container-type: inline-size;
+}
+
 .plot-config-layout {
   grid-template-columns: minmax(0, 1fr) 280px;
 }
@@ -18,18 +22,16 @@
 }
 
 .curve-config-box {
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
 }
 
 .curve-row {
   grid-template-columns:
-    minmax(150px, 1.4fr)
-    minmax(92px, 0.7fr)
-    minmax(82px, 0.52fr)
-    minmax(92px, 0.64fr)
-    minmax(64px, auto);
-  min-width: 540px;
+    minmax(0, 1.35fr)
+    minmax(86px, 0.75fr)
+    minmax(74px, 0.55fr)
+    minmax(78px, 0.6fr)
+    minmax(64px, 0.42fr);
 }
 
 .curve-row > * {
@@ -46,9 +48,15 @@
   .plot-config-layout {
     grid-template-columns: 1fr;
   }
+}
 
-  .curve-row {
-    min-width: 0;
+@container (max-width: 940px) {
+  .plot-config-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .plot-readiness-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
