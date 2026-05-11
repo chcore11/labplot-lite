@@ -93,6 +93,10 @@
   margin-top: 34px;
 }
 
+.hero-actions .btn-large {
+  min-width: 168px;
+}
+
 .hero-stage {
   position: relative;
   grid-area: stage;
