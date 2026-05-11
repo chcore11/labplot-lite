@@ -1,5 +1,66 @@
 "use strict";
 
+const REQUIRED_DEPENDENCIES = [
+  { key: "xlsx", label: "Excel 解析库", affects: "XLS / XLSX 文件和示例数据", isLoaded: () => Boolean(window.XLSX) },
+  { key: "chart", label: "图表绘制库", affects: "图像生成", isLoaded: () => Boolean(window.Chart) },
+  { key: "zip", label: "ZIP 打包库", affects: "报告素材包导出", isLoaded: () => Boolean(window.JSZip) },
+];
+
+function disableControl(control) {
+  if (!control) {
+    return;
+  }
+
+  if ("disabled" in control) {
+    control.disabled = true;
+  } else {
+    control.setAttribute("tabindex", "-1");
+  }
+  control.setAttribute("aria-disabled", "true");
+}
+
+function showDependencyMessage(missingDependencies) {
+  const box = qs("#dependencyMessage");
+  if (!box || !missingDependencies.length) {
+    return;
+  }
+
+  const missingLabels = missingDependencies.map((dependency) => dependency.label).join("、");
+  const affectedAreas = missingDependencies.map((dependency) => dependency.affects).join("、");
+  box.textContent = `部分功能依赖未加载：${missingLabels}。请检查网络后刷新页面。受影响：${affectedAreas}。`;
+  box.className = "message error";
+  show(box);
+}
+
+function checkRequiredDependencies() {
+  const missingDependencies = REQUIRED_DEPENDENCIES.filter((dependency) => !dependency.isLoaded());
+  const missingKeys = new Set(missingDependencies.map((dependency) => dependency.key));
+
+  showDependencyMessage(missingDependencies);
+
+  if (missingKeys.has("xlsx")) {
+    qsa(".sample-load-button").forEach(disableControl);
+  }
+
+  if (missingKeys.has("chart")) {
+    qsa(
+      ".nav-cta[href='#upload-section'], #enterSimpleMode, #enterAdvancedMode, #simpleChooseFile, #uploadForm button[type='submit'], .sample-load-button, #plotSubmitButton",
+    ).forEach(disableControl);
+  }
+
+  if (missingKeys.has("zip")) {
+    const zipLink = qs("#downloadZip");
+    if (zipLink) {
+      zipLink.setAttribute("aria-disabled", "true");
+    }
+  }
+
+  return {
+    blocksModeEntry: missingKeys.has("chart"),
+    blocksSampleLoad: missingKeys.has("xlsx") || missingKeys.has("chart"),
+  };
+}
+
 async function handlePlotSubmit() {
   setPlotProgress("正在检查绘图设置...");
   const payload = buildPlotPayload();
@@ -25,7 +86,7 @@ async function loadSample(url) {
   const extension = fileName.split(".").pop().toLowerCase();
   const rows = parseBuffer(buffer, extension);
   setDataset(rows, fileName);
-  qs("#upload-section").scrollIntoView({ behavior: "smooth", block: "start" });
+  scrollToElement(qs("#upload-section"));
   showMessage("success", `已加载示例数据：${fileName}`);
 }
 
@@ -116,38 +177,54 @@ function showMode(mode, opts = {}) {
   const sections = { landing, simple, advanced };
   const target = sections[mode];
 
-  // Find currently visible section
-  const visible = Object.values(sections).find(s => s && !s.classList.contains("is-hidden"));
+  const visible = Object.values(sections).find((section) => section && !section.classList.contains("is-hidden"));
 
-  const showImmediate = (el) => {
-    // Hide all others, show target without animation
-    Object.values(sections).forEach(s => {
-      if (s) s.classList.toggle("is-hidden", s !== el);
+  const showImmediate = (element) => {
+    Object.values(sections).forEach((section) => {
+      if (section) {
+        section.classList.toggle("is-hidden", section !== element);
+      }
     });
-    el.classList.remove("mode-enter", "mode-exit");
+    element.classList.remove("mode-enter", "mode-exit");
   };
 
-  const animateIn = (el) => {
-    el.classList.remove("is-hidden", "mode-exit");
-    void el.offsetWidth;
-    el.classList.add("mode-enter");
-    el.addEventListener("animationend", () => el.classList.remove("mode-enter"), { once: true });
+  const animateIn = (element) => {
+    element.classList.remove("is-hidden", "mode-exit");
+    void element.offsetWidth;
+    element.classList.add("mode-enter");
+    element.addEventListener("animationend", () => element.classList.remove("mode-enter"), { once: true });
   };
 
-  if (opts.skipAnim || !visible) {
-    if (target) showImmediate(target);
-  } else if (visible !== target) {
+  const scrollToModeTarget = () => {
+    if (mode === "advanced") {
+      const targetStep = state.rawRows.length ? state.activeStep : "upload";
+      setActiveStep(targetStep, { scroll: false });
+      scrollToElement(qs("#upload-section") || advanced);
+    } else if (mode === "simple") {
+      scrollToElement(simple || document.body);
+    } else {
+      scrollToElement(landing || document.body);
+    }
+  };
+
+  if (opts.skipAnim || prefersReducedMotion() || !visible || visible === target) {
+    if (target) {
+      showImmediate(target);
+    }
+    scrollToModeTarget();
+    return;
+  }
+
+  if (visible !== target) {
     visible.classList.add("mode-exit");
     visible.addEventListener("animationend", () => {
       visible.classList.add("is-hidden");
       visible.classList.remove("mode-exit");
-      if (target) animateIn(target);
+      if (target) {
+        animateIn(target);
+      }
+      scrollToModeTarget();
     }, { once: true });
-  }
-
-  if (mode === "advanced") {
-    const targetStep = state.rawRows.length ? state.activeStep : "upload";
-    setActiveStep(targetStep, { scroll: false });
   }
 }
 
@@ -478,9 +555,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupTheme();
   setupModeEvents();
   setupEvents();
+  const dependencyStatus = checkRequiredDependencies();
   updateWorkflowNav();
-  await loadInitialSampleFromUrl();
-  if (!getInitialSampleUrl()) {
+  if (!dependencyStatus.blocksSampleLoad) {
+    await loadInitialSampleFromUrl();
+  }
+  if (!getInitialSampleUrl() && !dependencyStatus.blocksModeEntry) {
     loadInitialModeFromUrl();
   }
 });

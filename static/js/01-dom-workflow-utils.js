@@ -16,6 +16,22 @@ function hide(element) {
   element.classList.add("is-hidden");
 }
 
+function prefersReducedMotion() {
+  return Boolean(
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+}
+
+function scrollToElement(element, options = {}) {
+  if (!element) {
+    return;
+  }
+
+  const behavior = prefersReducedMotion() ? "auto" : (options.behavior || "smooth");
+  element.scrollIntoView({ behavior, block: options.block || "start" });
+}
+
 function setText(selector, text) {
   const element = qs(selector);
   if (element) {
@@ -189,7 +205,7 @@ function setActiveStep(step, options = {}) {
 
   if (options.scroll) {
     const panel = getWorkflowPanel(step);
-    (panel || qs("#upload-section")).scrollIntoView({ behavior: "smooth", block: "start" });
+    scrollToElement(panel || qs("#upload-section"));
   }
 }
 

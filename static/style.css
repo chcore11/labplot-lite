@@ -177,6 +177,30 @@ body {
   transform: translateY(0);
 }
 
+.mode-choice-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+  transform: none;
+}
+
+.mode-choice-card:disabled:hover {
+  border-color: var(--line-soft);
+  background: var(--surface);
+  transform: none;
+}
+
+.nav-cta[aria-disabled="true"],
+.btn[aria-disabled="true"] {
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.56;
+}
+
+.mode-landing > .message {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
 .mode-choice-card span {
   color: var(--text-muted);
   font-size: 13px;
@@ -337,6 +361,14 @@ body {
   align-items: center;
 }
 
+.table-scroll-hint {
+  display: none;
+  margin: -2px 0 10px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 @media (max-width: 900px) {
   .mode-landing {
     grid-template-columns: 1fr;
@@ -364,6 +396,10 @@ body {
   .simple-upload-dropzone,
   .simple-meta-grid {
     grid-template-columns: 1fr;
+  }
+
+  .table-scroll-hint {
+    display: block;
   }
 
   .simple-mode-head {
