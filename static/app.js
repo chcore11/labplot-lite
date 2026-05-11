@@ -1083,8 +1083,8 @@ function resetWorkflow() {
   qs("#summaryRows").replaceChildren();
   qs("#statsGrid").replaceChildren();
   qs("#resultFigureTitle").textContent = "等待生成图像";
-  qs("#resultFigureMeta").textContent = "--";
-  qs("#resultFigureCurves").textContent = "--";
+  qs("#resultFigureMeta").textContent = "待生成";
+  qs("#resultFigureCurves").textContent = "待生成";
 
   qsa(".download-panel a").forEach((link) => {
     link.removeAttribute("download");
@@ -1295,9 +1295,9 @@ function inspectPlotReadiness() {
       canGenerate: false,
       status: "等待数据",
       hint: "上传或载入示例数据后再生成图像。",
-      points: "--",
-      fit: "--",
-      exportSize: "--",
+      points: "待选择",
+      fit: "待选择",
+      exportSize: "待生成",
     };
   }
 
@@ -1311,9 +1311,9 @@ function inspectPlotReadiness() {
       canGenerate: false,
       status: "等待选择绘图列",
       hint: "选择 X 轴和至少一条 Y 轴曲线。",
-      points: "--",
-      fit: "--",
-      exportSize: "--",
+      points: "待选择",
+      fit: "待选择",
+      exportSize: "待生成",
     };
   }
 
@@ -1323,9 +1323,9 @@ function inspectPlotReadiness() {
       canGenerate: false,
       status: "列选择有冲突",
       hint: "X 轴和 Y 轴不能使用同一列。",
-      points: "--",
+      points: "待选择",
       fit: "不可用",
-      exportSize: "--",
+      exportSize: "待生成",
     };
   }
 
@@ -1338,9 +1338,9 @@ function inspectPlotReadiness() {
       canGenerate: false,
       status: "导出尺寸需要检查",
       hint: error.message,
-      points: "--",
+      points: "待选择",
       fit: "待检查",
-      exportSize: "--",
+      exportSize: "待生成",
     };
   }
 

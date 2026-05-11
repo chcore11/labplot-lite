@@ -221,6 +221,7 @@ input:disabled {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  min-height: 44px;
   min-width: 0;
 }
 
@@ -277,7 +278,7 @@ input:disabled {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 11px;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-pill);
@@ -300,7 +301,7 @@ input:disabled {
 }
 
 .theme-select {
-  min-height: 30px;
+  min-height: 40px;
   border: 0;
   color: var(--text-main);
   background: transparent;
@@ -707,10 +708,6 @@ input:disabled {
   align-content: start;
   gap: 0;
   background: var(--surface-soft);
-}
-
-.fit-card h3 {
-  margin: 0 0 12px;
 }
 
 .preview-panel-title {
@@ -2314,6 +2311,7 @@ code {
 
   .workflow-actions .btn {
     flex: 1;
+    min-height: 44px;
     min-width: 0;
   }
 
@@ -2348,7 +2346,7 @@ code {
   .step-nav-item strong {
     max-width: 100%;
     overflow: hidden;
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.2;
     text-overflow: ellipsis;
     white-space: nowrap;
