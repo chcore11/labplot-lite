@@ -1,6 +1,7 @@
 :root {
   color-scheme: dark;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "SFMono-Regular", "Menlo", "Monaco", "Cascadia Mono", "Roboto Mono", Consolas, "Liberation Mono", monospace;
   --radius-xs: 6px;
   --radius-sm: 8px;
   --radius-md: 10px;
@@ -9,6 +10,11 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --duration-fast: 150ms;
   --duration-med: 220ms;
+  --control-height: 44px;
+  --control-height-sm: 40px;
+  --surface-pad: 18px;
+  --callout-pad: 14px 15px;
+  --surface-transition: background-color 0.22s var(--ease-out), border-color 0.22s var(--ease-out);
 
   --page-bg-main: oklch(11% 0.008 268);
   --page-bg-soft: oklch(8.5% 0.007 268);
@@ -151,7 +157,7 @@ body,
 .sample-list a,
 .hero-start-rail a,
 .download-panel a {
-  transition: background-color 0.22s var(--ease-out), border-color 0.22s var(--ease-out);
+  transition: var(--surface-transition);
 }
 
 a {
@@ -221,7 +227,7 @@ input:disabled {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-height: 44px;
+  min-height: var(--control-height);
   min-width: 0;
 }
 
@@ -278,7 +284,7 @@ input:disabled {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 44px;
+  min-height: var(--control-height);
   padding: 0 11px;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-pill);
@@ -301,7 +307,7 @@ input:disabled {
 }
 
 .theme-select {
-  min-height: 40px;
+  min-height: var(--control-height-sm);
   border: 0;
   color: var(--text-main);
   background: transparent;
@@ -318,8 +324,8 @@ input:disabled {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  min-width: 44px;
+  min-height: var(--control-height);
+  min-width: var(--control-height);
   padding: 0 18px;
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
@@ -738,7 +744,7 @@ input:disabled {
   color: var(--text-main);
   font-size: 14px;
   font-weight: 760;
-  font-family: "SFMono-Regular", "Menlo", "Monaco", "Cascadia Mono", "Roboto Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   overflow-wrap: anywhere;
 }
 
@@ -746,7 +752,7 @@ input:disabled {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 40px;
+  min-height: var(--control-height-sm);
   margin-top: 18px;
   border-radius: var(--radius-md);
   color: var(--button-primary-text) !important;
@@ -1262,14 +1268,14 @@ input:disabled {
 .form-card {
   display: grid;
   gap: 15px;
-  padding: 18px;
+  padding: var(--surface-pad);
 }
 
 .sample-card,
 .result-figure,
 .summary-card,
 .download-panel {
-  padding: 18px;
+  padding: var(--surface-pad);
 }
 
 label {
@@ -1283,7 +1289,7 @@ label {
 input,
 select {
   width: 100%;
-  min-height: 44px;
+  min-height: var(--control-height);
   padding: 0 12px;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-sm);
@@ -1345,7 +1351,7 @@ code {
   border-radius: var(--radius-xs);
   color: var(--text-soft);
   background: var(--surface);
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 0.92em;
 }
 
@@ -1362,10 +1368,6 @@ code {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
-}
-
-.formula-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .form-actions,
@@ -1387,22 +1389,34 @@ code {
   font-weight: 700;
 }
 
+.message.success,
+.message.error,
+.message.warning,
+.info-box,
+.warning-box,
+.plot-readiness.warning,
+.plot-readiness.danger {
+  color: var(--tone-text);
+  border-color: var(--tone-border);
+  background: var(--tone-bg);
+}
+
 .message.success {
-  color: var(--success-text);
-  border-color: var(--success-border);
-  background: var(--success-bg);
+  --tone-text: var(--success-text);
+  --tone-border: var(--success-border);
+  --tone-bg: var(--success-bg);
 }
 
 .message.error {
-  color: var(--danger-text);
-  border-color: var(--danger-border);
-  background: var(--danger-bg);
+  --tone-text: var(--danger-text);
+  --tone-border: var(--danger-border);
+  --tone-bg: var(--danger-bg);
 }
 
 .message.warning {
-  color: var(--warning-text);
-  border-color: var(--warning-border);
-  background: var(--warning-bg);
+  --tone-text: var(--warning-text);
+  --tone-border: var(--warning-border);
+  --tone-bg: var(--warning-bg);
 }
 
 .file-banner,
@@ -1412,7 +1426,7 @@ code {
 .metric-box,
 .sample-guide {
   margin-bottom: 16px;
-  padding: 14px 15px;
+  padding: var(--callout-pad);
   color: var(--text-soft);
   font-size: 14px;
 }
@@ -1426,9 +1440,9 @@ code {
 }
 
 .info-box {
-  color: var(--info-text);
-  border-color: var(--info-border);
-  background: var(--info-bg);
+  --tone-text: var(--info-text);
+  --tone-border: var(--info-border);
+  --tone-bg: var(--info-bg);
 }
 
 .info-box p,
@@ -1438,9 +1452,9 @@ code {
 }
 
 .warning-box {
-  color: var(--warning-text);
-  border-color: var(--warning-border);
-  background: var(--warning-bg);
+  --tone-text: var(--warning-text);
+  --tone-border: var(--warning-border);
+  --tone-bg: var(--warning-bg);
 }
 
 .sample-guide {
@@ -1557,7 +1571,7 @@ code {
   min-width: 720px;
   border-collapse: collapse;
   font-size: 12px;
-  font-family: "SFMono-Regular", "Menlo", "Monaco", "Cascadia Mono", "Roboto Mono", Consolas, monospace;
+  font-family: var(--font-mono);
 }
 
 .preview-table td,
@@ -1674,7 +1688,7 @@ code {
 }
 
 .curve-remove-button {
-  min-height: 44px;
+  min-height: var(--control-height);
   padding: 0 13px;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-sm);
@@ -1742,7 +1756,7 @@ code {
   font-size: 13px;
   font-weight: 760;
   line-height: 1.35;
-  font-family: "SFMono-Regular", "Menlo", "Monaco", "Cascadia Mono", "Roboto Mono", Consolas, monospace;
+  font-family: var(--font-mono);
   overflow-wrap: anywhere;
 }
 
@@ -1751,15 +1765,15 @@ code {
 }
 
 .plot-readiness.warning {
-  color: var(--warning-text);
-  border-color: var(--warning-border);
-  background: var(--warning-bg);
+  --tone-text: var(--warning-text);
+  --tone-border: var(--warning-border);
+  --tone-bg: var(--warning-bg);
 }
 
 .plot-readiness.danger {
-  color: var(--danger-text);
-  border-color: var(--danger-border);
-  background: var(--danger-bg);
+  --tone-text: var(--danger-text);
+  --tone-border: var(--danger-border);
+  --tone-bg: var(--danger-bg);
 }
 
 .advanced-box {
@@ -1968,7 +1982,7 @@ code {
 .download-panel a {
   display: flex;
   align-items: center;
-  min-height: 40px;
+  min-height: var(--control-height-sm);
   padding: 0 12px;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-sm);

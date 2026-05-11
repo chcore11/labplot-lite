@@ -226,6 +226,18 @@ const WORKFLOW_ACTION_LABELS = {
   result: "查看下载结果",
 };
 
+const EMPTY_RESULT_STATE = {
+  title: "等待生成图像",
+  meta: "待生成",
+  curves: "待生成",
+};
+
+const PLOT_PENDING_VALUES = {
+  points: "待选择",
+  fit: "待选择",
+  exportSize: "待生成",
+};
+
 function qs(selector) {
   return document.querySelector(selector);
 }
@@ -240,6 +252,84 @@ function show(element) {
 
 function hide(element) {
   element.classList.add("is-hidden");
+}
+
+function setText(selector, text) {
+  const element = qs(selector);
+  if (element) {
+    element.textContent = text;
+  }
+}
+
+function createElement(tag, options = {}) {
+  const element = document.createElement(tag);
+  const {
+    attributes = {},
+    children = [],
+    className = "",
+    dataset = {},
+    textContent,
+  } = options;
+
+  if (className) {
+    element.className = className;
+  }
+
+  if (textContent !== undefined) {
+    element.textContent = textContent;
+  }
+
+  Object.entries(attributes).forEach(([name, value]) => {
+    if (value === undefined || value === null || value === false) {
+      return;
+    }
+
+    if (name in element) {
+      element[name] = value;
+    } else {
+      element.setAttribute(name, value === true ? "" : String(value));
+    }
+  });
+
+  Object.entries(dataset).forEach(([name, value]) => {
+    if (value !== undefined && value !== null) {
+      element.dataset[name] = String(value);
+    }
+  });
+
+  element.append(...children);
+  return element;
+}
+
+function createButton(label, className, dataset = {}, attributes = {}) {
+  return createElement("button", {
+    attributes: { type: "button", ...attributes },
+    className,
+    dataset,
+    textContent: label,
+  });
+}
+
+function createLabeledControl(labelText, control) {
+  return createElement("div", {
+    children: [
+      createElement("label", {
+        attributes: { htmlFor: control.id },
+        textContent: labelText,
+      }),
+      control,
+    ],
+  });
+}
+
+function createValueItem(label, value, className = "") {
+  return createElement("div", {
+    className,
+    children: [
+      createElement("span", { textContent: label }),
+      createElement("strong", { textContent: value }),
+    ],
+  });
 }
 
 function getWorkflowPanel(step) {
@@ -319,6 +409,12 @@ function updateWorkflowActions() {
   if (resetButton) {
     resetButton.disabled = !state.rawRows.length && !state.lastPlotPayload;
   }
+}
+
+function resetResultFigure() {
+  setText("#resultFigureTitle", EMPTY_RESULT_STATE.title);
+  setText("#resultFigureMeta", EMPTY_RESULT_STATE.meta);
+  setText("#resultFigureCurves", EMPTY_RESULT_STATE.curves);
 }
 
 function setActiveStep(step, options = {}) {
@@ -447,13 +543,13 @@ function setOptions(select, entries, selectedValue = null) {
   select.replaceChildren();
 
   entries.forEach((entry) => {
-    const option = document.createElement("option");
-    option.value = entry.value;
-    option.textContent = entry.label;
-    if (entry.value === selectedValue) {
-      option.selected = true;
-    }
-    select.appendChild(option);
+    select.appendChild(createElement("option", {
+      attributes: {
+        selected: entry.value === selectedValue,
+        value: entry.value,
+      },
+      textContent: entry.label,
+    }));
   });
 }
 
@@ -731,32 +827,21 @@ function renderPreview() {
 
   const previewRows = state.rawRows.slice(0, 15);
   previewRows.forEach((row, index) => {
-    const tr = document.createElement("tr");
-    const th = document.createElement("th");
-    th.textContent = `第 ${index + 1} 行`;
-    tr.appendChild(th);
-
-    row.forEach((value) => {
-      const td = document.createElement("td");
-      td.textContent = cellText(value);
-      tr.appendChild(td);
-    });
-
-    body.appendChild(tr);
+    body.appendChild(createElement("tr", {
+      children: [
+        createElement("th", { textContent: `第 ${index + 1} 行` }),
+        ...row.map((value) => createElement("td", { textContent: cellText(value) })),
+      ],
+    }));
   });
 }
 
 function renderColumnsBox(target, label) {
   target.replaceChildren();
-  const span = document.createElement("span");
-  span.textContent = label;
-  target.appendChild(span);
-
-  state.numericColumns.forEach((column) => {
-    const code = document.createElement("code");
-    code.textContent = column;
-    target.appendChild(code);
-  });
+  target.append(
+    createElement("span", { textContent: label }),
+    ...state.numericColumns.map((column) => createElement("code", { textContent: column })),
+  );
 }
 
 function getSampleGuide(fileName) {
@@ -800,33 +885,23 @@ function renderSampleGuide() {
 
   const steps = qs("#sampleGuideSteps");
   steps.replaceChildren();
-  guide.steps.forEach((step) => {
-    const item = document.createElement("li");
-    item.textContent = step;
-    steps.appendChild(item);
-  });
+  steps.append(...guide.steps.map((step) => createElement("li", { textContent: step })));
 
   const actions = qs("#sampleGuideActions");
   actions.replaceChildren();
 
   (guide.calcActions || []).forEach((action, index) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "btn btn-secondary";
-    button.dataset.sampleAction = "calc";
-    button.dataset.sampleActionIndex = String(index);
-    button.textContent = action.label;
-    actions.appendChild(button);
+    actions.appendChild(createButton(action.label, "btn btn-secondary", {
+      sampleAction: "calc",
+      sampleActionIndex: index,
+    }));
   });
 
   (guide.plotActions || []).forEach((action, index) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = index === 0 ? "btn btn-primary" : "btn btn-secondary";
-    button.dataset.sampleAction = "plot";
-    button.dataset.sampleActionIndex = String(index);
-    button.textContent = action.label;
-    actions.appendChild(button);
+    actions.appendChild(createButton(action.label, index === 0 ? "btn btn-primary" : "btn btn-secondary", {
+      sampleAction: "plot",
+      sampleActionIndex: index,
+    }));
   });
 
   show(box);
@@ -901,57 +976,49 @@ function renderStaticOptions() {
   const metricBox = qs("#metricBox");
   metricBox.replaceChildren();
   Object.entries(AVAILABLE_METRICS).forEach(([value, label]) => {
-    const wrapper = document.createElement("label");
-    wrapper.className = "checkbox-row";
-
-    const input = document.createElement("input");
-    input.type = "checkbox";
-    input.name = "selectedMetrics";
-    input.value = value;
-    input.checked = BASIC_METRICS.includes(value);
-
-    wrapper.appendChild(input);
-    wrapper.append(label);
+    const input = createElement("input", {
+      attributes: {
+        checked: BASIC_METRICS.includes(value),
+        name: "selectedMetrics",
+        type: "checkbox",
+        value,
+      },
+    });
+    const wrapper = createElement("label", {
+      className: "checkbox-row",
+      children: [input, label],
+    });
     metricBox.appendChild(wrapper);
   });
 }
 
 function createSelectField(labelText, name, options, selectedValue) {
-  const wrapper = document.createElement("div");
-  const label = document.createElement("label");
   const id = `${name}-${randomId()}`;
-  label.textContent = labelText;
-  label.htmlFor = id;
-  const select = document.createElement("select");
-  select.id = id;
-  select.name = name;
-  select.required = true;
+  const select = createElement("select", {
+    attributes: { id, name, required: true },
+  });
   setOptions(select, options, selectedValue);
-  wrapper.append(label, select);
-  return wrapper;
+  return createLabeledControl(labelText, select);
 }
 
 function createInputField(labelText, name, value) {
-  const wrapper = document.createElement("div");
-  const label = document.createElement("label");
   const id = `${name}-${randomId()}`;
-  label.textContent = labelText;
-  label.htmlFor = id;
-  const input = document.createElement("input");
-  input.id = id;
-  input.name = name;
-  input.type = "number";
-  input.min = "0.1";
-  input.step = "0.1";
-  input.required = true;
-  input.value = value;
-  wrapper.append(label, input);
-  return wrapper;
+  const input = createElement("input", {
+    attributes: {
+      id,
+      min: "0.1",
+      name,
+      required: true,
+      step: "0.1",
+      type: "number",
+      value,
+    },
+  });
+  return createLabeledControl(labelText, input);
 }
 
 function createCurveRow(config, index) {
-  const row = document.createElement("div");
-  row.className = "curve-row";
+  const row = createElement("div", { className: "curve-row" });
 
   const yOptions = state.numericColumns.map((column) => ({ value: column, label: column }));
   const colorOptions = objectEntriesToOptions(CURVE_COLORS);
@@ -964,10 +1031,7 @@ function createCurveRow(config, index) {
     createSelectField("线型", "curveStyles", styleOptions, config.lineStyle),
   );
 
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "curve-remove-button";
-  button.textContent = "删除";
+  const button = createButton("删除", "curve-remove-button");
   button.disabled = index === 0 && qs("#curveConfigBox").children.length === 0;
   row.appendChild(button);
 
@@ -1082,9 +1146,7 @@ function resetWorkflow() {
   qs("#curveConfigBox").replaceChildren();
   qs("#summaryRows").replaceChildren();
   qs("#statsGrid").replaceChildren();
-  qs("#resultFigureTitle").textContent = "等待生成图像";
-  qs("#resultFigureMeta").textContent = "待生成";
-  qs("#resultFigureCurves").textContent = "待生成";
+  resetResultFigure();
 
   qsa(".download-panel a").forEach((link) => {
     link.removeAttribute("download");
@@ -1288,17 +1350,20 @@ function readOutputSize() {
   };
 }
 
+function getPendingReadiness(status, hint, overrides = {}) {
+  return {
+    level: "neutral",
+    canGenerate: false,
+    status,
+    hint,
+    ...PLOT_PENDING_VALUES,
+    ...overrides,
+  };
+}
+
 function inspectPlotReadiness() {
   if (!state.data.length || !state.numericColumns.length) {
-    return {
-      level: "neutral",
-      canGenerate: false,
-      status: "等待数据",
-      hint: "上传或载入示例数据后再生成图像。",
-      points: "待选择",
-      fit: "待选择",
-      exportSize: "待生成",
-    };
+    return getPendingReadiness("等待数据", "上传或载入示例数据后再生成图像。");
   }
 
   const xCol = qs("#xCol").value;
@@ -1306,42 +1371,24 @@ function inspectPlotReadiness() {
   const fitType = qs("#fitType").value;
 
   if (!xCol || !yCols.length) {
-    return {
-      level: "neutral",
-      canGenerate: false,
-      status: "等待选择绘图列",
-      hint: "选择 X 轴和至少一条 Y 轴曲线。",
-      points: "待选择",
-      fit: "待选择",
-      exportSize: "待生成",
-    };
+    return getPendingReadiness("等待选择绘图列", "选择 X 轴和至少一条 Y 轴曲线。");
   }
 
   if (yCols.includes(xCol)) {
-    return {
+    return getPendingReadiness("列选择有冲突", "X 轴和 Y 轴不能使用同一列。", {
       level: "danger",
-      canGenerate: false,
-      status: "列选择有冲突",
-      hint: "X 轴和 Y 轴不能使用同一列。",
-      points: "待选择",
       fit: "不可用",
-      exportSize: "待生成",
-    };
+    });
   }
 
   let outputSize;
   try {
     outputSize = readOutputSize();
   } catch (error) {
-    return {
+    return getPendingReadiness("导出尺寸需要检查", error.message, {
       level: "danger",
-      canGenerate: false,
-      status: "导出尺寸需要检查",
-      hint: error.message,
-      points: "待选择",
       fit: "待检查",
-      exportSize: "待生成",
-    };
+    });
   }
 
   const curveInfos = yCols.map((yCol) => {
@@ -2403,24 +2450,11 @@ async function renderDownloads(payload) {
 }
 
 function addSummaryRow(container, label, value, large = false) {
-  const row = document.createElement("div");
-  row.className = large ? "summary-row large" : "summary-row";
-  const span = document.createElement("span");
-  span.textContent = label;
-  const strong = document.createElement("strong");
-  strong.textContent = value;
-  row.append(span, strong);
-  container.appendChild(row);
+  container.appendChild(createValueItem(label, value, large ? "summary-row large" : "summary-row"));
 }
 
 function addStat(container, label, value) {
-  const item = document.createElement("div");
-  const span = document.createElement("span");
-  span.textContent = label;
-  const strong = document.createElement("strong");
-  strong.textContent = value;
-  item.append(span, strong);
-  container.appendChild(item);
+  container.appendChild(createValueItem(label, value));
 }
 
 function renderResult(payload) {
