@@ -8,6 +8,8 @@
 .workbench-page > .workbench,
 .workbench-page > .workbench-brief {
   width: min(1180px, calc(100% - 40px));
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .workbench-page > .workbench {
