@@ -47,25 +47,17 @@
       </div>
     </header>
 
-    <section class="workbench-brief" aria-labelledby="workbenchTitle">
-      <div>
-        <span class="section-kicker">工作台</span>
-        <h1 id="workbenchTitle">从实验表格到报告素材</h1>
-        <p>按数据表、计算列、绘图、拟合、导出的顺序处理，保留 OriginLab 常用任务路径，但把入口收敛成一个低学习成本流程。</p>
-      </div>
-
-      <div class="workbench-brief-actions" aria-label="工作台入口">
-        <a href="#step-upload" class="btn btn-primary">导入数据</a>
-        <a href="./index.html#samples" class="btn btn-secondary">选择示例</a>
-      </div>
-    </section>
-
     <section class="workbench" id="upload-section">
-      <aside class="workbench-sidebar" aria-label="数据处理步骤">
-        <div class="workbench-sidebar-head">
-          <span class="section-kicker">流程</span>
-          <h2>工作台导航</h2>
-          <p>完成一个步骤后，下一个步骤自动解锁。</p>
+      <div class="workbench-main">
+        <div class="workbench-head">
+          <div>
+            <span class="section-kicker">线性工作流</span>
+            <h1>从表格到报告图</h1>
+          </div>
+          <div class="workflow-status">
+            <span>当前步骤</span>
+            <strong id="workflowStatusText">等待导入数据</strong>
+          </div>
         </div>
 
         <nav class="step-nav" aria-label="工作台步骤">
@@ -90,27 +82,6 @@
             <span><strong>查看结果</strong><small>检查并下载素材</small></span>
           </button>
         </nav>
-
-        <div class="workflow-status">
-          <span>当前状态</span>
-          <strong id="workflowStatusText">等待导入数据</strong>
-        </div>
-
-        <div class="workflow-tools" aria-label="工作台能力">
-          <span>表格预览</span>
-          <span>计算列</span>
-          <span>多曲线</span>
-          <span>拟合指标</span>
-          <span>ZIP 导出</span>
-        </div>
-      </aside>
-
-      <div class="workbench-main">
-        <div class="workbench-head">
-          <span class="section-kicker">开始处理</span>
-          <h2>上传数据，生成图表和拟合结果</h2>
-          <p>每一步只显示当前需要确认的内容。高级图表参数保留在当前步骤内。</p>
-        </div>
 
         <section id="statusMessage" class="message is-hidden" role="status" aria-live="polite"></section>
 

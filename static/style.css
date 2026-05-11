@@ -363,7 +363,7 @@ input:disabled {
 
 .workbench-page > .workbench,
 .workbench-page > .workbench-brief {
-  width: min(1440px, calc(100% - 40px));
+  width: min(1180px, calc(100% - 40px));
 }
 
 .workbench-page > .workbench {
@@ -914,9 +914,11 @@ input:disabled {
 
 .workbench {
   display: grid;
-  grid-template-columns: 254px minmax(0, 1fr);
+  grid-template-columns: 1fr;
   align-items: start;
   overflow: hidden;
+  width: min(1180px, calc(100% - 40px));
+  margin-top: 24px;
   margin-bottom: 96px;
   border: 1px solid var(--line-soft);
   border-radius: 6px;
@@ -924,31 +926,14 @@ input:disabled {
   box-shadow: var(--shadow-lg);
 }
 
-.workbench-sidebar {
-  position: sticky;
-  top: 68px;
-  min-width: 0;
-  min-height: calc(100svh - 68px);
-  padding: 0;
-  border-right: 1px solid var(--line-soft);
-  background: var(--surface-soft);
-}
-
-.workbench-sidebar-head {
-  padding: 16px 14px 12px;
-  border-bottom: 1px solid var(--line-soft);
-}
-
-.workbench-sidebar-head h2,
-.workbench-head h2 {
+.workbench-head h1 {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   line-height: 1.2;
   font-weight: 760;
   letter-spacing: 0;
 }
 
-.workbench-sidebar-head p,
 .workbench-head p {
   margin: 5px 0 0;
   color: var(--text-muted);
@@ -958,21 +943,23 @@ input:disabled {
 
 .step-nav {
   display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0;
   margin-top: 0;
   border-bottom: 1px solid var(--line-soft);
+  background: var(--surface);
 }
 
 .step-nav-item {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  gap: 10px;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 8px;
   align-items: center;
   width: 100%;
-  min-height: 48px;
-  padding: 8px 14px;
+  min-height: 60px;
+  padding: 9px 12px;
   border: 0;
-  border-top: 1px solid var(--line-soft);
+  border-left: 1px solid var(--line-soft);
   border-radius: 0;
   color: var(--text-muted);
   background: transparent;
@@ -990,7 +977,7 @@ input:disabled {
 .step-nav-item.is-active {
   color: var(--text-main);
   background: var(--surface-active);
-  box-shadow: 0 0 28px color-mix(in oklch, var(--accent) 12%, transparent);
+  box-shadow: inset 0 -2px 0 var(--accent);
 }
 
 .step-nav-item.is-complete:not(.is-active) .step-index {
@@ -1006,13 +993,13 @@ input:disabled {
 .step-index {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-sm);
   color: var(--text-soft);
   background: var(--surface);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 780;
   transition: border-color 0.22s var(--ease-out), background 0.22s var(--ease-out), color 0.22s var(--ease-out), box-shadow 0.22s var(--ease-out);
 }
@@ -1030,23 +1017,20 @@ input:disabled {
 
 .step-nav-item strong {
   display: block;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 760;
 }
 
 .step-nav-item small {
-  display: block;
-  margin-top: 3px;
-  color: var(--text-muted);
-  font-size: 12px;
-  line-height: 1.35;
+  display: none;
 }
 
 .workflow-status {
   margin-top: 0;
-  padding: 12px 14px;
-  border-top: 1px solid var(--line-soft);
+  min-width: 170px;
+  padding: 0;
   background: transparent;
+  text-align: right;
 }
 
 .workflow-status span {
@@ -1058,9 +1042,9 @@ input:disabled {
 
 .workflow-status strong {
   display: block;
-  margin-top: 6px;
+  margin-top: 4px;
   color: var(--text-main);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 760;
 }
 
@@ -1091,13 +1075,24 @@ input:disabled {
 }
 
 .workbench-head {
-  padding: 16px 24px 14px;
-  border-bottom: 2px solid var(--line-strong);
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line-soft);
   background: var(--surface-raised);
+}
+
+.workbench-head p {
+  max-width: 560px;
+  margin: 0;
+  text-align: right;
 }
 
 .workbench-step-panel {
   display: none;
+  scroll-margin-top: 92px;
 }
 
 .workbench-step-panel.is-active:not(.is-hidden) {
@@ -1378,14 +1373,17 @@ code {
 
 .sample-guide {
   display: grid;
-  grid-template-columns: minmax(0, 0.72fr) minmax(260px, 0.8fr);
-  gap: 16px;
-  align-items: start;
-  background: var(--surface-soft);
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  border-radius: 0;
+  background: var(--surface-raised);
 }
 
 .workbench-main > .sample-guide {
-  margin: 18px 24px 0;
+  margin: 0;
+  border-right: 0;
+  border-left: 0;
 }
 
 .sample-guide-main {
@@ -1395,18 +1393,18 @@ code {
 .sample-guide-main span {
   display: inline-flex;
   align-items: center;
-  min-height: 26px;
-  padding: 0 8px;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-pill);
+  min-height: 22px;
+  padding: 0;
+  border: 0;
   color: var(--text-muted);
-  background: var(--surface);
+  background: transparent;
   font-size: 12px;
   font-weight: 760;
 }
 
 .sample-guide h4 {
-  margin: 10px 0 0;
+  display: inline;
+  margin: 0 8px 0 0;
   color: var(--text-main);
   font-size: 1rem;
   line-height: 1.3;
@@ -1414,14 +1412,15 @@ code {
 }
 
 .sample-guide p {
-  margin: 6px 0 0;
+  display: inline;
+  margin: 0;
   color: var(--text-muted);
   font-size: 13px;
   line-height: 1.55;
 }
 
 .sample-guide-steps {
-  display: grid;
+  display: none;
   gap: 7px;
   margin: 0;
   padding: 0;
@@ -1456,12 +1455,12 @@ code {
 }
 
 .sample-guide-actions {
-  grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 10px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line-soft);
+  padding-top: 0;
+  border-top: 0;
 }
 
 .table-wrap {
@@ -1983,14 +1982,6 @@ code {
     grid-template-columns: 1fr;
   }
 
-  .workbench-sidebar {
-    position: relative;
-    top: auto;
-    min-height: 0;
-    border-right: 0;
-    border-bottom: 1px solid var(--line-soft);
-  }
-
   .step-nav {
     grid-template-columns: repeat(5, minmax(150px, 1fr));
     overflow-x: auto;
@@ -2000,6 +1991,7 @@ code {
 
   .step-nav-item {
     border-top: 0;
+    border-left: 0;
     border-right: 1px solid var(--line-soft);
     min-height: 52px;
   }
@@ -2046,7 +2038,7 @@ code {
 
   .workbench-page > .workbench,
   .workbench-page > .workbench-brief {
-    width: min(100% - 32px, 1440px);
+    width: min(100% - 32px, 1180px);
   }
 
   .workbench-brief {
@@ -2189,14 +2181,8 @@ code {
     font-size: 1.55rem;
   }
 
-  .workbench-sidebar,
   .workbench-head,
   .panel {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  .workbench-sidebar-head {
     padding-left: 16px;
     padding-right: 16px;
   }

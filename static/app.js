@@ -307,7 +307,8 @@ function setActiveStep(step, options = {}) {
   updateWorkflowNav();
 
   if (options.scroll) {
-    qs("#upload-section").scrollIntoView({ behavior: "smooth", block: "start" });
+    const panel = getWorkflowPanel(step);
+    (panel || qs("#upload-section")).scrollIntoView({ behavior: "smooth", block: "start" });
   }
 }
 
