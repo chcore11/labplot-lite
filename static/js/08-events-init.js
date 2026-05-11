@@ -44,7 +44,7 @@ function checkRequiredDependencies() {
 
   if (missingKeys.has("chart")) {
     qsa(
-      ".nav-cta[href='#upload-section'], #enterSimpleMode, #enterAdvancedMode, #simpleChooseFile, #uploadForm button[type='submit'], .sample-load-button, #plotSubmitButton",
+      ".workbench-page .nav-cta, #enterSimpleMode, #enterAdvancedMode, #simpleChooseFile, #uploadForm button[type='submit'], .sample-load-button, #plotSubmitButton",
     ).forEach(disableControl);
   }
 

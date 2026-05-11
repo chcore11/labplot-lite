@@ -1,31 +1,18 @@
 @media (max-width: 1180px) {
   .landing-hero {
     grid-template-columns: 1fr;
-    grid-template-areas:
-      "copy"
-      "stage"
-      "flow";
     min-height: auto;
-    padding-top: 56px;
+    padding-top: 48px;
   }
 
-  .hero-stage {
-    min-height: 460px;
-  }
-
-  .preview-body {
-    grid-template-columns: 150px minmax(0, 1fr);
-  }
-
-  .fit-card {
-    grid-column: 1 / -1;
-    border-top: 1px solid var(--line-soft);
+  .hero-product {
+    max-width: 820px;
   }
 
   .sample-chart-grid,
   .mode-entry-grid,
-  .workbench {
-    grid-template-columns: 1fr;
+  .workflow-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .sample-chart-wide {
@@ -48,17 +35,14 @@
     grid-template-columns: repeat(5, minmax(150px, 1fr));
     grid-row: auto;
     overflow-x: auto;
-    padding-bottom: 2px;
     border-right: 0;
-    border-bottom: 0;
+    border-bottom: 1px solid var(--line-soft);
   }
 
   .step-nav-item {
-    border-top: 0;
-    border-left: 0;
+    min-height: 52px;
     border-right: 1px solid var(--line-soft);
     border-bottom: 0;
-    min-height: 52px;
   }
 
   .step-nav-item:last-child {
@@ -97,44 +81,43 @@
   }
 
   .hero h1 {
-    font-size: 48px;
-    letter-spacing: 0;
+    font-size: 44px;
   }
 
-  .workbench-page > .workbench,
-  .workbench-page > .workbench-brief {
-    width: min(100% - 32px, 1180px);
-    margin-left: auto;
-    margin-right: auto;
+  .hero-product-body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "chart"
+      "table"
+      "inspector";
   }
 
-  .workbench-brief {
+  .hero-inspector {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mode-landing {
     grid-template-columns: 1fr;
-    align-items: start;
   }
 
-  .workbench-brief-actions {
-    justify-content: flex-start;
-  }
-
-  .sample-gallery,
-  .mode-entry-section,
-  .workbench,
-  .chart-card {
-    border-radius: 14px;
-  }
-
-  .sample-list.compact,
-  .sample-chart-grid,
-  .mode-entry-grid,
+  .mode-choice-grid,
+  .simple-result-meta,
   .upload-layout,
   .sample-guide,
   .result-side,
-  .guide-grid,
   .stats,
   .form-grid,
   .formula-grid,
   .compact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-list {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .sample-chart-grid,
+  .mode-entry-grid {
     grid-template-columns: 1fr;
   }
 
@@ -144,10 +127,6 @@
 
   .curve-remove-button {
     grid-column: 1 / -1;
-  }
-
-  .origin-map-row {
-    grid-template-columns: 1fr;
   }
 
   .sample-guide-main,
@@ -174,7 +153,7 @@
   }
 
   .nav {
-    min-height: 64px;
+    min-height: 62px;
     padding: 0 12px;
   }
 
@@ -182,88 +161,23 @@
     display: none;
   }
 
-  .nav-actions {
-    gap: 8px;
-  }
-
   .nav-cta {
-    display: none;
-  }
-
-  .hero {
-    gap: 28px;
-    padding: 44px 0 58px;
-  }
-
-  .hero-copy,
-  .hero-stage,
-  .chart-card,
-  .chart-svg,
-  .hero-actions,
-  .simple-mode,
-  .simple-upload-dropzone {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
+    min-height: 40px;
+    padding: 0 12px;
+    font-size: 13px;
   }
 
   .landing-hero {
-    width: calc(100% - 24px);
-    max-width: 366px;
-  }
-
-  .hero-actions,
-  .hero-stage {
-    max-width: 366px;
+    gap: 28px;
+    padding: 38px 0 48px;
   }
 
   .hero h1 {
-    font-size: 36px;
-  }
-
-  .hero-stage {
-    min-height: 0;
-  }
-
-  .chart-card-main {
-    min-height: 0;
-    padding: 12px;
-  }
-
-  .chart-card-float {
-    position: static;
-    width: 100%;
-    margin-top: 12px;
-  }
-
-  .workbench-brief {
-    padding: 16px;
-  }
-
-  .workbench-brief h1 {
-    font-size: 22px;
-  }
-
-  .workbench-brief-actions,
-  .workbench-brief-actions .btn {
-    width: 100%;
-  }
-
-  .figure-toolbar {
-    display: grid;
-    align-items: start;
-  }
-
-  .figure-meta {
-    justify-content: flex-start;
-    min-width: 0;
-  }
-
-  .plot-wrap {
-    padding: 14px;
+    font-size: 34px;
   }
 
   .hero-desc {
+    max-width: 100%;
     font-size: 16px;
   }
 
@@ -276,35 +190,86 @@
     display: grid;
   }
 
-  .hero-desc {
-    max-width: 100%;
-    overflow-wrap: anywhere;
-    word-break: break-all;
+  .hero-product-toolbar {
+    display: grid;
+  }
+
+  .hero-product-body {
+    padding: 10px;
+  }
+
+  .mini-table {
+    overflow-x: auto;
+  }
+
+  .mini-table > div {
+    min-width: 360px;
+  }
+
+  .hero-inspector {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-list {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-section,
+  .sample-gallery,
+  .mode-entry-section {
+    padding-top: 34px;
+    margin-bottom: 58px;
   }
 
   .section-heading h2 {
-    font-size: 28px;
+    font-size: 26px;
+  }
+
+  .mode-landing,
+  .simple-mode {
+    width: calc(100% - 24px);
+  }
+
+  .mode-landing-copy,
+  .simple-mode {
+    padding: 18px;
+  }
+
+  .mode-landing h1,
+  .simple-mode h1 {
+    font-size: 25px;
+  }
+
+  .mode-choice-grid,
+  .simple-upload-dropzone,
+  .simple-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mode-choice-card {
+    min-height: 180px;
+    padding: 18px;
+  }
+
+  .simple-mode-head {
+    display: grid;
+  }
+
+  .simple-result-actions .btn,
+  .simple-result-actions button,
+  .simple-upload-dropzone .btn {
+    width: 100%;
+  }
+
+  .workbench {
+    width: calc(100% - 24px);
+    margin-top: 16px;
   }
 
   .workbench-head,
   .panel {
     padding-left: 16px;
     padding-right: 16px;
-  }
-
-  .mode-landing h1,
-  .simple-mode h1 {
-    font-size: 28px;
-    word-break: break-all;
-  }
-
-  .simple-upload-dropzone .btn {
-    width: 100%;
-  }
-
-  .simple-upload-copy strong,
-  .simple-upload-copy span {
-    word-break: break-all;
   }
 
   .workbench-head {
@@ -342,7 +307,6 @@
   .step-nav {
     display: flex;
     overflow: visible;
-    padding-bottom: 0;
   }
 
   .step-nav-item {
@@ -375,16 +339,6 @@
     display: none;
   }
 
-  .sample-card,
-  .form-card,
-  .sample-list button,
-  .sample-list a,
-  .hint,
-  .sample-card p {
-    min-width: 0;
-    overflow-wrap: anywhere;
-  }
-
   .step-head {
     grid-template-columns: 34px minmax(0, 1fr);
   }
@@ -392,6 +346,19 @@
   .step-head > span {
     width: 32px;
     height: 32px;
+  }
+
+  .sample-card,
+  .form-card,
+  .sample-list button,
+  .hint,
+  .sample-card p {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .table-scroll-hint {
+    display: block;
   }
 
   .curve-row,
@@ -413,6 +380,20 @@
   .plot-progress {
     width: 100%;
     justify-content: center;
+  }
+
+  .figure-toolbar {
+    display: grid;
+    align-items: start;
+  }
+
+  .figure-meta {
+    justify-content: flex-start;
+    min-width: 0;
+  }
+
+  .plot-wrap {
+    padding: 14px;
   }
 
   .footer {

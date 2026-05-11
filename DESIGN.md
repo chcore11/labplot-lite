@@ -1,259 +1,218 @@
 ---
 name: LabPlot Lite
-description: 对齐 Moonshot 式黑白灰秩序的学生实验绘图工具
+description: 报告纸与仪器面板结合的学生实验绘图工具
 colors:
-  moon-black: "oklch(1.5% 0 0)"
-  deep-graphite: "oklch(7.8% 0 0)"
-  graphite: "oklch(12.5% 0 0)"
-  graphite-raised: "oklch(17% 0 0)"
-  graphite-line: "oklch(100% 0 0 / 0.12)"
-  graphite-line-strong: "oklch(100% 0 0 / 0.42)"
-  text-primary: "oklch(96% 0 0)"
-  text-secondary: "oklch(96% 0 0 / 0.66)"
-  text-muted: "oklch(62% 0 0)"
-  text-faint: "oklch(96% 0 0 / 0.42)"
-  white-wash: "oklch(96% 0 0 / 0.05)"
-  white-hover: "oklch(96% 0 0 / 0.08)"
-  focus-glow: "oklch(96% 0 0 / 0.28)"
-  plot-paper: "oklch(97% 0.004 260)"
-  plot-ink: "oklch(16% 0.005 260)"
-  plot-muted: "oklch(48% 0.006 260)"
-  plot-line: "oklch(76% 0.004 260 / 0.36)"
-  state-success: "oklch(72% 0.08 155)"
-  state-warning: "oklch(78% 0.1 82)"
-  state-danger: "oklch(70% 0.11 28)"
+  page-canvas: "oklch(97.8% 0.006 255)"
+  page-field: "oklch(95.2% 0.008 250)"
+  surface: "oklch(99.2% 0.004 255)"
+  surface-raised: "oklch(100% 0.004 255)"
+  surface-panel: "oklch(93.8% 0.008 252)"
+  surface-tool: "oklch(90.8% 0.01 250)"
+  ink: "oklch(20% 0.014 255)"
+  ink-soft: "oklch(38% 0.016 255)"
+  ink-muted: "oklch(55% 0.014 255)"
+  line-soft: "oklch(21% 0.014 255 / 0.10)"
+  line-strong: "oklch(21% 0.014 255 / 0.22)"
+  primary-blue: "oklch(48% 0.145 255)"
+  primary-blue-hover: "oklch(42% 0.15 255)"
+  primary-blue-soft: "oklch(48% 0.145 255 / 0.10)"
+  instrument-teal: "oklch(58% 0.11 178)"
+  data-amber: "oklch(72% 0.13 82)"
+  data-red: "oklch(62% 0.16 32)"
+  success: "oklch(48% 0.11 150)"
+  warning: "oklch(60% 0.13 76)"
+  danger: "oklch(55% 0.16 28)"
+  plot-paper: "oklch(98.7% 0.004 95)"
+  plot-ink: "oklch(17% 0.014 255)"
+  plot-grid: "oklch(24% 0.012 255 / 0.13)"
 typography:
   display:
-    fontFamily: "MiSans, PingFang SC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif"
-    fontSize: "56px"
-    fontWeight: 500
-    lineHeight: 1.2
+    fontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Hiragino Sans GB, Microsoft YaHei, system-ui, sans-serif"
+    fontSize: "48px"
+    fontWeight: 650
+    lineHeight: 1.08
     letterSpacing: "0"
   section:
-    fontFamily: "MiSans, PingFang SC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif"
-    fontSize: "32px"
-    fontWeight: 500
-    lineHeight: 1.28
+    fontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Hiragino Sans GB, Microsoft YaHei, system-ui, sans-serif"
+    fontSize: "30px"
+    fontWeight: 650
+    lineHeight: 1.22
     letterSpacing: "0"
   title:
-    fontFamily: "MiSans, PingFang SC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif"
+    fontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Hiragino Sans GB, Microsoft YaHei, system-ui, sans-serif"
     fontSize: "18px"
-    fontWeight: 500
-    lineHeight: 1.52
+    fontWeight: 650
+    lineHeight: 1.35
     letterSpacing: "0"
   body:
-    fontFamily: "PingFang SC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif"
-    fontSize: "18px"
+    fontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Hiragino Sans GB, Microsoft YaHei, system-ui, sans-serif"
+    fontSize: "16px"
     fontWeight: 400
-    lineHeight: 1.52
+    lineHeight: 1.62
     letterSpacing: "0"
   label:
-    fontFamily: "PingFang SC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif"
-    fontSize: "14px"
-    fontWeight: 450
-    lineHeight: "20px"
+    fontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Hiragino Sans GB, Microsoft YaHei, system-ui, sans-serif"
+    fontSize: "13px"
+    fontWeight: 600
+    lineHeight: "18px"
     letterSpacing: "0"
   mono:
     fontFamily: "SFMono-Regular, Menlo, Monaco, Cascadia Mono, Roboto Mono, Consolas, Liberation Mono, monospace"
-    fontSize: "13px"
-    fontWeight: 500
+    fontSize: "12px"
+    fontWeight: 600
     lineHeight: 1.45
 rounded:
-  control-pill: "999px"
-  card: "16px"
-  panel: "12px"
-  small: "4px"
+  card: "8px"
+  panel: "8px"
+  control: "6px"
+  pill: "999px"
 spacing:
-  page-x: "80px"
-  page-x-tablet: "48px"
-  page-x-mobile: "24px"
-  section-y: "80px"
-  section-gap: "96px"
-  cluster-gap: "24px"
-  control-pad: "12px 20px"
+  page-x: "56px"
+  page-x-tablet: "32px"
+  page-x-mobile: "16px"
+  section-y: "72px"
+  section-gap: "72px"
+  cluster-gap: "18px"
 components:
-  cta-outline:
-    backgroundColor: "transparent"
-    textColor: "{colors.text-secondary}"
-    rounded: "{rounded.control-pill}"
-    padding: "{spacing.control-pad}"
+  button-primary:
+    backgroundColor: "{colors.primary-blue}"
+    textColor: "oklch(98% 0.004 255)"
+    rounded: "{rounded.control}"
+    padding: "0 16px"
+    typography: "{typography.label}"
+  button-secondary:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink-soft}"
+    rounded: "{rounded.control}"
+    padding: "0 16px"
     typography: "{typography.label}"
   panel:
-    backgroundColor: "{colors.graphite}"
-    textColor: "{colors.text-primary}"
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
     rounded: "{rounded.panel}"
+    padding: "20px"
+  plot-paper:
+    backgroundColor: "{colors.plot-paper}"
+    textColor: "{colors.plot-ink}"
+    rounded: "3px"
     padding: "24px"
-  media-card:
-    backgroundColor: "{colors.graphite}"
-    textColor: "{colors.text-primary}"
-    rounded: "{rounded.card}"
-    padding: "0"
-  input:
-    backgroundColor: "oklch(20% 0 0 / 0.30)"
-    textColor: "{colors.text-primary}"
-    rounded: "24px"
-    padding: "18px 12px 12px"
 ---
 
 # Design System: LabPlot Lite
 
 ## 1. Overview
 
-**Creative North Star: "黑场科学工作台"**
+**Creative North Star: 报告纸上的轻量仪器面板**
 
-LabPlot Lite 的视觉系统应向 Moonshot 官网的克制黑场、清晰文字秩序和低色彩密度靠拢。界面第一感受不是“AI 工具”，不是彩色科技感，而是安静、精确、可信：大面积黑白灰，少量半透明边界，明确分区，短句标题和直接行动。
+LabPlot Lite 的界面应让学生感觉自己正在使用一个可信的实验绘图工具，而不是一个营销网站、AI 工具或复杂科研软件。默认视觉是浅色报告纸、冷静灰阶、清晰表格和白底图表。功能模式允许更高密度，但控件必须像专业软件一样稳定、可预测。
 
-LabPlot Lite 仍然是实验绘图工具，不复制 Moonshot 的品牌、内容和动态视觉。对齐的是设计方法：黑色背景承载专注，灰阶建立层级，按钮像轻量入口而不是营销按钮，内容区靠留白和排版组织，而不是靠装饰色、卡片堆叠或夸张图形。
-
-工作台必须比官网更可操作。Moonshot 式留白用于 landing、模式选择和说明区；进入功能模式后，仍然保留表格、输入、步骤和结果面板，但它们要被压进同一套黑白灰秩序里。图表导出区域可以使用白底，因为学生最终需要报告图件，但白底只属于图表和结果交付，不扩散成整站纸面主题。
+这套方向综合四类参考：Carbon 的数据密集产品结构，Spectrum 的专业工具控件密度，GOV.UK 的低学习成本表单规范，Datawrapper / Prism 的图表生成路径。借鉴的是原则，不是复制品牌。
 
 **Key Characteristics:**
 
-- 黑白灰优先：品牌层面不使用绿、琥珀、紫、蓝作为主视觉。
-- 低装饰：少图标、少徽章、少彩色状态，避免 AI 模板感。
-- 大留白：landing 和说明区使用 80px 级别分区间距，移动端收敛到 24px。
-- 轻 CTA：圆角 pill、细边框、透明背景、hover 时轻微显现箭头或浅白底。
-- 内容可信：图表、拟合指标和导出结果必须保持严谨可查，不被品牌视觉淹没。
+- 浅色优先：页面背景接近实验报告纸，主内容用白色或浅灰面板承载。
+- 图表可信：结果画布保持白底、细网格、清晰轴线和可读图例。
+- 工具感克制：功能模式可以密集，但避免深色 SaaS、渐变、玻璃拟态和装饰图标。
+- 蓝色只做功能色：主要动作、当前步骤、选中态使用蓝色，不把蓝色铺成品牌装饰。
+- 数据色归数据：蓝、青、琥珀、红只用于曲线、状态和图表语义。
 
-## 2. Colors
+## 2. Color Strategy
 
-调色板从 Moonshot 的黑色背景、白色文字、灰色说明和低透明白边界中抽象出来。彩色只用于数据曲线和语义状态，不作为品牌装饰。
+颜色策略是 Restrained with Data Palette：界面 85% 以上由纸色、白色、灰阶和墨色完成。蓝色作为操作和选中状态，其他颜色只属于数据曲线或语义状态。
 
-### Primary
+### Interface Neutrals
 
-- **Moon Black** (`moon-black`): 页面主背景和 landing 主视觉底色。它是沉静黑场，不是炫酷深色渐变。
-- **White Text** (`text-primary`, `text-secondary`): 主标题、按钮和关键说明。主要层级通过透明度变化，而不是彩色变化。
+- **Page Canvas**: 全站背景，轻微偏冷，避免纯白刺眼。
+- **Surface / Surface Raised**: 首页模块、工作台步骤面板、表单区域。
+- **Surface Panel / Surface Tool**: 左侧步骤、属性组、表格预览和控制区。
+- **Ink / Ink Soft / Ink Muted**: 标题、正文、辅助说明。
 
-### Secondary
+### Functional Color
 
-- **Graphite Surfaces** (`deep-graphite`, `graphite`, `graphite-raised`): 用于工作台面板、示例卡、下载区和浮层。面板之间的差异应细微。
-- **Ghost Lines** (`graphite-line`, `graphite-line-strong`): 用于边框、分隔线、pill 按钮和 focus 前的结构线。
+- **Primary Blue**: 主按钮、当前步骤、可操作焦点。
+- **Primary Blue Soft**: 选中背景、信息提示和聚焦区域。
 
-### Tertiary
+### Data and State
 
-- **Plot Paper** (`plot-paper`, `plot-ink`, `plot-line`): 只用于图表画布、导出预览和报告图件。它是结果材质，不是页面主主题。
-- **Semantic Signals** (`state-success`, `state-warning`, `state-danger`): 只用于状态、错误、警告和可访问性提示。禁止扩大为品牌色。
-
-### Neutral
-
-- **Muted Grey** (`text-muted`, `text-faint`): 用于描述、日期、辅助说明和禁用状态。
-- **White Wash** (`white-wash`, `white-hover`): 用于 hover、选中、轻背景和玻璃感输入底，但透明度必须克制。
+- **Instrument Teal, Data Amber, Data Red**: 多曲线和图表示例。
+- **Success, Warning, Danger**: 状态提示，必须配合文本。
+- **Plot Paper / Plot Ink / Plot Grid**: 图表输出区域。
 
 ### Named Rules
 
-**The Monochrome First Rule.** 默认任何新界面都先用黑、白、灰完成层级；只有语义状态和数据曲线允许使用彩色。
+**The Paper Boundary Rule.** 页面可以是浅灰纸感，但真正的图表画布必须比周围更白，形成“报告图件”的边界。
 
-**The No Accent Branding Rule.** 不允许再用墨绿、琥珀、紫蓝渐变或荧光色作为 LabPlot Lite 的品牌主色。
+**The Blue Means Action Rule.** 蓝色只表示当前步骤、主操作、选中和链接，不用于装饰条、背景渐变或大面积品牌涂色。
 
-**The Plot Paper Boundary Rule.** 白底只属于图表和导出结果，不要把整站改成报告纸主题。
+**The Data Color Rule.** 多彩只出现在图表曲线、状态和少量数据标记中，不出现在卡片标题和营销区块。
 
 ## 3. Typography
 
-- **Display Font:** MiSans / PingFang SC with system fallbacks
-- **Body Font:** PingFang SC with system fallbacks
-- **Label/Mono Font:** SFMono-Regular family for metrics, code, dimensions
+产品 UI 使用系统字体栈，不引入装饰字体。字号层级保持紧凑，服务扫描和重复操作。
 
-**Character:** 排版应像 Moonshot 官网一样克制、轻、留白充足。标题不靠大字压迫用户，而靠短句、居中或强对齐和灰阶对比建立秩序。
-
-### Hierarchy
-
-- **Display** (500, 56px, 1.2): 用于 landing 主标题或功能模式大标题。只出现一次，不能在工作台内反复使用。
-- **Section** (500, 32px, 1.28): 用于主要分区标题，例如示例流程、产品能力、结果下载。
-- **Title** (500, 18px, 1.52): 用于卡片标题、步骤标题和模式选择标题。
-- **Body** (400, 18px, 1.52): 用于产品说明和引导句，文字必须短，不写重复标题的段落。
-- **Label** (450, 14px, 20px): 用于 CTA、日期、辅助说明和小型控件。
-- **Mono** (500, 13px, 1.45): 用于列名、R²、RMSE、MAE、DPI、导出尺寸和数值摘要。
+- **Display**: 首页主标题。只出现一次。
+- **Section**: 首页分区和工作台主要区块标题。
+- **Title**: 卡片、步骤、模式入口标题。
+- **Body**: 说明文本和流程指引。
+- **Label**: 控件标签、按钮、状态和小标题。
+- **Mono**: 列名、拟合指标、DPI、尺寸和数值摘要。
 
 ### Named Rules
 
-**The Quiet Type Rule.** 字重保持 400 到 500 为主，只有关键工具标签可到 600。禁止到处使用 760 以上的强粗体。
+**The Scan First Rule.** 工作台内优先保证标签和当前状态可扫读，不用大标题制造层级。
 
-**The Short Sentence Rule.** 所有首页说明文字以一到两句为限；工作台提示只说下一步动作和判断依据。
+**The Short Help Rule.** 帮助文案只说明下一步动作、判断依据和风险，不能重复标题。
 
-## 4. Elevation
+## 4. Layout
 
-系统应几乎不依赖投影。Moonshot 式深度来自黑场、半透明白边、微弱灰阶层和图片/视频材质。LabPlot Lite 的工作台也应以边界和层级为主，只有大型浮层或结果容器允许轻微发光。
+首页是产品 landing，但第一屏必须直接展示图表输出和工作流。工作台是工具，不是展示页。
 
-### Shadow Vocabulary
-
-- **Focus Glow** (`0 0 40px oklch(96% 0 0 / 0.24)`): 只用于聚焦输入、关键生成区域或当前步骤，不用于普通卡片。
-- **Inset Hairline** (`inset 1px 1px 0 -0.5px oklch(100% 0 0 / 0.10)`): 可用于输入、图表容器或重要面板的内部精致边界。
-- **No Default Shadow** (`none`): 普通卡片、表单、示例项和下载项默认无外投影。
-
-### Named Rules
-
-**The Border Over Shadow Rule.** 优先用 1px 半透明白边、灰阶背景和间距建立层级，不给每个面板加阴影。
-
-**The Glow Is Rare Rule.** 发光只用于聚焦和关键状态。持续发光、彩色 glow、霓虹边缘都禁止。
+- Landing 首屏: 左侧一句定位和入口，右侧展示“数据表 -> 设置 -> 图表结果”的真实产品意象。
+- Workflow: 使用 4 到 5 个稳定步骤，避免彩色编号卡片。
+- Workbench: 顶部状态栏，左侧或上方步骤导航，右侧主任务面板。
+- Result: 图表预览是主内容，摘要和下载是右侧辅助内容。
+- Mobile: 390px 宽度下优先保留主动作、当前步骤和图表预览，复杂表格允许横向滚动。
 
 ## 5. Components
 
 ### Buttons
 
-按钮应像 Moonshot 的轻量 CTA：安静、圆润、边框明确，hover 才出现更多反馈。
+按钮使用 6px 圆角而不是大面积 pill。主按钮蓝底白字，次按钮白底灰字，危险操作只在必要时使用红色文本。
 
-- **Shape:** pill 按钮使用 999px；工作台内部小按钮可用 12px，避免大量 8px 卡片按钮造成后台工具感。
-- **Primary:** 默认仍是透明或近黑底 + 白色文字 + 半透明白边。生成、下载、进入工作台等主要动作可使用白底黑字，但一屏最多一个。
-- **Hover / Focus:** hover 使用 `white-wash` 或 `white-hover`，边框增强到 `graphite-line-strong`。focus 使用白色 glow，不使用绿色或琥珀色光圈。
-- **Secondary / Ghost:** 次级按钮保持透明背景，文字降到 `text-secondary` 或 `text-muted`。
+### Panels
 
-### Chips
+面板半径 8px，边框 1px，轻微阴影只用于页面级容器。工作台内部不要卡片套卡片，表单组用浅灰背景和分隔线而不是强卡片。
 
-标签用于主题、示例、状态和小说明，但必须弱化。
+### Inputs
 
-- **Style:** 14px、细边框、透明背景、pill 或 12px 圆角。
-- **State:** active 状态只增强白边和文字亮度。只有错误、警告、成功能使用语义色。
+输入框 44px 高，6px 圆角，focus 使用蓝色外环。文件上传可以是虚线 dropzone，但必须有明确按钮和文本。
 
-### Cards / Containers
+### Step Navigation
 
-容器应接近 Moonshot 的研究卡和产品块：黑灰底、圆角、细边界、少文字。
+步骤导航像任务清单，不像营销流程卡。当前步骤使用蓝色编号和浅蓝背景，完成步骤使用中性边框。
 
-- **Corner Style:** 内容卡 16px；工作台面板 12px；小型进度条和状态条 4px。
-- **Background:** 常规容器使用 `graphite` 或 `deep-graphite`，不要使用彩色 tint。
-- **Shadow Strategy:** 默认无外投影，靠边框和间距建立层级。
-- **Border:** `graphite-line` 是默认边界，hover 或 active 提升到 `graphite-line-strong`。
-- **Internal Padding:** landing 卡片 24px；工作台面板可更密，但不能低于 16px。
+### Plot Result Panel
 
-### Inputs / Fields
+外层是工具面板，内层是白底报告图。画布周围可以有浅灰网格或标尺感，但不能干扰图表。
 
-输入区应比普通表单更像一个聚焦工具入口，但不能变成 AI 聊天框。
+### Sample Cards
 
-- **Style:** 大入口可用 24px 圆角、半透明深灰底和内部 hairline；普通表单使用 12px 圆角、44px 高。
-- **Focus:** 背景略亮、边框显现、白色 glow。禁止彩色 focus ring。
-- **Error / Disabled:** 错误必须文本说明；禁用态降低透明度，不只改变颜色。
-
-### Navigation
-
-导航应轻，避免复杂后台感。
-
-- 顶栏使用黑底、细边界和紧凑链接。品牌、工作台入口、主题切换足够，不扩展成复杂菜单。
-- 首页导航像 Moonshot 一样短，最多保留几个明确入口。
-- 工作台步骤导航可以保留，但视觉上应更像纵向文本索引或细边状态列表，不像彩色流程卡。
-
-### Signature Component
-
-**Mode Choice.** 简易模式和功能模式继续保留，但视觉上更像两个黑灰入口块，而不是彩色功能卡。简易模式是默认主路径，功能模式是次级深入口。
-
-**Plot Result Panel.** 图表区域保留白底输出，这是产品必要性。外层容器使用黑灰工作台，内部画布使用 `plot-paper`，形成“黑场中的报告图件”。
-
-**Research-like Samples.** 示例数据可以借鉴 Moonshot 研究卡：灰阶图像/图件预览、短标题、短说明、hover 轻微上移。不要用彩色编号按钮堆成教育软件。
+示例卡重点展示图件类型和进入入口。每张卡应该像小型图表样张，不像功能宣传卡。
 
 ## 6. Do's and Don'ts
 
-### Do:
+### Do
 
-- **Do** 用黑、白、灰先完成所有视觉层级，再考虑语义色。
-- **Do** 使用 80px 级别分区留白，让首页像克制的产品展示，而不是表单集合。
-- **Do** 让 CTA 轻量化：透明底、细边框、pill、hover 轻反馈。
-- **Do** 保留图表白底输出，但把它限制在结果和导出区域。
-- **Do** 用短标题和短说明呈现功能，减少解释性段落。
-- **Do** 在工作台里保持线性流程，但降低按钮和面板的视觉噪音。
+- Do 用浅色纸面和白底图表建立报告可信感。
+- Do 保留线性路径：上传、识别、加工、绘图、结果、导出。
+- Do 让高级设置收进 details 或右侧属性区，不阻塞新手。
+- Do 使用表格、轴线、拟合指标和导出尺寸作为专业信号。
+- Do 在首页展示真实产品流程，而不是抽象插画。
 
-### Don't:
+### Don't
 
-- **Don't** 像复杂版 OriginLab，不要把大量按钮、菜单和参数一次性压给学生。
-- **Don't** 像泛 SaaS 官网，不要用大面积营销文案、装饰卡片网格或夸张转化话术替代真实工具。
-- **Don't** 像 AI 工具模板，不要使用彩色渐变、紫蓝 glow、玻璃拟态卡片、聊天框式首屏来暗示智能。
-- **Don't** 像儿童教育软件，不要过度可爱、游戏化或降低学术严肃性。
-- **Don't** 使用绿色或琥珀色作为品牌主色。它们只能作为图表数据色或语义状态色。
-- **Don't** 用卡片套卡片、彩色编号、侧边彩条或渐变文字制造层级。
+- Don't 使用深色渐变、玻璃拟态、彩色 glow 或 AI 工具模板。
+- Don't 把首页做成示例数据文档，landing 应该先给定位和入口。
+- Don't 把功能模式做成复杂 Origin 菜单。
+- Don't 让颜色承担唯一状态表达。
+- Don't 用同尺寸图标卡片网格堆功能。
