@@ -17,8 +17,8 @@
   --callout-pad: 14px 15px;
   --surface-transition: background-color 0.22s var(--ease-out), border-color 0.22s var(--ease-out);
 
-  --page-bg-main: oklch(91% 0.006 260);
-  --page-bg-soft: oklch(85% 0.006 260);
+  --page-bg-main: oklch(64.341% 0.00007 271.152 / 0.99);
+  --page-bg-soft: oklch(78.792% 0.00369 248.426);
   --surface: oklch(97% 0.005 260);
   --surface-raised: oklch(99% 0.005 260);
   --surface-soft: oklch(89% 0.006 260);
