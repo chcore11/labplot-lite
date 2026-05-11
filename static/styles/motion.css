@@ -11,11 +11,22 @@
 @keyframes heroEnter {
   from {
     opacity: 0;
-    transform: translateY(48px);
+    transform: translateY(64px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes heroExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(48px);
   }
 }
 

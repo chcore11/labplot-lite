@@ -234,8 +234,8 @@
 }
 
 .flow-arrow {
-  width: 36px;
-  height: 24px;
+  width: 48px;
+  height: 32px;
   color: var(--accent);
   flex-shrink: 0;
 }
