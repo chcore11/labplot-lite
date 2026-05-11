@@ -58,7 +58,7 @@ async function loadInitialSampleFromUrl() {
 
   clearMessage();
   try {
-    showMode("advanced");
+    showMode("advanced", { skipAnim: true });
     await loadSample(sampleUrl);
     window.history.replaceState(null, "", window.location.pathname);
   } catch (error) {
@@ -104,34 +104,50 @@ function setupTheme() {
 function loadInitialModeFromUrl() {
   const mode = getInitialMode();
   if (mode) {
-    showMode(mode);
+    showMode(mode, { skipAnim: true });
     window.history.replaceState(null, "", window.location.pathname);
   }
 }
 
-function showMode(mode) {
+function showMode(mode, opts = {}) {
   const landing = qs("#modeLanding");
   const simple = qs("#simpleMode");
   const advanced = qs("#advancedMode");
+  const sections = { landing, simple, advanced };
+  const target = sections[mode];
 
-  if (landing) {
-    landing.classList.toggle("is-hidden", mode !== "landing");
-  }
-  if (simple) {
-    simple.classList.toggle("is-hidden", mode !== "simple");
-  }
-  if (advanced) {
-    advanced.classList.toggle("is-hidden", mode !== "advanced");
+  // Find currently visible section
+  const visible = Object.values(sections).find(s => s && !s.classList.contains("is-hidden"));
+
+  const showImmediate = (el) => {
+    // Hide all others, show target without animation
+    Object.values(sections).forEach(s => {
+      if (s) s.classList.toggle("is-hidden", s !== el);
+    });
+    el.classList.remove("mode-enter", "mode-exit");
+  };
+
+  const animateIn = (el) => {
+    el.classList.remove("is-hidden", "mode-exit");
+    void el.offsetWidth;
+    el.classList.add("mode-enter");
+    el.addEventListener("animationend", () => el.classList.remove("mode-enter"), { once: true });
+  };
+
+  if (opts.skipAnim || !visible) {
+    if (target) showImmediate(target);
+  } else if (visible !== target) {
+    visible.classList.add("mode-exit");
+    visible.addEventListener("animationend", () => {
+      visible.classList.add("is-hidden");
+      visible.classList.remove("mode-exit");
+      if (target) animateIn(target);
+    }, { once: true });
   }
 
   if (mode === "advanced") {
     const targetStep = state.rawRows.length ? state.activeStep : "upload";
     setActiveStep(targetStep, { scroll: false });
-    (qs("#upload-section") || advanced).scrollIntoView({ behavior: "smooth", block: "start" });
-  } else if (mode === "simple") {
-    (simple || document.body).scrollIntoView({ behavior: "smooth", block: "start" });
-  } else {
-    (landing || document.body).scrollIntoView({ behavior: "smooth", block: "start" });
   }
 }
 
