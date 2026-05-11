@@ -60,14 +60,6 @@ async function loadInitialSampleFromUrl() {
 }
 
 function setupTheme() {
-  const root = document.documentElement;
-  const select = qs("#themeSelect");
-  const storageKey = "labplot-theme";
-
-  function getSystemTheme() {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  }
-
   async function refreshRenderedResult() {
     if (!state.lastPlotPayload || qs("#resultSection").classList.contains("is-hidden")) {
       return;
@@ -81,36 +73,12 @@ function setupTheme() {
     }
   }
 
-  function applyTheme(mode) {
-    const finalMode = mode === "system" ? getSystemTheme() : mode;
-    root.setAttribute("data-theme", finalMode);
-    root.setAttribute("data-theme-mode", mode);
-    localStorage.setItem(storageKey, mode);
-
-    qsa(".brand-logo").forEach((logo) => {
-      const lightSrc = logo.getAttribute("data-light");
-      const darkSrc = logo.getAttribute("data-dark");
-      logo.src = finalMode === "dark" ? darkSrc : lightSrc;
-    });
-
-    if (select) {
-      select.value = mode;
-    }
-
-    window.requestAnimationFrame(() => {
-      refreshRenderedResult();
-    });
-  }
-
-  const saved = localStorage.getItem(storageKey) || "dark";
-  applyTheme(saved);
-
-  select.addEventListener("change", () => applyTheme(select.value));
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-    const currentMode = localStorage.getItem(storageKey) || "system";
-    if (currentMode === "system") {
-      applyTheme("system");
-    }
+  window.LabPlotTheme.init({
+    onApply: () => {
+      window.requestAnimationFrame(() => {
+        refreshRenderedResult();
+      });
+    },
   });
 }
 
