@@ -279,6 +279,10 @@
   transform: translateY(-2px);
 }
 
+.sample-chart-card:active {
+  transform: translateY(0);
+}
+
 .sample-chart-wide {
   grid-row: span 2;
 }
@@ -323,6 +327,10 @@
   border-color: var(--line-strong);
   background: var(--surface-raised);
   transform: translateY(-2px);
+}
+
+.mode-entry:active {
+  transform: translateY(0);
 }
 
 .mode-entry-primary {

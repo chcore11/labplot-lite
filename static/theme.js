@@ -5,19 +5,6 @@
   const storageKey = "labplot-theme";
   const validModes = new Set(["dark"]);
   const onApplyCallbacks = new Set();
-  let initialized = false;
-  let systemQuery = null;
-
-  function getSystemQuery() {
-    if (!systemQuery && window.matchMedia) {
-      systemQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    }
-    return systemQuery;
-  }
-
-  function getSystemTheme() {
-    return "dark";
-  }
 
   function normalizeMode(mode) {
     return validModes.has(mode) ? mode : "dark";
@@ -39,24 +26,20 @@
     }
   }
 
-  function resolveTheme(mode) {
+  function resolveTheme() {
     return "dark";
   }
 
   function writeTheme(mode) {
-    const finalMode = resolveTheme(mode);
+    const nextMode = normalizeMode(mode);
+    const finalMode = resolveTheme();
     root.setAttribute("data-theme", finalMode);
-    root.setAttribute("data-theme-mode", mode);
+    root.setAttribute("data-theme-mode", nextMode);
     root.style.colorScheme = finalMode;
     return finalMode;
   }
 
-  function syncControls(mode, finalMode) {
-    const select = document.querySelector("#themeSelect");
-    if (select) {
-      select.value = mode;
-    }
-
+  function syncControls(finalMode) {
     document.querySelectorAll(".brand-logo").forEach((logo) => {
       const lightSrc = logo.getAttribute("data-light");
       const darkSrc = logo.getAttribute("data-dark");
@@ -81,7 +64,7 @@
     }
 
     if (document.readyState !== "loading") {
-      syncControls(nextMode, finalMode);
+      syncControls(finalMode);
     }
 
     if (options.notify !== false) {
@@ -91,13 +74,6 @@
     return { mode: nextMode, finalMode };
   }
 
-  function handleSystemThemeChange() {
-    const currentMode = getSavedMode();
-    if (currentMode === "system") {
-      applyTheme("system", { persist: false });
-    }
-  }
-
   function initTheme(options = {}) {
     if (typeof options.onApply === "function") {
       onApplyCallbacks.add(options.onApply);
@@ -105,21 +81,7 @@
 
     const currentMode = getSavedMode();
     const finalMode = writeTheme(currentMode);
-    syncControls(currentMode, finalMode);
-
-    if (!initialized) {
-      const select = document.querySelector("#themeSelect");
-      if (select) {
-        select.addEventListener("change", () => applyTheme(select.value));
-      }
-
-      const query = getSystemQuery();
-      if (query) {
-        query.addEventListener("change", handleSystemThemeChange);
-      }
-
-      initialized = true;
-    }
+    syncControls(finalMode);
 
     return { mode: currentMode, finalMode };
   }
@@ -131,7 +93,7 @@
     init: initTheme,
     getCurrent() {
       const mode = normalizeMode(root.getAttribute("data-theme-mode"));
-      return { mode, finalMode: resolveTheme(mode) };
+      return { mode, finalMode: resolveTheme() };
     },
   };
 

@@ -39,8 +39,8 @@
   --button-primary-hover: oklch(88% 0.004 260);
   --input-bg: oklch(10.5% 0.004 260);
   --focus-ring: 0 0 0 3px oklch(96% 0.004 260 / 0.28);
-  --shadow-lg: 0 28px 80px oklch(0% 0 0 / 0.56), 0 0 0 1px oklch(96% 0.004 260 / 0.08);
-  --shadow-md: 0 18px 44px oklch(0% 0 0 / 0.38), 0 0 0 1px oklch(96% 0.004 260 / 0.08);
+  --shadow-lg: 0 28px 80px oklch(4% 0.004 260 / 0.46), 0 0 0 1px oklch(96% 0.004 260 / 0.08);
+  --shadow-md: 0 18px 44px oklch(4% 0.004 260 / 0.30), 0 0 0 1px oklch(96% 0.004 260 / 0.08);
   --paper: oklch(97% 0.004 260);
   --paper-soft: oklch(93% 0.004 260);
   --paper-ink: oklch(16% 0.005 260);
@@ -48,10 +48,10 @@
   --paper-line: oklch(60% 0.004 260 / 0.42);
   --paper-mark: oklch(82% 0.004 260 / 0.32);
   --chart-bg: var(--paper);
-  --chart-grid: oklch(68% 0.025 176 / 0.32);
-  --chart-label-bg: oklch(94% 0.025 92 / 0.94);
+  --chart-grid: oklch(72% 0.004 260 / 0.30);
+  --chart-label-bg: oklch(94% 0.004 260 / 0.94);
   --chart-label-text: var(--paper-ink);
-  --chart-label-border: oklch(67% 0.03 176 / 0.58);
+  --chart-label-border: oklch(68% 0.004 260 / 0.50);
 
   --success-bg: oklch(22% 0.045 154);
   --success-border: oklch(50% 0.1 154 / 0.56);
@@ -65,10 +65,6 @@
   --info-bg: oklch(21% 0.045 268);
   --info-border: oklch(50% 0.1 268 / 0.55);
   --info-text: oklch(83% 0.12 268);
-}
-
-html[data-theme="light"] {
-  color-scheme: dark;
 }
 
 *,
