@@ -1174,6 +1174,7 @@ input:disabled {
 
 .form-card,
 .sample-card,
+.result-figure,
 .summary-card,
 .download-panel,
 .info-box,
@@ -1191,12 +1192,6 @@ input:disabled {
   background: var(--surface-soft);
 }
 
-.plot-wrap {
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-xs);
-  background: var(--chart-bg);
-}
-
 .form-card {
   display: grid;
   gap: 15px;
@@ -1204,6 +1199,7 @@ input:disabled {
 }
 
 .sample-card,
+.result-figure,
 .summary-card,
 .download-panel {
   padding: 18px;
@@ -1782,25 +1778,97 @@ code {
 
 .result-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.34fr);
+  gap: 16px;
   align-items: start;
 }
 
-.plot-wrap {
+.result-figure {
   min-width: 0;
-  overflow: auto;
-  padding: 14px;
-  background: var(--chart-bg);
+  padding: 0;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.figure-toolbar {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--surface-raised);
+}
+
+.figure-toolbar > div:first-child {
+  min-width: 0;
+}
+
+.figure-toolbar span,
+.figure-meta span {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 740;
+}
+
+.figure-toolbar strong {
+  display: block;
+  min-width: 0;
+  margin-top: 3px;
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 780;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.figure-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 170px;
+}
+
+.figure-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 8px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+
+.plot-wrap {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  overflow: hidden;
+  padding: 22px;
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--line-soft) 28%, transparent) 1px, transparent 1px),
+    linear-gradient(color-mix(in oklch, var(--line-soft) 28%, transparent) 1px, transparent 1px),
+    var(--surface-soft);
+  background-size: 24px 24px;
 }
 
 .plot {
   display: block;
+  width: min(100%, 980px);
+  height: auto;
+  border: 1px solid oklch(84% 0.012 264);
+  border-radius: 3px;
+  background: rgb(250, 250, 247);
+  box-shadow: 0 16px 42px oklch(4% 0.005 268 / 0.32);
 }
 
 .result-side {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .summary-card h4,
@@ -1815,19 +1883,19 @@ code {
 
 .download-panel {
   display: grid;
-  gap: 9px;
+  gap: 8px;
 }
 
 .download-panel a {
   display: flex;
   align-items: center;
-  min-height: 42px;
+  min-height: 40px;
   padding: 0 12px;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-sm);
   color: var(--text-main);
   background: var(--surface);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 740;
   transition:
     border-color var(--duration-fast) var(--ease-out),
@@ -1836,9 +1904,9 @@ code {
 }
 
 .download-panel a:first-of-type {
-  color: var(--button-primary-text);
-  border-color: transparent;
-  background: var(--button-primary-bg);
+  color: var(--text-main);
+  border-color: var(--accent-border);
+  background: color-mix(in oklch, var(--accent) 18%, var(--surface-raised));
 }
 
 .download-panel a:hover {
@@ -1848,12 +1916,12 @@ code {
 }
 
 .download-panel a:first-of-type:hover {
-  background: var(--button-primary-hover);
+  background: color-mix(in oklch, var(--accent) 26%, var(--surface-raised));
 }
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 1px;
   overflow: hidden;
   margin-top: 18px;
@@ -1945,6 +2013,11 @@ code {
     grid-template-columns: 1fr;
   }
 
+  .result-side {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 0.8fr);
+    align-items: start;
+  }
+
   .plot-readiness-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -1998,6 +2071,7 @@ code {
   .sample-list.compact,
   .upload-layout,
   .sample-guide,
+  .result-side,
   .process-grid,
   .guide-grid,
   .stats,
@@ -2066,6 +2140,20 @@ code {
   .workbench-brief-actions,
   .workbench-brief-actions .btn {
     width: 100%;
+  }
+
+  .figure-toolbar {
+    display: grid;
+    align-items: start;
+  }
+
+  .figure-meta {
+    justify-content: flex-start;
+    min-width: 0;
+  }
+
+  .plot-wrap {
+    padding: 14px;
   }
 
   .hero-desc {

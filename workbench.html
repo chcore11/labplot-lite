@@ -440,8 +440,21 @@
           </div>
 
           <div class="result-layout">
-            <div class="plot-wrap">
-              <canvas id="plotCanvas" class="plot" aria-label="X-Y plot"></canvas>
+            <div class="result-figure">
+              <div class="figure-toolbar">
+                <div>
+                  <span>图像预览</span>
+                  <strong id="resultFigureTitle">等待生成图像</strong>
+                </div>
+                <div class="figure-meta">
+                  <span id="resultFigureMeta">--</span>
+                  <span id="resultFigureCurves">--</span>
+                </div>
+              </div>
+
+              <div class="plot-wrap">
+                <canvas id="plotCanvas" class="plot" aria-label="X-Y plot"></canvas>
+              </div>
             </div>
 
             <div class="result-side">
