@@ -8,6 +8,17 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes heroEnter {
+  from {
+    opacity: 0;
+    transform: translateY(48px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes modeSlideIn {
   from {
     opacity: 0;
@@ -28,6 +39,18 @@
     opacity: 0;
     transform: translateY(-18px) scale(0.97);
   }
+}
+
+#heroSection .hero-copy {
+  animation: heroEnter 0.7s var(--ease-out) both;
+}
+
+#heroSection .hero-stage {
+  animation: heroEnter 0.7s var(--ease-out) 0.1s both;
+}
+
+#heroSection .hero-flow {
+  animation: heroEnter 0.7s var(--ease-out) 0.2s both;
 }
 
 .mode-enter {
@@ -65,6 +88,12 @@
   
   .mode-enter,
   .mode-exit {
+    animation: none;
+  }
+
+  #heroSection .hero-copy,
+  #heroSection .hero-stage,
+  #heroSection .hero-flow {
     animation: none;
   }
 }

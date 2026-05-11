@@ -158,6 +158,14 @@
   background: transparent;
 }
 
+.btn-large {
+  padding: 14px 36px;
+  font-size: 16px;
+  font-weight: 600;
+  min-height: 56px;
+  border-radius: var(--radius-md);
+}
+
 .btn-secondary:hover,
 .btn-ghost:hover {
   color: var(--text-main);

@@ -208,24 +208,36 @@
 
 .hero-flow {
   grid-area: flow;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  overflow: hidden;
-  margin-top: 6px;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-pill);
-  background: var(--line-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  overflow-x: auto;
+  margin-top: 16px;
+  padding: 12px 0;
 }
 
-.hero-flow span {
-  display: grid;
-  place-items: center;
-  min-height: 46px;
-  color: var(--text-muted);
+.flow-step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  min-height: 48px;
+  padding: 12px 18px;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-md);
   background: var(--surface-soft);
-  font-size: 14px;
-  font-weight: 450;
+  color: var(--text-main);
+  font-size: 15px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.flow-arrow {
+  width: 36px;
+  height: 24px;
+  color: var(--accent);
+  flex-shrink: 0;
 }
 
 .sample-gallery,

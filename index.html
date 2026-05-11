@@ -24,19 +24,18 @@
       </nav>
 
       <div class="nav-actions">
-        <a class="nav-cta" href="./workbench.html?mode=simple">进入工作台</a>
       </div>
     </header>
 
-    <section class="hero landing-hero" aria-labelledby="heroTitle">
+    <section class="hero landing-hero" id="heroSection" aria-labelledby="heroTitle">
       <div class="hero-copy">
         <div class="eyebrow">LabPlot Lite</div>
         <h1 id="heroTitle"><span>实验数据，</span><span>快速成图</span></h1>
         <p class="hero-desc">上传表格，检查列，生成报告图件。<br>为不想学习复杂软件的学生保留一条可靠路径。</p>
 
         <div class="hero-actions">
-          <a href="./workbench.html?mode=simple" class="btn btn-primary">进入工作台</a>
-          <a href="#samples" class="btn btn-secondary">查看示例图</a>
+          <a href="./workbench.html?mode=simple" class="btn btn-primary btn-large">进入工作台</a>
+          <a href="#samples" class="btn btn-secondary btn-large">查看示例图</a>
         </div>
       </div>
 
@@ -77,11 +76,28 @@
         </article>
       </div>
 
-      <div class="hero-flow" aria-label="工作流">
-        <span>上传</span>
-        <span>识别</span>
-        <span>绘图</span>
-        <span>导出</span>
+      <div class="hero-flow" aria-label="工作流程">
+        <div class="flow-step">
+          <span class="flow-label">上传</span>
+        </div>
+        <svg class="flow-arrow" viewBox="0 0 40 24" aria-hidden="true">
+          <path d="M4 12h28M28 6l8 6-8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="flow-step">
+          <span class="flow-label">识别</span>
+        </div>
+        <svg class="flow-arrow" viewBox="0 0 40 24" aria-hidden="true">
+          <path d="M4 12h28M28 6l8 6-8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="flow-step">
+          <span class="flow-label">绘图</span>
+        </div>
+        <svg class="flow-arrow" viewBox="0 0 40 24" aria-hidden="true">
+          <path d="M4 12h28M28 6l8 6-8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="flow-step">
+          <span class="flow-label">导出</span>
+        </div>
       </div>
     </section>
 

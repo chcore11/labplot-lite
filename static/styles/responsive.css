@@ -236,11 +236,6 @@
     margin-top: 12px;
   }
 
-  .hero-flow {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    border-radius: var(--radius-md);
-  }
-
   .workbench-brief {
     padding: 16px;
   }
