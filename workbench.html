@@ -50,6 +50,76 @@
       </div>
     </header>
 
+    <section class="mode-landing" id="modeLanding" aria-labelledby="modeLandingTitle">
+      <div class="mode-landing-copy">
+        <span class="section-kicker">选择入口</span>
+        <h1 id="modeLandingTitle">先选一种处理方式</h1>
+        <p>简易模式适合快速出一张基础图；功能模式保留完整的数据范围、计算列、多曲线、拟合和导出流程。</p>
+      </div>
+
+      <div class="mode-choice-grid" aria-label="工作模式">
+        <button type="button" class="mode-choice-card" id="enterSimpleMode">
+          <span>简易模式</span>
+          <strong>拖入文件，自动生成基础图</strong>
+          <small>自动识别表头、X/Y 数值列，默认散点 + 连线，不进行拟合。</small>
+        </button>
+
+        <button type="button" class="mode-choice-card" id="enterAdvancedMode">
+          <span>功能模式</span>
+          <strong>进入完整工作台</strong>
+          <small>手动确认数据范围，配置多曲线、计算列、拟合指标和报告素材。</small>
+        </button>
+      </div>
+    </section>
+
+    <section class="simple-mode is-hidden" id="simpleMode" aria-labelledby="simpleModeTitle">
+      <div class="simple-mode-head">
+        <div>
+          <span class="section-kicker">简易模式</span>
+          <h1 id="simpleModeTitle">把 Excel / CSV 拖到这里，自动生成基础图</h1>
+          <p>第一版只选择一组 X/Y，默认散点 + 连线，不做自动拟合。</p>
+        </div>
+        <button type="button" class="btn btn-secondary" id="simpleToAdvancedTop">进入功能模式手动调整</button>
+      </div>
+
+      <div class="simple-upload-dropzone" id="simpleDropzone">
+        <input id="simpleFileInput" type="file" accept=".csv,.xls,.xlsx">
+        <div class="simple-upload-copy">
+          <strong>拖拽 CSV / XLSX / XLS 文件到这里</strong>
+          <span>或点击按钮选择文件，系统会自动识别表头、数值列和基础图。</span>
+        </div>
+        <button type="button" class="btn btn-primary" id="simpleChooseFile">选择文件</button>
+      </div>
+
+      <div id="simpleMessage" class="message is-hidden" role="status" aria-live="polite"></div>
+
+      <section class="simple-result is-hidden" id="simpleResult" aria-labelledby="simpleResultTitle">
+        <div class="simple-result-meta">
+          <div>
+            <span>识别结果</span>
+            <h2 id="simpleResultTitle">基础图已生成</h2>
+          </div>
+          <div class="simple-meta-grid">
+            <div><span>X 列</span><strong id="simpleXCol">待识别</strong></div>
+            <div><span>Y 列</span><strong id="simpleYCol">待识别</strong></div>
+            <div><span>有效点数</span><strong id="simplePointCount">待生成</strong></div>
+          </div>
+        </div>
+
+        <div class="simple-plot-wrap">
+          <canvas id="simplePlotCanvas" class="plot" aria-label="simple X-Y plot"></canvas>
+        </div>
+
+        <div class="simple-result-actions">
+          <a id="simpleDownloadPng" class="btn btn-secondary" href="#">下载 PNG</a>
+          <a id="simpleDownloadCsv" class="btn btn-secondary" href="#">下载 CSV</a>
+          <a id="simpleDownloadTxt" class="btn btn-secondary" href="#">下载 TXT 报告</a>
+          <button type="button" class="btn btn-primary" id="simpleToAdvanced">进入功能模式手动调整</button>
+        </div>
+      </section>
+    </section>
+
+    <div id="advancedMode" class="is-hidden">
     <section class="workbench" id="upload-section">
       <div class="workbench-main">
         <div class="workbench-head">
@@ -458,6 +528,7 @@
         </section>
       </div>
     </section>
+    </div>
   </main>
 </body>
 </html>

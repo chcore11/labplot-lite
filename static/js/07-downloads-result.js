@@ -135,6 +135,22 @@ async function renderDownloads(payload) {
   setDownloadLink("#downloadZip", zipBlob, payload.filenames.zip);
 }
 
+async function renderSimpleDownloads(payload) {
+  revokeDownloadUrls();
+
+  const pngBlob = await canvasToBlob(qs("#simplePlotCanvas"));
+  const originCsvBlob = new Blob(
+    ["\uFEFF", rowsToCsv(payload.originRows, payload.originColumns)],
+    { type: "text/csv;charset=utf-8" },
+  );
+  const reportText = buildFitReport(payload.stats, payload.plotTitle);
+  const reportBlob = new Blob([reportText], { type: "text/plain;charset=utf-8" });
+
+  setDownloadLink("#simpleDownloadPng", pngBlob, payload.filenames.png);
+  setDownloadLink("#simpleDownloadCsv", originCsvBlob, payload.filenames.originCsv);
+  setDownloadLink("#simpleDownloadTxt", reportBlob, payload.filenames.fitReport);
+}
+
 function addSummaryRow(container, label, value, large = false) {
   container.appendChild(createValueItem(label, value, large ? "summary-row large" : "summary-row"));
 }

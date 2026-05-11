@@ -52,6 +52,7 @@ async function loadInitialSampleFromUrl() {
 
   clearMessage();
   try {
+    showMode("advanced");
     await loadSample(sampleUrl);
     window.history.replaceState(null, "", window.location.pathname);
   } catch (error) {
@@ -61,11 +62,23 @@ async function loadInitialSampleFromUrl() {
 
 function setupTheme() {
   async function refreshRenderedResult() {
-    if (!state.lastPlotPayload || qs("#resultSection").classList.contains("is-hidden")) {
-      return;
-    }
-
     try {
+      const simpleMode = qs("#simpleMode");
+      if (
+        state.simplePlotPayload &&
+        simpleMode &&
+        !simpleMode.classList.contains("is-hidden") &&
+        !qs("#simpleResult").classList.contains("is-hidden")
+      ) {
+        renderChart(state.simplePlotPayload, "#simplePlotCanvas");
+        await renderSimpleDownloads(state.simplePlotPayload);
+        return;
+      }
+
+      if (!state.lastPlotPayload || qs("#resultSection").classList.contains("is-hidden")) {
+        return;
+      }
+
       renderChart(state.lastPlotPayload);
       await renderDownloads(state.lastPlotPayload);
     } catch (error) {
@@ -79,6 +92,213 @@ function setupTheme() {
         refreshRenderedResult();
       });
     },
+  });
+}
+
+function showMode(mode) {
+  const landing = qs("#modeLanding");
+  const simple = qs("#simpleMode");
+  const advanced = qs("#advancedMode");
+
+  if (landing) {
+    landing.classList.toggle("is-hidden", mode !== "landing");
+  }
+  if (simple) {
+    simple.classList.toggle("is-hidden", mode !== "simple");
+  }
+  if (advanced) {
+    advanced.classList.toggle("is-hidden", mode !== "advanced");
+  }
+
+  if (mode === "advanced") {
+    const targetStep = state.rawRows.length ? state.activeStep : "upload";
+    setActiveStep(targetStep, { scroll: false });
+    (qs("#upload-section") || advanced).scrollIntoView({ behavior: "smooth", block: "start" });
+  } else if (mode === "simple") {
+    (simple || document.body).scrollIntoView({ behavior: "smooth", block: "start" });
+  } else {
+    (landing || document.body).scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+function setSimpleMessage(type, text) {
+  const box = qs("#simpleMessage");
+  if (!box) {
+    return;
+  }
+
+  box.textContent = text;
+  box.className = `message ${type}`;
+  show(box);
+}
+
+function clearSimpleMessage() {
+  const box = qs("#simpleMessage");
+  if (!box) {
+    return;
+  }
+
+  box.textContent = "";
+  box.className = "message is-hidden";
+}
+
+function isLikelyXColumn(column) {
+  const text = cellText(column).toLowerCase();
+  const compact = text.replace(/[\s_-]+/g, "");
+  return (
+    text.includes("time") ||
+    text.includes("时间") ||
+    compact === "t" ||
+    compact === "x" ||
+    compact.startsWith("t") ||
+    compact.startsWith("x")
+  );
+}
+
+function chooseSimpleXYColumns() {
+  if (state.numericColumns.length < 2) {
+    throw new Error("无法自动识别 X/Y，请进入功能模式手动选择。");
+  }
+
+  const xCol = state.numericColumns.find(isLikelyXColumn) || state.numericColumns[0];
+  const yCol = state.numericColumns.find((column) => column !== xCol);
+  if (!yCol) {
+    throw new Error("无法自动识别 X/Y，请进入功能模式手动选择。");
+  }
+
+  return { xCol, yCol };
+}
+
+function loadSimpleRows(rows, fileName) {
+  state.fileName = fileName;
+  state.sampleGuide = null;
+  state.rawRows = rows.map((row) => Array.isArray(row) ? row.map(cellText) : []);
+
+  if (!state.rawRows.length) {
+    throw new Error("文件中没有可读取的数据。");
+  }
+
+  const guess = guessHeaderAndDataRows(state.rawRows);
+  qs("#currentFileName").textContent = fileName;
+  qs("#headerGuessMessage").textContent = guess.message;
+  qs("#headerRow").value = String(guess.headerRow);
+  qs("#dataStartRow").value = String(guess.dataStartRow);
+  qs("#dataEndRow").value = "";
+
+  const loaded = loadDataFromRawRows(guess.headerRow, guess.dataStartRow, null);
+  state.columns = loaded.columns;
+  state.data = loaded.data;
+  state.numericColumns = loaded.numericColumns;
+  state.activeStep = "range";
+
+  renderPreview();
+  renderDataControls();
+  show(qs("#previewSection"));
+  updateWorkflowNav();
+
+  return guess;
+}
+
+async function handleSimpleFile(file) {
+  clearSimpleMessage();
+
+  if (!file) {
+    throw new Error("请先选择 CSV / Excel 文件。");
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error("建议单个文件不超过 5MB。");
+  }
+
+  setSimpleMessage("success", "正在读取文件并识别绘图列...");
+  const rows = await parseFile(file);
+  const headerGuess = loadSimpleRows(rows, file.name);
+  const { xCol, yCol } = chooseSimpleXYColumns();
+  setSelectIfExists("#xCol", xCol);
+  setSelectIfExists("#chartType", "line_marker");
+  setSelectIfExists("#fitType", "none");
+  renderCurveRows([{
+    yCol,
+    color: DEFAULT_CURVE_COLORS[0],
+    lineWidth: 1.8,
+    lineStyle: "solid",
+  }]);
+  updatePlotReadiness();
+
+  const payload = buildSimplePlotPayload({ xCol, yCol, headerGuess });
+
+  state.simplePlotPayload = payload;
+  state.lastPlotPayload = payload;
+  renderChart(payload, "#simplePlotCanvas");
+  await renderSimpleDownloads(payload);
+
+  qs("#simpleXCol").textContent = xCol;
+  qs("#simpleYCol").textContent = yCol;
+  qs("#simplePointCount").textContent = `${payload.stats.points} 点`;
+  show(qs("#simpleResult"));
+  setSimpleMessage("success", `已自动生成基础图：${file.name}`);
+}
+
+function setupModeEvents() {
+  const simpleInput = qs("#simpleFileInput");
+  const dropzone = qs("#simpleDropzone");
+
+  qs("#enterSimpleMode").addEventListener("click", () => {
+    showMode("simple");
+  });
+
+  qs("#enterAdvancedMode").addEventListener("click", () => {
+    showMode("advanced");
+  });
+
+  const navImport = qs('.nav-cta[href="#upload-section"]');
+  if (navImport) {
+    navImport.addEventListener("click", (event) => {
+      event.preventDefault();
+      showMode("advanced");
+    });
+  }
+
+  qsa("#simpleToAdvanced, #simpleToAdvancedTop").forEach((button) => {
+    button.addEventListener("click", () => {
+      showMode("advanced");
+      if (state.rawRows.length) {
+        showMessage("success", "已进入功能模式。可继续手动确认数据范围和绘图配置。");
+      }
+    });
+  });
+
+  qs("#simpleChooseFile").addEventListener("click", () => {
+    simpleInput.click();
+  });
+
+  simpleInput.addEventListener("change", async () => {
+    try {
+      await handleSimpleFile(simpleInput.files[0]);
+    } catch (error) {
+      setSimpleMessage("error", error.message);
+    }
+  });
+
+  ["dragenter", "dragover"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      dropzone.classList.add("is-dragging");
+    });
+  });
+
+  ["dragleave", "drop"].forEach((eventName) => {
+    dropzone.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      dropzone.classList.remove("is-dragging");
+    });
+  });
+
+  dropzone.addEventListener("drop", async (event) => {
+    try {
+      await handleSimpleFile(event.dataTransfer.files[0]);
+    } catch (error) {
+      setSimpleMessage("error", error.message);
+    }
   });
 }
 
@@ -226,6 +446,7 @@ function setupEvents() {
 document.addEventListener("DOMContentLoaded", async () => {
   renderStaticOptions();
   setupTheme();
+  setupModeEvents();
   setupEvents();
   updateWorkflowNav();
   await loadInitialSampleFromUrl();

@@ -315,6 +315,7 @@ function resetWorkflow() {
   state.data = [];
   state.numericColumns = [];
   state.lastPlotPayload = null;
+  state.simplePlotPayload = null;
   state.isPlotGenerating = false;
   state.activeStep = "upload";
   state.sampleGuide = null;

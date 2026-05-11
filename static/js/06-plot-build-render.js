@@ -228,6 +228,109 @@ function buildPlotPayload() {
   };
 }
 
+function buildSimplePlotPayload(options) {
+  const xCol = options.xCol;
+  const yCol = options.yCol;
+  const pairs = sortPairsByX(getPlotPairs(xCol, yCol));
+
+  if (!pairs.length) {
+    throw new Error("所选 X/Y 列中没有可用于绘图的成对数值数据。");
+  }
+
+  const config = {
+    yCol,
+    color: DEFAULT_CURVE_COLORS[0],
+    lineWidth: 1.8,
+    lineStyle: "solid",
+  };
+  const xValues = pairs.map((point) => point.x);
+  const yValues = pairs.map((point) => point.y);
+  const maxValue = Math.max(...yValues);
+  const minValue = Math.min(...yValues);
+  const avgValue = yValues.reduce((sum, value) => sum + value, 0) / yValues.length;
+  const peakPoint = pairs.reduce((best, point) => point.y > best.y ? point : best, pairs[0]);
+  const figWidth = 7;
+  const figHeight = 4.6;
+  const figDpi = 300;
+  const plotTitle = autoTitle("", xCol, yCol);
+  const jobId = randomId();
+  const prefix = `${safeFilenamePart(yCol)}_vs_${safeFilenamePart(xCol)}`;
+  const headerGuess = options.headerGuess || {};
+
+  const stats = {
+    x_col: xCol,
+    y_col: yCol,
+    y_cols_label: yCol,
+    curve_count: "1",
+    curve_configs: [config],
+    multi_y: false,
+    fit_notice: "",
+    x_label: xCol,
+    y_label: yCol,
+    max_value: formatShortNumber(maxValue),
+    min_value: formatShortNumber(minValue),
+    avg_value: formatShortNumber(avgValue),
+    peak_x: String(peakPoint.x),
+    points: String(pairs.length),
+    header_row: String(headerGuess.headerRow || 1),
+    data_start_row: String(headerGuess.dataStartRow || 2),
+    data_end_row: "未限制",
+    chart_type: CHART_TYPES.line_marker,
+    fit_type: "none",
+    fit_type_label: FIT_TYPES.none,
+    has_fit: false,
+    equation: null,
+    fit_quality: "",
+    fit_a: null,
+    fit_b: null,
+    fit_c: null,
+    metric_mode: "basic",
+    metric_mode_label: METRIC_MODES.basic,
+    selected_metrics: [],
+    metric_values: {},
+    metric_display: [],
+    core_metrics: null,
+    fig_width: figWidth,
+    fig_height: figHeight,
+    fig_dpi: figDpi,
+    title_fontsize: 15,
+    label_fontsize: 13,
+    legend_fontsize: 11,
+    show_grid: false,
+  };
+
+  return {
+    datasets: [makeChartDataset(yCol, pairs, config, "line_marker")],
+    stats,
+    plotTitle,
+    xLabel: xCol,
+    yLabel: yCol,
+    fitText: "",
+    figWidth,
+    figHeight,
+    figDpi,
+    titleFontsize: 15,
+    labelFontsize: 13,
+    legendFontsize: 11,
+    showGrid: false,
+    xMin: Math.min(...xValues),
+    xMax: Math.max(...xValues),
+    yMin: minValue,
+    yMax: maxValue,
+    originRows: pairs.map((point) => ({ [xCol]: point.x, [yCol]: point.y })),
+    originColumns: [xCol, yCol],
+    fullRows: state.data,
+    fullColumns: state.columns,
+    filenames: {
+      png: `${prefix}_${jobId}.png`,
+      originCsv: `${prefix}_origin_${jobId}.csv`,
+      fullCsv: `${prefix}_full_data_${jobId}.csv`,
+      fitReport: `${prefix}_report_${jobId}.txt`,
+      zip: `report_package_${safeFilenamePart(plotTitle)}_${jobId}.zip`,
+    },
+  };
+}
+
 function makeChartDataset(label, pairs, config, chartType) {
   const isScatter = chartType === "scatter";
   const isLineOnly = chartType === "line";
@@ -401,14 +504,14 @@ function ensureChartPlugin() {
   window.__labplotFitLabelPluginRegistered = true;
 }
 
-function renderChart(payload) {
+function renderChart(payload, canvasSelector = "#plotCanvas") {
   if (!window.Chart) {
     throw new Error("图表库未加载，请检查网络后刷新页面。");
   }
 
   ensureChartPlugin();
 
-  const canvas = qs("#plotCanvas");
+  const canvas = qs(canvasSelector);
   const width = Math.round(payload.figWidth * payload.figDpi);
   const height = Math.round(payload.figHeight * payload.figDpi);
   canvas.width = width;
