@@ -4,41 +4,43 @@
 product
 
 ## Theme
-Default to a Linear-inspired dark product surface: near-black page background, subtle borders, quiet text hierarchy, and a large product preview. Light mode remains supported for classrooms and printing, but the primary visual direction is dark and restrained.
+Default to a Linear-inspired dark product workbench: near-black page background, precise borders, dense tool surfaces, a persistent left workflow sidebar, and quiet text hierarchy. Light mode remains supported for classrooms and printing, but dark mode is the primary authored surface.
 
 ## Color
 - Use restrained product color: tinted neutrals plus one blue-violet accent.
 - Prefer OKLCH tokens for surfaces, text, lines, focus rings, semantic states, and shadows.
-- Avoid pure black and pure white; every neutral should have a slight cool or green tint.
-- Accent color is for primary actions, active indicators, selected states, and data emphasis.
-- Semantic states: success, warning, and danger must work on both themes and remain readable.
+- Avoid pure black and pure white; every neutral should have a slight cool tint.
+- Accent color is reserved for primary actions, active steps, selected states, and chart emphasis.
+- Semantic states must include info, success, warning, and danger and remain readable in both themes.
 
 ## Typography
 - Use the system UI font stack with Chinese system fallbacks.
-- Product headings should be confident but not billboard-sized.
-- No fluid typography for product sections; use fixed rem sizes and breakpoint overrides.
-- Labels and button text should be compact, high contrast, and consistent.
+- Product headings should be compact and confident, not billboard-sized.
+- Use fixed rem sizes with breakpoint overrides; do not scale typography continuously with viewport width.
+- Labels, buttons, table text, and metrics should be tight, readable, and consistent.
 
 ## Layout
-- The product workbench is the center of the experience.
-- The hero may borrow Linear's structure: quiet top navigation, large left-aligned headline, sparse supporting copy, and a real product-like preview.
-- Avoid cards inside cards where a full-width work area or simple panel is enough.
-- Use consistent panel borders, 16 to 28 px spacing, and compact form grids.
+- The workbench is the product center: a left step sidebar and a right task panel.
+- The flow is import data, identify range, optional data processing, configure plot, review result.
+- Keep the hero short and functional, with a real product-like preview instead of a marketing composition.
+- Avoid nested cards. Use full-width bands, bordered panels, split panes, and dense rows.
 - Tables may scroll horizontally within their own container only.
 
 ## Components
-- Buttons use one shape vocabulary: primary, secondary, neutral/download, and disabled.
-- Inputs/selects share height, border, focus ring, background, and disabled styling.
-- Messages and info boxes use the same border and tone system as panels.
-- Interactive elements must define hover, focus-visible, active, and disabled states.
+- Buttons use one vocabulary: primary, secondary, ghost/sidebar, neutral/download, disabled.
+- Inputs and selects share height, border, background, focus ring, hover, active, disabled, and error states.
+- Step navigation exposes active, available, locked, and complete states.
+- Messages, readiness checks, info boxes, metrics, and downloads share the same border and tone system.
+- The generated result prioritizes fit equation, R², RMSE, MAE, valid point count, and ZIP export.
 
 ## Motion
-- Motion is only for state feedback and light hover response.
+- Motion is only for state feedback, reveal, focus, and hover response.
 - Use 150 to 220 ms ease-out transitions.
 - Respect `prefers-reduced-motion` by removing smooth scroll and transform transitions.
 
 ## Accessibility
 - Keep focus rings visible in both themes.
 - Maintain at least 44 px touch targets on mobile.
+- Use `aria-current` for the active workflow step and disable unavailable steps.
 - Avoid text overlap at 390 px width.
 - Keep generated chart labels readable after theme changes.

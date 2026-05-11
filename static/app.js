@@ -88,7 +88,27 @@ const state = {
   numericColumns: [],
   chart: null,
   lastPlotPayload: null,
+  isPlotGenerating: false,
+  activeStep: "upload",
   objectUrls: [],
+};
+
+const WORKFLOW_STEPS = ["upload", "range", "calc", "plot", "result"];
+
+const WORKFLOW_PANELS = {
+  upload: "step-upload",
+  range: "previewSection",
+  calc: "calcSection",
+  plot: "plotSection",
+  result: "resultSection",
+};
+
+const WORKFLOW_STATUS = {
+  upload: "等待导入数据",
+  range: "检查表头和数据范围",
+  calc: "可以生成计算列，也可以跳过",
+  plot: "选择坐标轴、曲线和拟合方式",
+  result: "结果已生成，可检查并下载",
 };
 
 function qs(selector) {
@@ -105,6 +125,83 @@ function show(element) {
 
 function hide(element) {
   element.classList.add("is-hidden");
+}
+
+function getWorkflowPanel(step) {
+  const id = WORKFLOW_PANELS[step];
+  return id ? qs(`#${id}`) : null;
+}
+
+function isWorkflowStepAvailable(step) {
+  if (step === "upload") {
+    return true;
+  }
+
+  const panel = getWorkflowPanel(step);
+  return Boolean(panel && !panel.classList.contains("is-hidden"));
+}
+
+function getLastAvailableWorkflowStep() {
+  for (let index = WORKFLOW_STEPS.length - 1; index >= 0; index -= 1) {
+    const step = WORKFLOW_STEPS[index];
+    if (isWorkflowStepAvailable(step)) {
+      return step;
+    }
+  }
+
+  return "upload";
+}
+
+function updateWorkflowNav() {
+  if (!getWorkflowPanel("upload")) {
+    return;
+  }
+
+  if (!isWorkflowStepAvailable(state.activeStep)) {
+    state.activeStep = getLastAvailableWorkflowStep();
+  }
+
+  WORKFLOW_STEPS.forEach((step) => {
+    const panel = getWorkflowPanel(step);
+    if (panel) {
+      panel.classList.toggle("is-active", step === state.activeStep && isWorkflowStepAvailable(step));
+    }
+  });
+
+  const activeIndex = WORKFLOW_STEPS.indexOf(state.activeStep);
+  qsa(".step-nav-item[data-step-target]").forEach((button) => {
+    const step = button.dataset.stepTarget;
+    const stepIndex = WORKFLOW_STEPS.indexOf(step);
+    const available = isWorkflowStepAvailable(step);
+
+    button.disabled = !available;
+    button.classList.toggle("is-active", step === state.activeStep);
+    button.classList.toggle("is-complete", available && stepIndex >= 0 && stepIndex < activeIndex);
+
+    if (step === state.activeStep) {
+      button.setAttribute("aria-current", "step");
+    } else {
+      button.removeAttribute("aria-current");
+    }
+  });
+
+  const status = qs("#workflowStatusText");
+  if (status) {
+    status.textContent = WORKFLOW_STATUS[state.activeStep] || WORKFLOW_STATUS.upload;
+  }
+}
+
+function setActiveStep(step, options = {}) {
+  if (!WORKFLOW_PANELS[step] || !isWorkflowStepAvailable(step)) {
+    return;
+  }
+
+  state.activeStep = step;
+  updateWorkflowNav();
+
+  if (options.scroll) {
+    qs("#upload-section").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 function showMessage(type, text) {
@@ -672,6 +769,7 @@ function renderDataControls() {
   setOptions(qs("#secondCol"), numericOptions, state.numericColumns[1] || state.numericColumns[0]);
   setOptions(qs("#xCol"), numericOptions, state.numericColumns[0]);
   renderCurveRows(getDefaultCurveConfigs());
+  updatePlotReadiness();
 
   if (state.numericColumns.length >= 2) {
     show(qs("#calcSection"));
@@ -681,6 +779,8 @@ function renderDataControls() {
     hide(qs("#plotSection"));
     showMessage("error", `至少需要两列数值数据才能绘图。当前可用数值列：${state.numericColumns.join("、") || "无"}`);
   }
+
+  updateWorkflowNav();
 }
 
 function reloadDataFromRange(showSuccess = false) {
@@ -697,7 +797,12 @@ function reloadDataFromRange(showSuccess = false) {
   hide(qs("#resultSection"));
   if (showSuccess) {
     showMessage("success", "已按新的表头和数据范围重新读取。");
+    if (state.numericColumns.length >= 2) {
+      setActiveStep("plot", { scroll: true });
+    }
   }
+
+  updateWorkflowNav();
 }
 
 function setDataset(rows, fileName) {
@@ -718,6 +823,7 @@ function setDataset(rows, fileName) {
   renderPreview();
   show(qs("#previewSection"));
   reloadDataFromRange(false);
+  setActiveStep("range", { scroll: true });
 }
 
 function getNumericSeries(column, label) {
@@ -816,6 +922,7 @@ function calculateColumn() {
 
   qs("#newColName").value = "";
   showMessage("success", `已生成新列：${newColName}`);
+  setActiveStep("plot", { scroll: true });
 }
 
 function normalizeSelectedMetrics() {
@@ -835,6 +942,228 @@ function getPlotPairs(xCol, yCol) {
       y: toNumber(row[yCol]),
     }))
     .filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+}
+
+function sortPairsByX(pairs) {
+  return pairs.slice().sort((a, b) => {
+    if (a.x === b.x) {
+      return a.y - b.y;
+    }
+    return a.x - b.x;
+  });
+}
+
+function getSelectedCurveSummary() {
+  return qsa("#curveConfigBox .curve-row")
+    .map((row) => {
+      const ySelect = row.querySelector('select[name="curveYCols"]');
+      return ySelect ? ySelect.value : "";
+    })
+    .filter(Boolean);
+}
+
+function readOutputSize() {
+  const figWidth = parsePositiveFloat(qs("#figWidth").value, 6.5, "图片宽度", 3, 20);
+  const figHeight = parsePositiveFloat(qs("#figHeight").value, 4.2, "图片高度", 2, 16);
+  const figDpi = Math.round(parsePositiveFloat(qs("#figDpi").value, 150, "图片 DPI", 72, 600));
+  return {
+    width: Math.round(figWidth * figDpi),
+    height: Math.round(figHeight * figDpi),
+  };
+}
+
+function inspectPlotReadiness() {
+  if (!state.data.length || !state.numericColumns.length) {
+    return {
+      level: "neutral",
+      canGenerate: false,
+      status: "等待数据",
+      hint: "上传或载入示例数据后再生成图像。",
+      points: "--",
+      fit: "--",
+      exportSize: "--",
+    };
+  }
+
+  const xCol = qs("#xCol").value;
+  const yCols = getSelectedCurveSummary();
+  const fitType = qs("#fitType").value;
+
+  if (!xCol || !yCols.length) {
+    return {
+      level: "neutral",
+      canGenerate: false,
+      status: "等待选择绘图列",
+      hint: "选择 X 轴和至少一条 Y 轴曲线。",
+      points: "--",
+      fit: "--",
+      exportSize: "--",
+    };
+  }
+
+  if (yCols.includes(xCol)) {
+    return {
+      level: "danger",
+      canGenerate: false,
+      status: "列选择有冲突",
+      hint: "X 轴和 Y 轴不能使用同一列。",
+      points: "--",
+      fit: "不可用",
+      exportSize: "--",
+    };
+  }
+
+  let outputSize;
+  try {
+    outputSize = readOutputSize();
+  } catch (error) {
+    return {
+      level: "danger",
+      canGenerate: false,
+      status: "导出尺寸需要检查",
+      hint: error.message,
+      points: "--",
+      fit: "待检查",
+      exportSize: "--",
+    };
+  }
+
+  const curveInfos = yCols.map((yCol) => {
+    const pairs = getPlotPairs(xCol, yCol);
+    const uniqueX = new Set(pairs.map((point) => point.x));
+    return { yCol, pairs, uniqueX };
+  });
+  const validCounts = curveInfos.map((info) => info.pairs.length);
+  const minPoints = Math.min(...validCounts);
+  const pointLabel = yCols.length > 1
+    ? `${validCounts.join(" / ")} 点`
+    : `${minPoints} 点`;
+
+  if (minPoints <= 0) {
+    return {
+      level: "danger",
+      canGenerate: false,
+      status: "没有可绘制数据",
+      hint: "所选 X/Y 列中没有成对的数值数据。",
+      points: pointLabel,
+      fit: "不可用",
+      exportSize: `${outputSize.width} × ${outputSize.height}px`,
+    };
+  }
+
+  if (yCols.length > 1) {
+    return {
+      level: "warning",
+      canGenerate: true,
+      status: "多曲线绘图就绪",
+      hint: "多曲线模式会生成图像，但暂不输出拟合结果。",
+      points: pointLabel,
+      fit: "多曲线不拟合",
+      exportSize: `${outputSize.width} × ${outputSize.height}px`,
+    };
+  }
+
+  const onlyCurve = curveInfos[0];
+  let fitLabel = FIT_TYPES[fitType] || "待选择";
+  let level = "ready";
+  let hint = "数据点和导出设置已通过检查。";
+  let canGenerate = true;
+
+  if (fitType === "linear" && (onlyCurve.pairs.length < 2 || onlyCurve.uniqueX.size < 2)) {
+    level = "danger";
+    canGenerate = false;
+    fitLabel = "一次拟合不可用";
+    hint = "一次拟合至少需要 2 个不同的 X 值。";
+  } else if (fitType === "quadratic" && (onlyCurve.pairs.length < 3 || onlyCurve.uniqueX.size < 3)) {
+    level = "danger";
+    canGenerate = false;
+    fitLabel = "二次拟合不可用";
+    hint = "二次拟合至少需要 3 个不同的 X 值。";
+  } else if (fitType === "none") {
+    fitLabel = "不拟合，只绘图";
+  }
+
+  return {
+    level,
+    canGenerate,
+    status: canGenerate ? "可以生成" : "暂不能生成",
+    hint,
+    points: pointLabel,
+    fit: fitLabel,
+    exportSize: `${outputSize.width} × ${outputSize.height}px`,
+  };
+}
+
+function syncFitAvailability() {
+  const fitSelect = qs("#fitType");
+  if (!fitSelect) {
+    return;
+  }
+
+  const isMultiCurve = getSelectedCurveSummary().length > 1;
+  fitSelect.disabled = isMultiCurve;
+  if (isMultiCurve) {
+    fitSelect.value = "none";
+  }
+}
+
+function syncMetricBoxVisibility() {
+  const metricBox = qs(".metric-box");
+  const metricMode = qs("#metricMode");
+  if (!metricBox || !metricMode) {
+    return;
+  }
+
+  const isCustom = metricMode.value === "custom";
+  metricBox.classList.toggle("is-hidden", !isCustom);
+  metricBox.setAttribute("aria-hidden", String(!isCustom));
+}
+
+function updatePlotReadiness() {
+  const box = qs("#plotReadinessBox");
+  const submitButton = qs("#plotSubmitButton");
+  if (!box || !submitButton) {
+    return;
+  }
+
+  syncFitAvailability();
+  syncMetricBoxVisibility();
+
+  const info = inspectPlotReadiness();
+  box.className = `plot-readiness ${info.level}`;
+  qs("#plotReadyStatus").textContent = info.status;
+  qs("#plotReadyHint").textContent = info.hint;
+  qs("#plotReadyPoints").textContent = info.points;
+  qs("#plotReadyFit").textContent = info.fit;
+  qs("#plotReadyExport").textContent = info.exportSize;
+
+  submitButton.disabled = state.isPlotGenerating || !info.canGenerate;
+  return info;
+}
+
+function setPlotProgress(text, visible = true) {
+  const progress = qs("#plotProgress");
+  const progressText = qs("#plotProgressText");
+  if (!progress || !progressText) {
+    return;
+  }
+
+  progressText.textContent = text;
+  progress.classList.toggle("is-hidden", !visible);
+}
+
+function setPlotGenerating(isGenerating, text = "正在生成") {
+  state.isPlotGenerating = isGenerating;
+  const submitButton = qs("#plotSubmitButton");
+  const plotForm = qs("#plotForm");
+  if (plotForm) {
+    plotForm.setAttribute("aria-busy", String(isGenerating));
+  }
+  if (submitButton) {
+    submitButton.textContent = isGenerating ? "生成中..." : "生成图像与拟合结果";
+  }
+  setPlotProgress(text, isGenerating);
+  updatePlotReadiness();
 }
 
 function calcRSquared(yTrue, yPred) {
@@ -870,6 +1199,22 @@ function calcAllFitMetrics(yTrue, yPred) {
     residual_mean: residualMean,
     residual_std: residualStd,
   };
+}
+
+function describeFitQuality(metrics) {
+  if (!metrics || !Number.isFinite(metrics.r2)) {
+    return "";
+  }
+  if (metrics.r2 >= 0.99) {
+    return "拟合度很高，请仍结合实验原理判断。";
+  }
+  if (metrics.r2 >= 0.95) {
+    return "拟合度较高，建议同时查看残差和实验原理。";
+  }
+  if (metrics.r2 >= 0.85) {
+    return "拟合度一般，建议检查模型选择或异常点。";
+  }
+  return "拟合度偏低，建议先查看散点分布。";
 }
 
 function formatLinearEquation(a, b) {
@@ -1062,7 +1407,7 @@ function buildPlotPayload() {
     fitType = "none";
 
     curveConfigs.forEach((config) => {
-      const pairs = getPlotPairs(xCol, config.yCol);
+      const pairs = sortPairsByX(getPlotPairs(xCol, config.yCol));
       if (!pairs.length) {
         return;
       }
@@ -1083,7 +1428,7 @@ function buildPlotPayload() {
     });
   } else {
     const config = curveConfigs[0];
-    const pairs = getPlotPairs(xCol, config.yCol);
+    const pairs = sortPairsByX(getPlotPairs(xCol, config.yCol));
     if (!pairs.length) {
       throw new Error("所选 X/Y 列中没有可用的数值数据，请检查表格内容。");
     }
@@ -1178,6 +1523,7 @@ function buildPlotPayload() {
     fit_type_label: curveConfigs.length > 1 ? MULTI_Y_FIT_NOTICE : FIT_TYPES[fitType],
     has_fit: Boolean(fitResult),
     equation: fitResult ? fitResult.equation : null,
+    fit_quality: fitResult ? describeFitQuality(fitResult.allMetrics) : "",
     fit_a: fitResult ? formatNumber(fitResult.a) : null,
     fit_b: fitResult ? formatNumber(fitResult.b) : null,
     fit_c: fitResult && fitResult.c !== null ? formatNumber(fitResult.c) : null,
@@ -1186,6 +1532,11 @@ function buildPlotPayload() {
     selected_metrics: fitResult ? selectedMetrics : [],
     metric_values: metricValues,
     metric_display: metricDisplay,
+    core_metrics: fitResult ? {
+      r2: formatNumber(fitResult.allMetrics.r2),
+      rmse: formatNumber(fitResult.allMetrics.rmse),
+      mae: formatNumber(fitResult.allMetrics.mae),
+    } : null,
     fig_width: figWidth,
     fig_height: figHeight,
     fig_dpi: figDpi,
@@ -1473,6 +1824,7 @@ function buildFitReport(stats, title) {
 
   if (stats.has_fit) {
     lines.push(`拟合方程：${stats.equation}`);
+    lines.push(`拟合判断：${stats.fit_quality}`);
     if (stats.fit_type === "linear") {
       lines.push(`斜率 a：${stats.fit_a}`);
       lines.push(`截距 b：${stats.fit_b}`);
@@ -1585,20 +1937,25 @@ function renderResult(payload) {
   const stats = payload.stats;
   const summary = qs("#summaryRows");
   summary.replaceChildren();
+
+  if (stats.has_fit) {
+    addSummaryRow(summary, "拟合方程", stats.equation, true);
+    addSummaryRow(summary, "R²", stats.core_metrics.r2);
+    addSummaryRow(summary, "RMSE", stats.core_metrics.rmse);
+    addSummaryRow(summary, "MAE", stats.core_metrics.mae);
+    addSummaryRow(summary, "数据点数", stats.points);
+    addSummaryRow(summary, "拟合判断", stats.fit_quality, true);
+  } else {
+    addSummaryRow(summary, "拟合方式", stats.fit_type_label);
+    addSummaryRow(summary, "数据点数", stats.points);
+    if (stats.multi_y) {
+      addSummaryRow(summary, "提示", stats.fit_notice, true);
+    }
+  }
   addSummaryRow(summary, "X 轴", stats.x_col);
   addSummaryRow(summary, "Y 轴", stats.y_cols_label || stats.y_col);
   addSummaryRow(summary, "曲线数量", stats.curve_count);
   addSummaryRow(summary, "图表类型", stats.chart_type);
-  addSummaryRow(summary, "拟合方式", stats.fit_type_label);
-  addSummaryRow(summary, "数据点数", stats.points);
-
-  if (stats.multi_y) {
-    addSummaryRow(summary, "提示", stats.fit_notice, true);
-  }
-  if (stats.has_fit) {
-    addSummaryRow(summary, "拟合方程", stats.equation, true);
-    stats.metric_display.forEach((metric) => addSummaryRow(summary, metric.label, metric.value));
-  }
 
   const statsGrid = qs("#statsGrid");
   statsGrid.replaceChildren();
@@ -1619,13 +1976,17 @@ function renderResult(payload) {
 }
 
 async function handlePlotSubmit() {
+  setPlotProgress("正在检查绘图设置...");
   const payload = buildPlotPayload();
   state.lastPlotPayload = payload;
+  setPlotProgress("正在绘制图像...");
   renderChart(payload);
+  setPlotProgress("正在生成下载文件...");
   await renderDownloads(payload);
+  setPlotProgress("正在整理结果摘要...");
   renderResult(payload);
   showMessage("success", "已生成图像、CSV、拟合报告和 ZIP 素材包。");
-  qs("#resultSection").scrollIntoView({ behavior: "smooth", block: "start" });
+  setActiveStep("result", { scroll: true });
 }
 
 async function loadSample(url) {
@@ -1747,11 +2108,18 @@ function setupEvents() {
     clearMessage();
 
     try {
+      setPlotGenerating(true, "正在检查绘图设置...");
       await handlePlotSubmit();
     } catch (error) {
       showMessage("error", error.message);
+    } finally {
+      setPlotGenerating(false);
+      setPlotProgress("生成完成", false);
     }
   });
+
+  qs("#plotForm").addEventListener("input", updatePlotReadiness);
+  qs("#plotForm").addEventListener("change", updatePlotReadiness);
 
   qs("#addCurveButton").addEventListener("click", () => {
     const rows = qsa("#curveConfigBox .curve-row");
@@ -1765,6 +2133,7 @@ function setupEvents() {
     };
     qs("#curveConfigBox").appendChild(createCurveRow(config, nextIndex));
     updateRemoveButtons();
+    updatePlotReadiness();
   });
 
   qs("#curveConfigBox").addEventListener("click", (event) => {
@@ -1781,6 +2150,16 @@ function setupEvents() {
 
     button.closest(".curve-row").remove();
     updateRemoveButtons();
+    updatePlotReadiness();
+  });
+
+  qsa("[data-step-target]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const step = button.dataset.stepTarget;
+      if (WORKFLOW_PANELS[step]) {
+        setActiveStep(step, { scroll: true });
+      }
+    });
   });
 
   qsa(".sample-load-button").forEach((button) => {
@@ -1799,4 +2178,5 @@ document.addEventListener("DOMContentLoaded", () => {
   renderStaticOptions();
   setupTheme();
   setupEvents();
+  updateWorkflowNav();
 });
