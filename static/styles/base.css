@@ -1,0 +1,222 @@
+:root {
+  color-scheme: dark;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "SFMono-Regular", "Menlo", "Monaco", "Cascadia Mono", "Roboto Mono", Consolas, "Liberation Mono", monospace;
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 8px;
+  --radius-pill: 999px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-med: 220ms;
+  --control-height: 44px;
+  --control-height-sm: 40px;
+  --surface-pad: 18px;
+  --callout-pad: 14px 15px;
+  --surface-transition: background-color 0.22s var(--ease-out), border-color 0.22s var(--ease-out);
+
+  --page-bg-main: oklch(13.2% 0.014 178);
+  --page-bg-soft: oklch(10.5% 0.011 178);
+  --surface: oklch(17.5% 0.012 190);
+  --surface-raised: oklch(20.5% 0.014 190);
+  --surface-soft: oklch(15% 0.01 190);
+  --surface-hover: oklch(24% 0.018 178);
+  --surface-active: oklch(25.5% 0.035 165);
+  --nav-bg: oklch(12.5% 0.012 178 / 0.96);
+  --text-main: oklch(94% 0.012 92);
+  --text-soft: oklch(77% 0.018 108);
+  --text-muted: oklch(57% 0.018 118);
+  --line-soft: oklch(30% 0.018 178);
+  --line-strong: oklch(43% 0.026 170);
+  --accent: oklch(76% 0.14 158);
+  --accent-strong: oklch(84% 0.14 150);
+  --accent-soft: oklch(29% 0.065 158 / 0.72);
+  --accent-border: oklch(61% 0.1 158 / 0.78);
+  --accent-warm: oklch(80% 0.14 78);
+  --button-primary-bg: oklch(83% 0.13 78);
+  --button-primary-text: oklch(16% 0.014 178);
+  --button-primary-hover: oklch(88% 0.12 82);
+  --input-bg: oklch(13.5% 0.01 190);
+  --focus-ring: 0 0 0 4px oklch(76% 0.14 158 / 0.28);
+  --shadow-lg: 0 24px 72px oklch(6% 0.01 178 / 0.5), 0 0 0 1px oklch(42% 0.025 160 / 0.12);
+  --shadow-md: 0 14px 38px oklch(6% 0.01 178 / 0.36), 0 0 0 1px oklch(42% 0.025 160 / 0.1);
+  --paper: oklch(94% 0.025 92);
+  --paper-soft: oklch(89% 0.025 92);
+  --paper-ink: oklch(20% 0.022 180);
+  --paper-muted: oklch(47% 0.028 165);
+  --paper-line: oklch(70% 0.025 92 / 0.58);
+  --paper-mark: oklch(82% 0.085 86 / 0.34);
+  --chart-bg: var(--paper);
+  --chart-grid: oklch(68% 0.025 176 / 0.32);
+  --chart-label-bg: oklch(94% 0.025 92 / 0.94);
+  --chart-label-text: var(--paper-ink);
+  --chart-label-border: oklch(67% 0.03 176 / 0.58);
+
+  --success-bg: oklch(22% 0.045 154);
+  --success-border: oklch(50% 0.1 154 / 0.56);
+  --success-text: oklch(82% 0.12 154);
+  --warning-bg: oklch(23% 0.045 88);
+  --warning-border: oklch(52% 0.105 88 / 0.56);
+  --warning-text: oklch(86% 0.12 88);
+  --danger-bg: oklch(22% 0.055 25);
+  --danger-border: oklch(48% 0.12 25 / 0.58);
+  --danger-text: oklch(81% 0.12 25);
+  --info-bg: oklch(21% 0.045 268);
+  --info-border: oklch(50% 0.1 268 / 0.55);
+  --info-text: oklch(83% 0.12 268);
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+  --page-bg-main: oklch(96% 0.022 92);
+  --page-bg-soft: oklch(91.5% 0.025 92);
+  --surface: oklch(98.2% 0.017 92);
+  --surface-raised: oklch(99% 0.014 92);
+  --surface-soft: oklch(94.5% 0.02 92);
+  --surface-hover: oklch(92.5% 0.028 92);
+  --surface-active: oklch(89% 0.045 150);
+  --nav-bg: oklch(97% 0.018 92 / 0.96);
+  --text-main: oklch(22% 0.025 178);
+  --text-soft: oklch(41% 0.028 174);
+  --text-muted: oklch(57% 0.03 155);
+  --line-soft: oklch(82% 0.028 94);
+  --line-strong: oklch(68% 0.045 150);
+  --accent: oklch(54% 0.12 158);
+  --accent-strong: oklch(45% 0.12 158);
+  --accent-soft: oklch(90% 0.06 152);
+  --accent-border: oklch(71% 0.075 152);
+  --accent-warm: oklch(70% 0.15 76);
+  --button-primary-bg: oklch(23% 0.025 178);
+  --button-primary-text: oklch(96% 0.022 92);
+  --button-primary-hover: oklch(31% 0.032 176);
+  --input-bg: oklch(98% 0.015 92);
+  --focus-ring: 0 0 0 4px oklch(54% 0.12 158 / 0.28);
+  --shadow-lg: 0 24px 72px oklch(37% 0.04 90 / 0.14), 0 0 0 1px oklch(37% 0.04 90 / 0.05);
+  --shadow-md: 0 12px 36px oklch(37% 0.04 90 / 0.1), 0 0 0 1px oklch(37% 0.04 90 / 0.04);
+  --chart-bg: oklch(98% 0.005 264);
+  --chart-grid: oklch(76% 0.018 264 / 0.28);
+  --chart-label-bg: oklch(98.8% 0.005 264 / 0.94);
+  --chart-label-text: oklch(19% 0.024 264);
+  --chart-label-border: oklch(76% 0.024 264 / 0.55);
+  --success-bg: oklch(95% 0.045 154);
+  --success-border: oklch(73% 0.095 154);
+  --success-text: oklch(36% 0.11 154);
+  --warning-bg: oklch(96% 0.052 88);
+  --warning-border: oklch(76% 0.12 88);
+  --warning-text: oklch(42% 0.12 88);
+  --danger-bg: oklch(95% 0.045 25);
+  --danger-border: oklch(75% 0.12 25);
+  --danger-text: oklch(42% 0.15 25);
+  --info-bg: oklch(94% 0.04 268);
+  --info-border: oklch(77% 0.08 268);
+  --info-text: oklch(42% 0.14 268);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  overflow-x: hidden;
+  color: var(--text-main);
+  background:
+    linear-gradient(180deg, var(--page-bg-main) 0%, var(--page-bg-soft) 100%);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 31px,
+      color-mix(in oklch, var(--line-soft) 36%, transparent) 32px
+    ),
+    linear-gradient(90deg, color-mix(in oklch, var(--accent) 12%, transparent), transparent 34%);
+  opacity: 0.2;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.22s var(--ease-out);
+}
+
+body,
+.nav,
+.panel,
+.form-card,
+.preview-window,
+.workbench,
+.quick-start,
+.process-grid article,
+.guide-grid > div,
+.step-nav-item,
+.theme-select-wrap,
+.sample-list button,
+.sample-list a,
+.hero-start-rail a,
+.download-panel a {
+  transition: var(--surface-transition);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled,
+select:disabled,
+input:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 0;
+  box-shadow: var(--focus-ring);
+}
+
+::selection {
+  color: var(--page-bg-main);
+  background: var(--accent);
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+.site {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding-bottom: 64px;
+}
+

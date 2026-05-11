@@ -1,0 +1,18 @@
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line-soft);
+  color: var(--text-muted);
+}
+
+.footer strong {
+  color: var(--text-main);
+}
+
+.footer p {
+  margin: 0;
+}
+

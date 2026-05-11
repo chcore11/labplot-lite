@@ -1,0 +1,390 @@
+.plot-config-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(310px, 0.58fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.plot-config-main {
+  min-width: 0;
+}
+
+.curve-config-box {
+  display: grid;
+  gap: 0;
+  margin-bottom: 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+}
+
+.curve-row {
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) minmax(120px, 0.56fr) minmax(110px, 0.42fr) minmax(120px, 0.5fr) auto;
+  gap: 10px;
+  align-items: end;
+  padding: 12px;
+  border-bottom: 1px solid var(--line-soft);
+  border-radius: 0;
+  background: var(--surface-soft);
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.curve-row:last-child {
+  border-bottom: 0;
+}
+
+.curve-row:hover {
+  background: var(--surface-hover);
+}
+
+.curve-remove-button {
+  min-height: var(--control-height);
+  padding: 0 13px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  color: var(--danger-text);
+  background: transparent;
+  font-weight: 740;
+}
+
+.curve-remove-button:hover:not(:disabled) {
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+}
+
+.plot-readiness {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  align-self: stretch;
+}
+
+.plot-readiness-main {
+  display: grid;
+  gap: 7px;
+}
+
+.plot-readiness-main span {
+  color: var(--text-main);
+  font-size: 15px;
+  font-weight: 780;
+}
+
+.plot-readiness-main strong {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.55;
+}
+
+.plot-readiness-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line-soft);
+  border-radius: 4px;
+  background: var(--line-soft);
+}
+
+.plot-readiness-grid div {
+  padding: 12px;
+  background: var(--surface);
+}
+
+.plot-readiness-grid span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.plot-readiness-grid strong {
+  display: block;
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 760;
+  line-height: 1.35;
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.plot-readiness.ready {
+  border-color: var(--accent-border);
+}
+
+.plot-readiness.warning {
+  --tone-text: var(--warning-text);
+  --tone-border: var(--warning-border);
+  --tone-bg: var(--warning-bg);
+}
+
+.plot-readiness.danger {
+  --tone-text: var(--danger-text);
+  --tone-border: var(--danger-border);
+  --tone-bg: var(--danger-bg);
+}
+
+.advanced-box {
+  padding: 0;
+  overflow: hidden;
+}
+
+.advanced-box summary {
+  min-height: 48px;
+  padding: 14px 16px;
+  color: var(--text-soft);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 740;
+}
+
+.advanced-box summary:hover {
+  color: var(--text-main);
+  background: var(--surface-hover);
+}
+
+.advanced-box > :not(summary) {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.advanced-box > :last-child {
+  margin-bottom: 16px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 38px;
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.checkbox-row input {
+  width: 18px;
+  min-height: 18px;
+  accent-color: var(--accent);
+}
+
+.single-checkbox {
+  margin: 12px 16px;
+}
+
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+  margin-top: 10px;
+}
+
+.plot-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-pill);
+  color: var(--text-soft);
+  background: var(--surface-soft);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.plot-progress-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--accent) 18%, transparent);
+}
+
+#plotForm[aria-busy="true"] .plot-progress-dot {
+  animation: plotPulse 1s var(--ease-out) infinite;
+}
+
+@keyframes plotPulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.85);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.result-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.34fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.result-figure {
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.figure-toolbar {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--surface-raised);
+}
+
+.figure-toolbar > div:first-child {
+  min-width: 0;
+}
+
+.figure-toolbar span,
+.figure-meta span {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 740;
+}
+
+.figure-toolbar strong {
+  display: block;
+  min-width: 0;
+  margin-top: 3px;
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 780;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.figure-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 170px;
+}
+
+.figure-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 8px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+
+.plot-wrap {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  overflow: hidden;
+  padding: 22px;
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--line-soft) 28%, transparent) 1px, transparent 1px),
+    linear-gradient(color-mix(in oklch, var(--line-soft) 28%, transparent) 1px, transparent 1px),
+    var(--surface-soft);
+  background-size: 24px 24px;
+}
+
+.plot {
+  display: block;
+  width: min(100%, 980px);
+  height: auto;
+  border: 1px solid oklch(84% 0.012 264);
+  border-radius: 3px;
+  background: rgb(250, 250, 247);
+  box-shadow: 0 16px 42px oklch(4% 0.005 268 / 0.32);
+}
+
+.result-side {
+  display: grid;
+  gap: 12px;
+}
+
+.summary-card h3,
+.download-panel h3 {
+  margin-bottom: 10px;
+}
+
+.summary-row.large strong {
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.download-panel {
+  display: grid;
+  gap: 8px;
+}
+
+.download-panel a {
+  display: flex;
+  align-items: center;
+  min-height: var(--control-height-sm);
+  padding: 0 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 740;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.download-panel a:first-of-type {
+  color: var(--text-main);
+  border-color: var(--accent-border);
+  background: color-mix(in oklch, var(--accent) 18%, var(--surface-raised));
+}
+
+.download-panel a:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-hover);
+  transform: translateY(-1px);
+}
+
+.download-panel a:first-of-type:hover {
+  background: color-mix(in oklch, var(--accent) 26%, var(--surface-raised));
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  margin-top: 18px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-xs);
+  background: var(--line-soft);
+}
+
+.stats div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 12px;
+  border: 0;
+  border-radius: 0;
+  background: var(--surface-soft);
+}
+
+.guide-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+

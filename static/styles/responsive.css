@@ -1,0 +1,382 @@
+@media (max-width: 1180px) {
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding-top: 56px;
+  }
+
+  .preview-body {
+    grid-template-columns: 150px minmax(0, 1fr);
+  }
+
+  .fit-card {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .quick-start,
+  .workbench {
+    grid-template-columns: 1fr;
+  }
+
+  .workbench-main {
+    grid-template-columns: 1fr;
+  }
+
+  .workbench-head,
+  .step-nav,
+  .message,
+  .workbench-main > .sample-guide,
+  .workbench-step-panel {
+    grid-column: 1;
+  }
+
+  .step-nav {
+    grid-template-columns: repeat(5, minmax(150px, 1fr));
+    grid-row: auto;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    border-right: 0;
+    border-bottom: 0;
+  }
+
+  .step-nav-item {
+    border-top: 0;
+    border-left: 0;
+    border-right: 1px solid var(--line-soft);
+    border-bottom: 0;
+    min-height: 52px;
+  }
+
+  .step-nav-item:last-child {
+    border-right: 0;
+  }
+
+  .plot-config-layout,
+  .result-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .result-side {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 0.8fr);
+    align-items: start;
+  }
+
+  .plot-readiness-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .site > section,
+  .footer {
+    width: min(100% - 32px, 1180px);
+  }
+
+  .nav {
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    padding: 0 16px;
+  }
+
+  .hero h1 {
+    font-size: 39px;
+    letter-spacing: 0;
+  }
+
+  .workbench-page > .workbench,
+  .workbench-page > .workbench-brief {
+    width: min(100% - 32px, 1180px);
+  }
+
+  .workbench-brief {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .workbench-brief-actions {
+    justify-content: flex-start;
+  }
+
+  .quick-start,
+  .workbench,
+  .preview-window {
+    border-radius: 6px;
+  }
+
+  .quick-start {
+    padding: 20px;
+  }
+
+  .sample-list.compact,
+  .upload-layout,
+  .sample-guide,
+  .result-side,
+  .process-grid,
+  .guide-grid,
+  .stats,
+  .form-grid,
+  .formula-grid,
+  .compact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .curve-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .curve-remove-button {
+    grid-column: 1 / -1;
+  }
+
+  .process-grid {
+    gap: 1px;
+  }
+
+  .origin-map-row {
+    grid-template-columns: 1fr;
+  }
+
+  .sample-guide-main,
+  .sample-guide-actions,
+  .sample-guide-steps {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .sample-guide-actions {
+    justify-content: flex-start;
+  }
+
+  .sample-guide-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .site > section,
+  .footer {
+    width: min(100% - 24px, 1180px);
+  }
+
+  .nav {
+    min-height: 64px;
+    padding: 0 12px;
+  }
+
+  .brand-text {
+    display: none;
+  }
+
+  .theme-select-wrap span {
+    display: none;
+  }
+
+  .nav-actions {
+    gap: 8px;
+  }
+
+  .theme-select-wrap {
+    padding: 0 8px;
+  }
+
+  .nav-cta {
+    min-height: var(--control-height-sm);
+    padding: 0 12px;
+  }
+
+  .hero {
+    gap: 34px;
+    padding: 44px 0 58px;
+  }
+
+  .hero h1 {
+    font-size: 34px;
+  }
+
+  .workbench-brief {
+    padding: 16px;
+  }
+
+  .workbench-brief h1 {
+    font-size: 22px;
+  }
+
+  .workbench-brief-actions,
+  .workbench-brief-actions .btn {
+    width: 100%;
+  }
+
+  .figure-toolbar {
+    display: grid;
+    align-items: start;
+  }
+
+  .figure-meta {
+    justify-content: flex-start;
+    min-width: 0;
+  }
+
+  .plot-wrap {
+    padding: 14px;
+  }
+
+  .hero-desc {
+    font-size: 16px;
+  }
+
+  .hero-actions,
+  .hero-actions .btn {
+    width: 100%;
+  }
+
+  .hero-start-rail a {
+    grid-template-columns: 1fr;
+    gap: 3px;
+    align-items: start;
+  }
+
+  .preview-body {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-sidebar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-right: 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .mock-chart {
+    border-right: 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .chart-area {
+    height: 260px;
+  }
+
+  .quick-start-copy h2,
+  .section-heading h2 {
+    font-size: 25px;
+  }
+
+  .workbench-head,
+  .panel {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .workbench-head {
+    display: grid;
+    align-items: start;
+  }
+
+  .workflow-head-tools {
+    display: grid;
+    justify-content: stretch;
+    gap: 12px;
+  }
+
+  .workflow-status {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .workflow-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .workflow-actions .btn {
+    flex: 1;
+    min-height: 44px;
+    min-width: 0;
+  }
+
+  .message {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .step-nav {
+    display: flex;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .step-nav-item {
+    flex: 1 1 0;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 5px;
+    min-width: 0;
+    min-height: 58px;
+    padding: 8px 3px;
+    border-right: 1px solid var(--line-soft);
+  }
+
+  .step-nav-item span:last-child {
+    display: grid;
+    justify-items: center;
+    width: 100%;
+  }
+
+  .step-nav-item strong {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .step-nav-item small {
+    display: none;
+  }
+
+  .sample-card,
+  .form-card,
+  .sample-list button,
+  .sample-list a,
+  .hint,
+  .sample-card p {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .step-head {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+
+  .step-head > span {
+    width: 32px;
+    height: 32px;
+  }
+
+  .curve-row,
+  .plot-readiness-grid,
+  .checkbox-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sample-guide-steps {
+    display: none;
+  }
+
+  .plot-generate-row,
+  .sample-guide-actions .btn,
+  #plotSubmitButton {
+    width: 100%;
+  }
+
+  .plot-progress {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
