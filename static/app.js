@@ -89,7 +89,7 @@ const SAMPLE_GUIDES = {
       "导出 PNG 和 ZIP，用作报告中的光谱对比图。",
     ],
     plotActions: [{
-      label: "填入光谱叠图",
+      label: "直接填入光谱叠图",
       xCol: "wavelength_nm",
       yCols: ["sample_low_a_u", "sample_high_a_u", "reference_a_u"],
       chartType: "line_marker",
@@ -110,7 +110,7 @@ const SAMPLE_GUIDES = {
       "导出图像，检查图例和曲线间距是否清楚。",
     ],
     plotActions: [{
-      label: "填入动力学图",
+      label: "直接填入动力学图",
       xCol: "time_min",
       yCols: ["control_pct", "low_dose_pct", "high_dose_pct", "pulse_recovery_pct"],
       chartType: "line_marker",
@@ -132,7 +132,7 @@ const SAMPLE_GUIDES = {
     ],
     plotActions: [
       {
-        label: "填入标准曲线",
+        label: "直接填入标准曲线",
         xCol: "concentration_um",
         yCols: ["absorbance_mean"],
         chartType: "scatter",
@@ -143,7 +143,7 @@ const SAMPLE_GUIDES = {
         yLabel: "Absorbance (a.u.)",
       },
       {
-        label: "填入残差图",
+        label: "直接填入残差图",
         xCol: "concentration_um",
         yCols: ["residual_a_u"],
         chartType: "line_marker",
@@ -165,7 +165,7 @@ const SAMPLE_GUIDES = {
       "导出白底 PNG，检查谱峰和图例是否适合报告使用。",
     ],
     plotActions: [{
-      label: "填入拉曼谱图",
+      label: "直接填入拉曼谱图",
       xCol: "raman_shift_cm",
       yCols: ["pristine_a_u", "annealed_a_u", "doped_a_u"],
       chartType: "line_marker",
@@ -216,6 +216,14 @@ const WORKFLOW_STATUS = {
   calc: "可以生成计算列，也可以跳过",
   plot: "选择坐标轴、曲线和拟合方式",
   result: "结果已生成，可检查并下载",
+};
+
+const WORKFLOW_ACTION_LABELS = {
+  upload: "开始导入",
+  range: "继续识别范围",
+  calc: "继续数据加工",
+  plot: "继续配置图像",
+  result: "查看下载结果",
 };
 
 function qs(selector) {
@@ -295,6 +303,21 @@ function updateWorkflowNav() {
   const status = qs("#workflowStatusText");
   if (status) {
     status.textContent = WORKFLOW_STATUS[state.activeStep] || WORKFLOW_STATUS.upload;
+  }
+
+  updateWorkflowActions();
+}
+
+function updateWorkflowActions() {
+  const resumeButton = qs("#resumeWorkflowButton");
+  const resetButton = qs("#resetWorkflowButton");
+
+  if (resumeButton) {
+    resumeButton.textContent = WORKFLOW_ACTION_LABELS[state.activeStep] || WORKFLOW_ACTION_LABELS.upload;
+  }
+
+  if (resetButton) {
+    resetButton.disabled = !state.rawRows.length && !state.lastPlotPayload;
   }
 }
 
@@ -771,6 +794,7 @@ function renderSampleGuide() {
     return;
   }
 
+  qs("#sampleGuideKicker").textContent = "已载入示例，下一步";
   qs("#sampleGuideTitle").textContent = guide.title;
   qs("#sampleGuideGoal").textContent = guide.goal;
 
@@ -1022,6 +1046,56 @@ function renderDataControls() {
   }
 
   updateWorkflowNav();
+}
+
+function resetWorkflow() {
+  revokeDownloadUrls();
+
+  if (state.chart) {
+    state.chart.destroy();
+    state.chart = null;
+  }
+
+  state.fileName = "";
+  state.rawRows = [];
+  state.columns = [];
+  state.data = [];
+  state.numericColumns = [];
+  state.lastPlotPayload = null;
+  state.isPlotGenerating = false;
+  state.activeStep = "upload";
+  state.sampleGuide = null;
+
+  ["#previewSection", "#calcSection", "#plotSection", "#resultSection", "#sampleGuideBox"].forEach((selector) => {
+    hide(qs(selector));
+  });
+
+  qs("#uploadForm").reset();
+  qs("#rangeForm").reset();
+  qs("#calcForm").reset();
+  qs("#plotForm").reset();
+  qs("#currentFileName").textContent = "";
+  qs("#headerGuessMessage").textContent = "";
+  qs("#previewBody").replaceChildren();
+  qs("#numericColumnsBox").replaceChildren();
+  qs("#plotColumnsBox").replaceChildren();
+  qs("#curveConfigBox").replaceChildren();
+  qs("#summaryRows").replaceChildren();
+  qs("#statsGrid").replaceChildren();
+  qs("#resultFigureTitle").textContent = "等待生成图像";
+  qs("#resultFigureMeta").textContent = "--";
+  qs("#resultFigureCurves").textContent = "--";
+
+  qsa(".download-panel a").forEach((link) => {
+    link.removeAttribute("download");
+    link.href = "#";
+  });
+
+  renderStaticOptions();
+  clearMessage();
+  showMessage("success", "已清空当前数据。可以重新上传文件，或载入一份示例数据。");
+  updateWorkflowNav();
+  setActiveStep("upload", { scroll: true });
 }
 
 function reloadDataFromRange(showSuccess = false) {
@@ -2611,6 +2685,18 @@ function setupEvents() {
       }
     });
   });
+
+  const resumeButton = qs("#resumeWorkflowButton");
+  if (resumeButton) {
+    resumeButton.addEventListener("click", () => {
+      setActiveStep(state.activeStep, { scroll: true });
+    });
+  }
+
+  const resetButton = qs("#resetWorkflowButton");
+  if (resetButton) {
+    resetButton.addEventListener("click", resetWorkflow);
+  }
 
   qs("#sampleGuideActions").addEventListener("click", (event) => {
     const button = event.target.closest("[data-sample-action]");

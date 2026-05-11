@@ -107,11 +107,13 @@ html[data-theme="light"] {
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
   min-width: 320px;
+  overflow-x: hidden;
   color: var(--text-main);
   background: linear-gradient(180deg, var(--page-bg-main) 0%, var(--page-bg-soft) 100%);
   font-family: var(--font-sans);
@@ -147,6 +149,7 @@ body,
 .theme-select-wrap,
 .sample-list button,
 .sample-list a,
+.hero-start-rail a,
 .download-panel a {
   transition: background-color 0.22s var(--ease-out), border-color 0.22s var(--ease-out);
 }
@@ -348,10 +351,17 @@ input:disabled {
   background: var(--surface-soft);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover,
+.btn-ghost:hover {
   color: var(--text-main);
   border-color: var(--line-strong);
   background: var(--surface-hover);
+}
+
+.btn-ghost {
+  color: var(--text-muted);
+  border-color: transparent;
+  background: transparent;
 }
 
 .site > section,
@@ -386,7 +396,7 @@ input:disabled {
 
 .workbench-brief h1 {
   margin: 12px 0 0;
-  font-size: 1.55rem;
+  font-size: 25px;
   line-height: 1.18;
   font-weight: 780;
   letter-spacing: 0;
@@ -467,7 +477,7 @@ input:disabled {
 .hero h1 {
   max-width: 680px;
   margin: 20px 0 0;
-  font-size: 3.2rem;
+  font-size: 52px;
   line-height: 1.06;
   font-weight: 780;
   letter-spacing: 0;
@@ -486,6 +496,45 @@ input:disabled {
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 28px;
+}
+
+.hero-start-rail {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  max-width: 620px;
+  margin-top: 20px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-md);
+  background: var(--line-soft);
+}
+
+.hero-start-rail a {
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  min-height: 52px;
+  padding: 10px 14px;
+  background: var(--surface-soft);
+}
+
+.hero-start-rail a:hover {
+  background: var(--surface-hover);
+}
+
+.hero-start-rail span {
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 780;
+}
+
+.hero-start-rail strong {
+  min-width: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.45;
 }
 
 .hero-preview {
@@ -524,7 +573,7 @@ input:disabled {
 
 .preview-top strong,
 .chart-title,
-.fit-card h3 {
+.preview-panel-title {
   font-size: 14px;
   font-weight: 760;
 }
@@ -664,6 +713,11 @@ input:disabled {
   margin: 0 0 12px;
 }
 
+.preview-panel-title {
+  display: block;
+  margin-bottom: 12px;
+}
+
 .fit-card div,
 .summary-row {
   display: grid;
@@ -725,7 +779,7 @@ input:disabled {
 .quick-start-copy h2,
 .section-heading h2 {
   margin: 14px 0 0;
-  font-size: 1.85rem;
+  font-size: 30px;
   line-height: 1.18;
   font-weight: 760;
   letter-spacing: 0;
@@ -846,11 +900,11 @@ input:disabled {
 .process-grid h3,
 .guide-grid h3,
 .sample-card h3,
-.summary-card h4,
-.download-panel h4 {
+.summary-card h3,
+.download-panel h3 {
   margin: 0;
   color: var(--text-main);
-  font-size: 1.02rem;
+  font-size: 16px;
   font-weight: 760;
 }
 
@@ -928,7 +982,7 @@ input:disabled {
 
 .workbench-head h1 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 26px;
   line-height: 1.2;
   font-weight: 760;
   letter-spacing: 0;
@@ -1033,6 +1087,14 @@ input:disabled {
   text-align: right;
 }
 
+.workflow-head-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  min-width: 0;
+}
+
 .workflow-status span {
   display: block;
   color: var(--text-muted);
@@ -1046,6 +1108,19 @@ input:disabled {
   color: var(--text-main);
   font-size: 13px;
   font-weight: 760;
+}
+
+.workflow-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.workflow-actions .btn {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
 }
 
 .workflow-tools {
@@ -1145,10 +1220,10 @@ input:disabled {
   font-weight: 780;
 }
 
-.step-head h3 {
+.step-head h2 {
   margin: 0;
   color: var(--text-main);
-  font-size: 1.1rem;
+  font-size: 21px;
   line-height: 1.25;
   font-weight: 760;
 }
@@ -1387,6 +1462,8 @@ code {
 }
 
 .sample-guide-main {
+  grid-column: 1;
+  grid-row: 1;
   min-width: 0;
 }
 
@@ -1402,11 +1479,11 @@ code {
   font-weight: 760;
 }
 
-.sample-guide h4 {
+.sample-guide-main strong {
   display: inline;
   margin: 0 8px 0 0;
   color: var(--text-main);
-  font-size: 1rem;
+  font-size: 16px;
   line-height: 1.3;
   font-weight: 780;
 }
@@ -1420,10 +1497,13 @@ code {
 }
 
 .sample-guide-steps {
-  display: none;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 7px;
   margin: 0;
-  padding: 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--line-soft);
   list-style: none;
   counter-reset: sample-step;
 }
@@ -1457,6 +1537,8 @@ code {
 .sample-guide-actions {
   display: flex;
   flex-wrap: wrap;
+  grid-column: 2;
+  grid-row: 1;
   justify-content: flex-end;
   gap: 10px;
   padding-top: 0;
@@ -1465,6 +1547,7 @@ code {
 
 .table-wrap {
   max-width: 100%;
+  max-height: 360px;
   overflow: auto;
   margin-bottom: 16px;
   border: 1px solid var(--line-soft);
@@ -1870,8 +1953,8 @@ code {
   gap: 12px;
 }
 
-.summary-card h4,
-.download-panel h4 {
+.summary-card h3,
+.download-panel h3 {
   margin-bottom: 10px;
 }
 
@@ -2032,7 +2115,7 @@ code {
   }
 
   .hero h1 {
-    font-size: 2.45rem;
+    font-size: 39px;
     letter-spacing: 0;
   }
 
@@ -2088,6 +2171,21 @@ code {
   .origin-map-row {
     grid-template-columns: 1fr;
   }
+
+  .sample-guide-main,
+  .sample-guide-actions,
+  .sample-guide-steps {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .sample-guide-actions {
+    justify-content: flex-start;
+  }
+
+  .sample-guide-steps {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -2118,7 +2216,7 @@ code {
   }
 
   .hero h1 {
-    font-size: 2.45rem;
+    font-size: 34px;
   }
 
   .workbench-brief {
@@ -2126,7 +2224,7 @@ code {
   }
 
   .workbench-brief h1 {
-    font-size: 1.35rem;
+    font-size: 22px;
   }
 
   .workbench-brief-actions,
@@ -2157,6 +2255,12 @@ code {
     width: 100%;
   }
 
+  .hero-start-rail a {
+    grid-template-columns: 1fr;
+    gap: 3px;
+    align-items: start;
+  }
+
   .preview-body {
     grid-template-columns: 1fr;
   }
@@ -2178,7 +2282,7 @@ code {
 
   .quick-start-copy h2,
   .section-heading h2 {
-    font-size: 1.55rem;
+    font-size: 25px;
   }
 
   .workbench-head,
@@ -2187,17 +2291,77 @@ code {
     padding-right: 16px;
   }
 
+  .workbench-head {
+    display: grid;
+    align-items: start;
+  }
+
+  .workflow-head-tools {
+    display: grid;
+    justify-content: stretch;
+    gap: 12px;
+  }
+
+  .workflow-status {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .workflow-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .workflow-actions .btn {
+    flex: 1;
+    min-width: 0;
+  }
+
   .message {
     margin-left: 16px;
     margin-right: 16px;
   }
 
   .step-nav {
-    grid-template-columns: repeat(5, 150px);
+    display: flex;
+    overflow: visible;
+    padding-bottom: 0;
   }
 
   .step-nav-item {
-    min-height: 48px;
+    flex: 1 1 0;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 5px;
+    min-width: 0;
+    min-height: 58px;
+    padding: 8px 3px;
+    border-right: 1px solid var(--line-soft);
+  }
+
+  .step-nav-item span:last-child {
+    display: grid;
+    justify-items: center;
+    width: 100%;
+  }
+
+  .step-nav-item strong {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 11px;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sample-card,
+  .form-card,
+  .sample-list button,
+  .sample-list a,
+  .hint,
+  .sample-card p {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .step-head {
@@ -2213,6 +2377,10 @@ code {
   .plot-readiness-grid,
   .checkbox-grid {
     grid-template-columns: 1fr;
+  }
+
+  .sample-guide-steps {
+    display: none;
   }
 
   .plot-generate-row,

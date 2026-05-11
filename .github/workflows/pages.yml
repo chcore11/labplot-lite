@@ -33,7 +33,7 @@ jobs:
       - name: Prepare static site
         run: |
           mkdir _site
-          cp index.html _site/
+          cp index.html workbench.html _site/
           cp .nojekyll _site/
           cp -R static samples _site/
 

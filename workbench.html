@@ -54,9 +54,15 @@
             <span class="section-kicker">线性工作流</span>
             <h1>从表格到报告图</h1>
           </div>
-          <div class="workflow-status">
-            <span>当前步骤</span>
-            <strong id="workflowStatusText">等待导入数据</strong>
+          <div class="workflow-head-tools">
+            <div class="workflow-status" aria-live="polite">
+              <span>当前步骤</span>
+              <strong id="workflowStatusText">等待导入数据</strong>
+            </div>
+            <div class="workflow-actions" aria-label="工作台操作">
+              <button type="button" class="btn btn-secondary" id="resumeWorkflowButton">开始导入</button>
+              <button type="button" class="btn btn-ghost" id="resetWorkflowButton" disabled>重新开始</button>
+            </div>
           </div>
         </div>
 
@@ -88,7 +94,7 @@
         <div id="sampleGuideBox" class="sample-guide is-hidden" aria-live="polite">
           <div class="sample-guide-main">
             <span id="sampleGuideKicker">示例指引</span>
-            <h4 id="sampleGuideTitle"></h4>
+            <strong id="sampleGuideTitle"></strong>
             <p id="sampleGuideGoal"></p>
           </div>
           <ol id="sampleGuideSteps" class="sample-guide-steps"></ol>
@@ -99,7 +105,7 @@
           <div class="step-head">
             <span>1</span>
             <div>
-              <h3>导入数据</h3>
+              <h2>导入数据</h2>
               <p>上传 CSV / Excel，或直接载入示例数据跑通一次。</p>
             </div>
           </div>
@@ -157,7 +163,7 @@
           <div class="step-head">
             <span>2</span>
             <div>
-              <h3>识别表头和数据范围</h3>
+              <h2>识别表头和数据范围</h2>
               <p>看预览，确认哪一行是列名，哪一行开始是真正数据。</p>
             </div>
           </div>
@@ -207,7 +213,7 @@
           <div class="step-head">
             <span>3</span>
             <div>
-              <h3>数据加工</h3>
+              <h2>数据加工</h2>
               <p>可选步骤。用已有列生成单位换算、误差、对数或比值列。</p>
             </div>
           </div>
@@ -264,7 +270,7 @@
           <div class="step-head">
             <span>4</span>
             <div>
-              <h3>配置图像与拟合</h3>
+              <h2>配置图像与拟合</h2>
               <p>选择 X/Y 轴、曲线和拟合方式，生成前会自动检查条件。</p>
             </div>
           </div>
@@ -405,7 +411,7 @@
           <div class="step-head">
             <span>5</span>
             <div>
-              <h3>查看结果并下载</h3>
+              <h2>查看结果并下载</h2>
               <p>先检查图像和拟合摘要，再下载实验报告素材。</p>
             </div>
           </div>
@@ -430,12 +436,12 @@
 
             <div class="result-side">
               <div class="summary-card">
-                <h4>拟合与数据摘要</h4>
+                <h3>拟合与数据摘要</h3>
                 <div id="summaryRows"></div>
               </div>
 
               <div class="download-panel">
-                <h4>下载文件</h4>
+                <h3>下载文件</h3>
                 <a id="downloadZip" href="#">下载报告素材包 ZIP</a>
                 <a id="downloadPng" href="#">下载 PNG 图片</a>
                 <a id="downloadFitReport" href="#">下载拟合报告 TXT</a>
