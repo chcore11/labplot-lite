@@ -3,18 +3,18 @@
 (() => {
   const root = document.documentElement;
   const storageKey = "labplot-theme";
-  const validModes = new Set(["dark"]);
+  const validModes = new Set(["light"]);
   const onApplyCallbacks = new Set();
 
   function normalizeMode(mode) {
-    return validModes.has(mode) ? mode : "dark";
+    return validModes.has(mode) ? mode : "light";
   }
 
   function getSavedMode() {
     try {
       return normalizeMode(localStorage.getItem(storageKey));
     } catch (error) {
-      return "dark";
+      return "light";
     }
   }
 
@@ -27,7 +27,7 @@
   }
 
   function resolveTheme() {
-    return "dark";
+    return "light";
   }
 
   function writeTheme(mode) {
