@@ -208,36 +208,39 @@
 
 .hero-flow {
   grid-area: flow;
-  display: flex;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   overflow-x: auto;
-  margin-top: 16px;
-  padding: 12px 0;
+  margin-top: 18px;
+  padding: 8px 0 4px;
 }
 
 .flow-step {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 90px;
-  min-height: 48px;
-  padding: 12px 18px;
-  border: 2px solid var(--accent);
-  border-radius: var(--radius-md);
-  background: var(--surface-soft);
+  min-width: 74px;
+  min-height: 34px;
+  padding: 8px 14px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
   color: var(--text-main);
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 650;
   flex-shrink: 0;
 }
 
 .flow-arrow {
-  width: 48px;
-  height: 32px;
+  width: 26px;
+  height: 18px;
   color: var(--accent);
   flex-shrink: 0;
+  opacity: 0.72;
 }
 
 .sample-gallery,

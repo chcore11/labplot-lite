@@ -8,25 +8,14 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes heroEnter {
+@keyframes pageIntro {
   from {
     opacity: 0;
-    transform: translateY(64px);
+    transform: translateY(36px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes heroExit {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(48px);
   }
 }
 
@@ -52,16 +41,8 @@
   }
 }
 
-#heroSection .hero-copy {
-  animation: heroEnter 0.7s var(--ease-out) both;
-}
-
-#heroSection .hero-stage {
-  animation: heroEnter 0.7s var(--ease-out) 0.1s both;
-}
-
-#heroSection .hero-flow {
-  animation: heroEnter 0.7s var(--ease-out) 0.2s both;
+.landing-page {
+  animation: pageIntro 0.95s var(--ease-out) both;
 }
 
 .mode-enter {
@@ -96,15 +77,13 @@
   .nav {
     animation: none;
   }
-  
+
   .mode-enter,
   .mode-exit {
     animation: none;
   }
 
-  #heroSection .hero-copy,
-  #heroSection .hero-stage,
-  #heroSection .hero-flow {
+  .landing-page {
     animation: none;
   }
 }

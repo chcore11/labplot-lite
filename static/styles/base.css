@@ -17,19 +17,19 @@
   --callout-pad: 14px 15px;
   --surface-transition: background-color 0.22s var(--ease-out), border-color 0.22s var(--ease-out);
 
-  --page-bg-main: oklch(95% 0.003 260);
-  --page-bg-soft: oklch(92% 0.003 260);
-  --surface: oklch(97% 0.005 260);
-  --surface-raised: oklch(99% 0.005 260);
-  --surface-soft: oklch(89% 0.006 260);
-  --surface-hover: oklch(83% 0.008 260);
-  --surface-active: oklch(78% 0.01 260);
-  --nav-bg: oklch(94% 0.005 260 / 0.94);
+  --page-bg-main: oklch(98.2% 0.002 260);
+  --page-bg-soft: oklch(96.6% 0.002 260);
+  --surface: oklch(99.2% 0.004 260);
+  --surface-raised: oklch(100% 0.004 260);
+  --surface-soft: oklch(95.4% 0.004 260);
+  --surface-hover: oklch(91.6% 0.005 260);
+  --surface-active: oklch(88.2% 0.006 260);
+  --nav-bg: oklch(97.6% 0.003 260 / 0.96);
   --text-main: oklch(22% 0.01 260);
   --text-soft: oklch(42% 0.01 260);
   --text-muted: oklch(58% 0.01 260);
-  --line-soft: oklch(22% 0.01 260 / 0.10);
-  --line-strong: oklch(22% 0.01 260 / 0.25);
+  --line-soft: oklch(22% 0.01 260 / 0.08);
+  --line-strong: oklch(22% 0.01 260 / 0.20);
   --accent: oklch(54% 0.16 260);
   --accent-strong: oklch(47% 0.16 260);
   --accent-soft: oklch(54% 0.16 260 / 0.10);
@@ -76,6 +76,7 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
+  background-color: var(--page-bg-main);
 }
 
 body {
@@ -162,4 +163,5 @@ input:disabled {
   z-index: 1;
   width: 100%;
   padding-bottom: 64px;
+  background-color: var(--page-bg-main);
 }
