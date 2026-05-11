@@ -6,3 +6,64 @@
 @import "./styles/footer.css";
 @import "./styles/responsive.css";
 @import "./styles/motion.css";
+
+/* Keep the plot readiness card from squeezing or covering curve controls. */
+.plot-config-layout {
+  grid-template-columns: minmax(0, 1fr) 280px;
+}
+
+.plot-config-main,
+.plot-readiness {
+  min-width: 0;
+}
+
+.curve-config-box {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.curve-row {
+  grid-template-columns:
+    minmax(150px, 1.4fr)
+    minmax(92px, 0.7fr)
+    minmax(82px, 0.52fr)
+    minmax(92px, 0.64fr)
+    minmax(64px, auto);
+  min-width: 540px;
+}
+
+.curve-row > * {
+  min-width: 0;
+}
+
+.curve-remove-button {
+  justify-self: end;
+  width: 100%;
+  min-width: 64px;
+}
+
+@media (max-width: 1180px) {
+  .plot-config-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .curve-row {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .curve-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .curve-remove-button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .curve-row {
+    grid-template-columns: 1fr;
+  }
+}
