@@ -6,11 +6,10 @@
   <link rel="icon" href="./static/logo_dark.png" type="image/png">
   <title>LabPlot Lite - 实验数据，快速成图</title>
   <script src="./static/theme.js"></script>
-  <script defer src="./static/js/landing-hero.js"></script>
   <link rel="stylesheet" href="./static/style.css">
 </head>
 
-<body class="landing-shell">
+<body>
   <main class="site landing-page" id="main-content">
     <header class="nav">
       <a class="brand" href="./index.html" aria-label="LabPlot Lite 首页">
@@ -28,30 +27,76 @@
       </div>
     </header>
 
-    <section class="hero landing-hero" id="heroSection" aria-labelledby="heroTitle" data-lab-hero>
-      <div class="hero-field" aria-hidden="true">
-        <div class="hero-scanline"></div>
-        <div class="hero-lens">
-          <span></span>
+    <section class="hero landing-hero" id="heroSection" aria-labelledby="heroTitle">
+      <div class="hero-copy">
+        <div class="eyebrow">LabPlot Lite</div>
+        <h1 id="heroTitle"><span>实验数据，</span><span>快速成图</span></h1>
+        <p class="hero-desc">上传表格，检查列，生成报告图件。<br>为不想学习复杂软件的学生保留一条可靠路径。</p>
+
+        <div class="hero-actions">
+          <a href="./workbench.html?mode=simple" class="btn btn-primary btn-large">进入工作台</a>
+          <a href="#samples" class="btn btn-secondary btn-large">查看示例图</a>
         </div>
       </div>
 
-      <div class="hero-content">
-        <p class="hero-kicker">LabPlot Lite</p>
-        <h1 id="heroTitle" class="hero-word" data-text="LabPlot Lite">
-          <span>LabPlot Lite</span>
-        </h1>
-        <p class="hero-desc">让实验数据快速变成可提交图件</p>
+      <div class="hero-stage" aria-label="图表输出预览">
+        <article class="chart-card chart-card-main">
+          <div class="chart-card-head">
+            <span>标准曲线</span>
+            <strong>R² 0.9999</strong>
+          </div>
+          <svg class="chart-svg" viewBox="0 0 520 300" role="img" aria-label="线性校准曲线预览">
+            <path class="chart-grid-line" d="M54 38H486M54 92H486M54 146H486M54 200H486M54 254H486M108 30V260M186 30V260M264 30V260M342 30V260M420 30V260"/>
+            <path class="chart-axis" d="M54 30V260H486"/>
+            <path class="chart-fit-line" d="M76 230L454 62"/>
+            <g class="chart-points">
+              <circle cx="88" cy="224" r="5"/>
+              <circle cx="156" cy="193" r="5"/>
+              <circle cx="224" cy="164" r="5"/>
+              <circle cx="292" cy="133" r="5"/>
+              <circle cx="360" cy="102" r="5"/>
+              <circle cx="430" cy="71" r="5"/>
+            </g>
+            <text x="74" y="48">y = 0.0604x - 0.0002</text>
+            <text x="74" y="276">concentration_um</text>
+          </svg>
+        </article>
 
-        <a class="hero-command" href="./workbench.html?mode=simple" aria-label="进入简易模式上传 CSV 或 Excel 并生成图件">
-          <span>上传 CSV / Excel，生成报告图件</span>
-          <small>自动识别表头、数值列和基础图</small>
-          <strong aria-hidden="true">↑</strong>
-        </a>
+        <article class="chart-card chart-card-small chart-card-float">
+          <div class="chart-card-head">
+            <span>反应动力学</span>
+            <strong>300 DPI</strong>
+          </div>
+          <svg class="chart-svg small" viewBox="0 0 320 180" aria-hidden="true">
+            <path class="chart-grid-line" d="M36 24H294M36 70H294M36 116H294M36 162H294M96 20V164M156 20V164M216 20V164M276 20V164"/>
+            <path class="chart-axis" d="M36 20V164H294"/>
+            <path class="chart-line-a" d="M48 42C82 64 104 88 136 104C176 124 214 139 284 150"/>
+            <path class="chart-line-b" d="M48 58C88 78 126 96 158 116C196 136 238 146 286 154"/>
+          </svg>
+        </article>
+      </div>
 
-        <div class="hero-actions">
-          <a href="./workbench.html?mode=simple" class="btn btn-primary btn-large">体验简易模式</a>
-          <a href="#samples" class="btn btn-secondary btn-large">查看示例图</a>
+      <div class="hero-flow" aria-label="工作流程">
+        <div class="flow-step">
+          <span class="flow-label">上传</span>
+        </div>
+        <svg class="flow-arrow" viewBox="0 0 50 30" aria-hidden="true">
+          <path d="M5 15h30M30 5l12 10-12 10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="flow-step">
+          <span class="flow-label">识别</span>
+        </div>
+        <svg class="flow-arrow" viewBox="0 0 50 30" aria-hidden="true">
+          <path d="M5 15h30M30 5l12 10-12 10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="flow-step">
+          <span class="flow-label">绘图</span>
+        </div>
+        <svg class="flow-arrow" viewBox="0 0 50 30" aria-hidden="true">
+          <path d="M5 15h30M30 5l12 10-12 10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="flow-step">
+          <span class="flow-label">导出</span>
         </div>
       </div>
     </section>

@@ -1,7 +1,16 @@
 @media (max-width: 1180px) {
   .landing-hero {
-    min-height: calc(100svh - 96px);
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "copy"
+      "stage"
+      "flow";
+    min-height: auto;
     padding-top: 56px;
+  }
+
+  .hero-stage {
+    min-height: 460px;
   }
 
   .preview-body {
@@ -87,13 +96,9 @@
     display: none;
   }
 
-  .hero h1:not(.hero-word) {
+  .hero h1 {
     font-size: 48px;
     letter-spacing: 0;
-  }
-
-  .hero h1.hero-word {
-    font-size: clamp(54px, 14.5vw, 138px);
   }
 
   .workbench-page > .workbench,
@@ -190,6 +195,9 @@
     padding: 44px 0 58px;
   }
 
+  .hero-copy,
+  .hero-stage,
+  .chart-card,
   .chart-svg,
   .hero-actions,
   .simple-mode,
@@ -200,69 +208,32 @@
   }
 
   .landing-hero {
-    width: 100%;
-    max-width: none;
-    min-height: calc(100svh - 84px);
-    padding: 44px 18px 70px;
+    width: calc(100% - 24px);
+    max-width: 366px;
   }
 
-  .hero-content,
   .hero-actions,
-  .hero-command {
-    min-width: 0;
-    width: min(328px, calc(100vw - 36px)) !important;
-    max-width: min(328px, calc(100vw - 36px)) !important;
-    justify-self: center;
+  .hero-stage {
+    max-width: 366px;
   }
 
-  .hero-content {
-    transform: translateX(clamp(-54px, -13vw, -38px));
-  }
-
-  .hero h1:not(.hero-word) {
+  .hero h1 {
     font-size: 36px;
   }
 
-  .hero h1.hero-word {
+  .hero-stage {
+    min-height: 0;
+  }
+
+  .chart-card-main {
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .chart-card-float {
+    position: static;
     width: 100%;
-    max-width: calc(100vw - 36px);
-    overflow: hidden;
-    font-size: clamp(38px, 11vw, 44px);
-    filter: blur(0.7px);
-    text-align: center;
-    transform: none;
-  }
-
-  .hero-word::before,
-  .hero-word::after {
-    max-width: 100%;
-    overflow: hidden;
-  }
-
-  .hero-kicker {
-    margin-bottom: 24px;
-  }
-
-  .hero-command {
-    min-height: 104px;
-    padding: 20px 16px 18px 18px;
-    border-radius: 22px;
-  }
-
-  .landing-hero .hero-kicker,
-  .landing-hero .hero-word,
-  .landing-hero .hero-desc,
-  .landing-hero .hero-command,
-  .landing-hero .hero-actions {
-    transform: none;
-  }
-
-  .hero-lens {
-    width: 86px;
-  }
-
-  .hero-scanline {
-    height: 82px;
+    margin-top: 12px;
   }
 
   .workbench-brief {
