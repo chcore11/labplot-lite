@@ -13,8 +13,8 @@
   margin-left: auto;
   margin-right: auto;
   border: 1px solid var(--line-soft);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
+  border-radius: 18px;
+  background: var(--surface-soft);
   box-shadow: var(--shadow-lg);
 }
 
@@ -44,9 +44,7 @@
   margin-top: 0;
   border-right: 1px solid var(--line-soft);
   border-bottom: 0;
-  background:
-    repeating-linear-gradient(0deg, transparent 0 35px, color-mix(in oklch, var(--line-soft) 38%, transparent) 36px),
-    var(--surface-soft);
+  background: var(--surface-soft);
 }
 
 .step-nav-item {
@@ -75,13 +73,13 @@
 
 .step-nav-item.is-active {
   color: var(--text-main);
-  background: color-mix(in oklch, var(--surface-active) 80%, var(--accent-soft));
-  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 40%, transparent);
+  background: var(--surface-active);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
 }
 
 .step-nav-item.is-complete:not(.is-active) .step-index {
-  color: var(--success-text);
-  border-color: var(--success-border);
+  color: var(--text-main);
+  border-color: var(--line-strong);
 }
 
 .step-nav-item:disabled {
@@ -106,7 +104,7 @@
 .step-nav-item.is-active .step-index {
   border-color: var(--accent);
   background: var(--accent);
-  color: var(--page-bg-main);
+  color: var(--button-primary-text);
   box-shadow: none;
 }
 
@@ -197,7 +195,7 @@
   display: grid;
   grid-template-columns: 216px minmax(0, 1fr);
   min-width: 0;
-  background: var(--surface);
+  background: var(--surface-soft);
 }
 
 .workbench-head {
@@ -208,9 +206,7 @@
   justify-content: space-between;
   padding: 18px 24px;
   border-bottom: 1px solid var(--line-soft);
-  background:
-    linear-gradient(90deg, color-mix(in oklch, var(--accent) 9%, transparent), transparent 42%),
-    var(--surface-raised);
+  background: var(--surface);
 }
 
 .workbench-head p {
@@ -313,10 +309,8 @@
 .plot-readiness,
 .stats div {
   border: 1px solid var(--line-soft);
-  border-radius: var(--radius-xs);
-  background:
-    linear-gradient(180deg, color-mix(in oklch, var(--surface-raised) 32%, transparent), transparent 76%),
-    var(--surface-soft);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
 }
 
 .form-card {
@@ -519,9 +513,7 @@ code {
   gap: 14px;
   align-items: center;
   border-radius: 0;
-  background:
-    linear-gradient(90deg, color-mix(in oklch, var(--success-bg) 62%, transparent), transparent 46%),
-    var(--surface-raised);
+  background: var(--surface-raised);
 }
 
 .workbench-main > .sample-guide {
@@ -542,7 +534,7 @@ code {
   min-height: 22px;
   padding: 0;
   border: 0;
-  color: var(--accent-strong);
+  color: var(--text-muted);
   background: transparent;
   font-size: 12px;
   font-weight: 760;
@@ -597,8 +589,8 @@ code {
   height: 22px;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-xs);
-  color: var(--accent-strong);
-  background: color-mix(in oklch, var(--surface) 86%, var(--accent-soft));
+  color: var(--text-main);
+  background: var(--surface);
   font-size: 11px;
   font-weight: 780;
 }
@@ -660,7 +652,7 @@ code {
 }
 
 .preview-table tr:nth-child(even) td {
-  background: oklch(18% 0.009 268);
+  background: var(--surface);
 }
 
 .preview-table tr:hover td {
@@ -704,4 +696,3 @@ code {
   font-size: 12px;
   font-weight: 780;
 }
-

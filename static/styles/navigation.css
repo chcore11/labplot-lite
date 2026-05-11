@@ -3,14 +3,13 @@
   top: 0;
   z-index: 20;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 16px;
-  min-height: 64px;
-  padding: 0 32px;
+  min-height: 72px;
+  padding: 0 clamp(18px, 4vw, 56px);
   border-bottom: 1px solid var(--line-soft);
   background: var(--nav-bg);
-  backdrop-filter: blur(14px);
 }
 
 .brand,
@@ -36,12 +35,66 @@
   object-fit: contain;
 }
 
+.brand-mark {
+  position: relative;
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+}
+
+.brand-mark::before,
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  inset: 7px 5px;
+  border: 2px solid var(--text-main);
+  border-top-color: transparent;
+  border-left-color: transparent;
+  border-radius: var(--radius-pill);
+}
+
+.brand-mark::before {
+  transform: rotate(31deg) translateX(-2px);
+}
+
+.brand-mark::after {
+  transform: rotate(211deg) translateX(-2px);
+  opacity: 0.58;
+}
+
 .brand-text {
   color: var(--text-main);
-  font-size: 17px;
-  font-weight: 760;
+  font-size: 16px;
+  font-weight: 520;
   letter-spacing: 0;
   white-space: nowrap;
+}
+
+.nav-links {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(18px, 3vw, 34px);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.nav-links a {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 450;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
+}
+
+.nav-links a:hover {
+  color: var(--text-main);
 }
 
 .nav-actions {
@@ -51,70 +104,6 @@
   justify-self: end;
   gap: 10px;
   min-width: 0;
-}
-
-.theme-select-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: var(--control-height);
-  min-height: 0;
-  margin: 0;
-  padding: 0 12px;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
-  background: var(--surface-soft);
-  transition: border-color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out);
-}
-
-.theme-select-wrap::after {
-  content: "";
-  width: 7px;
-  height: 7px;
-  margin-left: 2px;
-  border-right: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
-  color: var(--text-soft);
-  pointer-events: none;
-  transform: rotate(45deg) translateY(-2px);
-}
-
-.theme-select-wrap:hover,
-.theme-select-wrap:focus-within {
-  border-color: var(--line-strong);
-  background: var(--surface-hover);
-}
-
-.theme-select-wrap span,
-.theme-select {
-  color: var(--text-soft);
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.theme-select-wrap span {
-  white-space: nowrap;
-}
-
-.theme-select {
-  width: auto;
-  height: 100%;
-  min-height: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  color: var(--text-main);
-  background: transparent;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.theme-select option {
-  color: var(--text-main);
-  background: var(--surface);
 }
 
 .nav-cta,
@@ -127,9 +116,9 @@
   min-width: var(--control-height);
   padding: 0 18px;
   border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
   font-size: 14px;
-  font-weight: 760;
+  font-weight: 520;
   white-space: nowrap;
   transition:
     transform var(--duration-fast) var(--ease-out),
@@ -142,6 +131,7 @@
 .btn-primary {
   color: var(--button-primary-text);
   background: var(--button-primary-bg);
+  border-color: var(--button-primary-bg);
 }
 
 .nav-cta {
@@ -153,7 +143,7 @@
 .btn-primary:hover {
   background: var(--button-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 10px 24px color-mix(in oklch, var(--accent-warm) 18%, transparent);
+  box-shadow: none;
 }
 
 .btn:active,
@@ -165,7 +155,7 @@
 .btn-secondary {
   color: var(--text-soft);
   border-color: var(--line-soft);
-  background: color-mix(in oklch, var(--surface-soft) 86%, var(--accent-soft));
+  background: transparent;
 }
 
 .btn-secondary:hover,
@@ -180,4 +170,3 @@
   border-color: transparent;
   background: transparent;
 }
-

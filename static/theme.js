@@ -3,7 +3,7 @@
 (() => {
   const root = document.documentElement;
   const storageKey = "labplot-theme";
-  const validModes = new Set(["system", "light", "dark"]);
+  const validModes = new Set(["dark"]);
   const onApplyCallbacks = new Set();
   let initialized = false;
   let systemQuery = null;
@@ -16,7 +16,7 @@
   }
 
   function getSystemTheme() {
-    return getSystemQuery()?.matches ? "dark" : "light";
+    return "dark";
   }
 
   function normalizeMode(mode) {
@@ -40,7 +40,7 @@
   }
 
   function resolveTheme(mode) {
-    return mode === "system" ? getSystemTheme() : mode;
+    return "dark";
   }
 
   function writeTheme(mode) {

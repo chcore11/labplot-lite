@@ -7,6 +7,18 @@
 @import "./styles/responsive.css";
 @import "./styles/motion.css";
 
+body {
+  font-family: var(--font-sans);
+}
+
+.hero h1,
+.section-heading h2,
+.mode-landing h1,
+.simple-mode h1,
+.workbench-head h1 {
+  font-family: var(--font-display);
+}
+
 /* Keep the plot readiness card from squeezing or covering curve controls. */
 #plotForm {
   container-type: inline-size;
@@ -79,7 +91,7 @@
 .mode-landing,
 .simple-mode {
   width: min(1180px, calc(100% - 40px));
-  margin: 24px auto 96px;
+  margin: 28px auto 96px;
 }
 
 .mode-landing.is-hidden,
@@ -90,8 +102,8 @@
 
 .mode-landing {
   display: grid;
-  grid-template-columns: minmax(0, 0.72fr) minmax(420px, 1fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 0.82fr) minmax(420px, 1fr);
+  gap: 14px;
   align-items: stretch;
 }
 
@@ -99,53 +111,52 @@
 .simple-mode,
 .simple-result {
   border: 1px solid var(--line-soft);
-  border-radius: var(--radius-lg);
-  background:
-    linear-gradient(180deg, color-mix(in oklch, var(--surface-raised) 32%, transparent), transparent 76%),
-    var(--surface-soft);
+  border-radius: 18px;
+  background: var(--surface-soft);
   box-shadow: var(--shadow-md);
 }
 
 .mode-landing-copy {
   display: grid;
   align-content: center;
-  gap: 10px;
-  padding: 28px;
+  gap: 14px;
+  padding: 32px;
 }
 
 .mode-landing h1,
 .simple-mode h1 {
   margin: 0;
   color: var(--text-main);
-  font-size: 28px;
-  line-height: 1.2;
-  font-weight: 780;
+  font-size: 34px;
+  line-height: 1.18;
+  font-weight: 500;
   letter-spacing: 0;
+  overflow-wrap: anywhere;
 }
 
 .mode-landing p,
 .simple-mode p {
   max-width: 62ch;
   margin: 0;
-  color: var(--text-muted);
-  font-size: 14px;
+  color: var(--text-soft);
+  font-size: 15px;
   line-height: 1.6;
 }
 
 .mode-choice-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
 }
 
 .mode-choice-card {
   display: grid;
   align-content: start;
-  gap: 10px;
-  min-height: 220px;
-  padding: 22px;
+  gap: 14px;
+  min-height: 240px;
+  padding: 26px;
   border: 1px solid var(--line-soft);
-  border-radius: var(--radius-lg);
+  border-radius: 18px;
   color: var(--text-main);
   background: var(--surface);
   text-align: left;
@@ -157,21 +168,21 @@
 }
 
 .mode-choice-card:hover {
-  border-color: var(--accent-border);
-  background: var(--surface-hover);
-  transform: translateY(-1px);
+  border-color: var(--line-strong);
+  background: var(--surface-raised);
+  transform: translateY(-2px);
 }
 
 .mode-choice-card span {
-  color: var(--accent-strong);
+  color: var(--text-muted);
   font-size: 13px;
-  font-weight: 780;
+  font-weight: 450;
 }
 
 .mode-choice-card strong {
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1.25;
-  font-weight: 780;
+  font-weight: 500;
 }
 
 .mode-choice-card small {
@@ -182,8 +193,8 @@
 
 .simple-mode {
   display: grid;
-  gap: 16px;
-  padding: 24px;
+  gap: 18px;
+  padding: 26px;
 }
 
 .simple-mode-head {
@@ -204,16 +215,24 @@
   min-height: 190px;
   padding: 26px;
   border: 1px dashed var(--line-strong);
-  border-radius: var(--radius-lg);
-  background: color-mix(in oklch, var(--surface) 72%, var(--accent-soft));
+  border-radius: 18px;
+  background: var(--surface);
   transition:
     border-color var(--duration-fast) var(--ease-out),
     background var(--duration-fast) var(--ease-out);
 }
 
+.simple-upload-dropzone,
+.simple-upload-copy,
+.simple-upload-copy strong,
+.simple-upload-copy span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .simple-upload-dropzone.is-dragging {
   border-color: var(--accent);
-  background: color-mix(in oklch, var(--surface-hover) 72%, var(--accent-soft));
+  background: var(--surface-hover);
 }
 
 .simple-upload-dropzone input {
@@ -232,6 +251,7 @@
   color: var(--text-main);
   font-size: 22px;
   line-height: 1.25;
+  font-weight: 500;
 }
 
 .simple-upload-copy span {
@@ -259,13 +279,14 @@
   color: var(--text-main);
   font-size: 20px;
   line-height: 1.25;
+  font-weight: 500;
 }
 
 .simple-result-meta span,
 .simple-meta-grid span {
   color: var(--text-muted);
   font-size: 12px;
-  font-weight: 740;
+  font-weight: 450;
 }
 
 .simple-meta-grid {
@@ -274,7 +295,7 @@
   gap: 1px;
   overflow: hidden;
   border: 1px solid var(--line-soft);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   background: var(--line-soft);
 }
 
@@ -301,7 +322,7 @@
   overflow: hidden;
   padding: 18px;
   border: 1px solid var(--line-soft);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   background: var(--surface);
 }
 
@@ -326,7 +347,13 @@
 @media (max-width: 640px) {
   .mode-landing,
   .simple-mode {
-    width: min(100% - 24px, 1180px);
+    width: calc(100% - 24px);
+    max-width: 340px;
+  }
+
+  .mode-landing h1,
+  .simple-mode h1 {
+    font-size: 26px;
   }
 
   .mode-choice-grid,
@@ -340,7 +367,8 @@
   }
 
   .simple-result-actions .btn,
-  .simple-result-actions button {
+  .simple-result-actions button,
+  .simple-upload-dropzone .btn {
     width: 100%;
   }
 }

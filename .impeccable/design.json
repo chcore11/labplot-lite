@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-11T09:24:37Z",
+  "title": "Design System: LabPlot Lite",
+  "extensions": {
+    "colorMeta": {
+      "moon-black": {
+        "role": "primary",
+        "displayName": "Moon Black",
+        "canonical": "oklch(1.5% 0 0)",
+        "tonalRamp": [
+          "oklch(1.5% 0 0)",
+          "oklch(7.8% 0 0)",
+          "oklch(12.5% 0 0)",
+          "oklch(17% 0 0)",
+          "oklch(24% 0 0)",
+          "oklch(42% 0 0)",
+          "oklch(62% 0 0)",
+          "oklch(96% 0 0)"
+        ]
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite Surface",
+        "canonical": "oklch(12.5% 0 0)",
+        "tonalRamp": [
+          "oklch(5% 0 0)",
+          "oklch(9% 0 0)",
+          "oklch(12.5% 0 0)",
+          "oklch(17% 0 0)",
+          "oklch(24% 0 0)",
+          "oklch(36% 0 0)",
+          "oklch(58% 0 0)",
+          "oklch(88% 0 0)"
+        ]
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "White Text",
+        "canonical": "oklch(96% 0 0)",
+        "tonalRamp": [
+          "oklch(20% 0 0)",
+          "oklch(34% 0 0)",
+          "oklch(48% 0 0)",
+          "oklch(62% 0 0)",
+          "oklch(74% 0 0)",
+          "oklch(84% 0 0)",
+          "oklch(92% 0 0)",
+          "oklch(96% 0 0)"
+        ]
+      },
+      "plot-paper": {
+        "role": "neutral",
+        "displayName": "Plot Paper",
+        "canonical": "oklch(97% 0.004 260)",
+        "tonalRamp": [
+          "oklch(18% 0.004 260)",
+          "oklch(30% 0.004 260)",
+          "oklch(44% 0.004 260)",
+          "oklch(58% 0.004 260)",
+          "oklch(72% 0.004 260)",
+          "oklch(84% 0.004 260)",
+          "oklch(92% 0.004 260)",
+          "oklch(97% 0.004 260)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Moonshot-like Display",
+        "purpose": "Large landing or mode titles, quiet weight, strong space."
+      },
+      "section": {
+        "displayName": "Section Title",
+        "purpose": "Major homepage and product sections."
+      },
+      "mono": {
+        "displayName": "Metric Mono",
+        "purpose": "Fit metrics, export dimensions, code fragments, and column names."
+      }
+    },
+    "shadows": [
+      {
+        "name": "focus-glow",
+        "value": "0 0 40px oklch(96% 0 0 / 0.24)",
+        "purpose": "Focused input or currently active generation area only."
+      },
+      {
+        "name": "inset-hairline",
+        "value": "inset 1px 1px 0 -0.5px oklch(100% 0 0 / 0.10)",
+        "purpose": "Precise internal edge for inputs and important panels."
+      },
+      {
+        "name": "none-by-default",
+        "value": "none",
+        "purpose": "Default for cards, panels, samples, and downloads."
+      }
+    ],
+    "motion": [
+      {
+        "name": "moonshot-reveal",
+        "value": "opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Large section reveals only."
+      },
+      {
+        "name": "control-hover",
+        "value": "border-color 0.2s, background 0.2s, color 0.2s",
+        "purpose": "CTA, platform buttons, and compact controls."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "679px"
+      },
+      {
+        "name": "tablet",
+        "value": "999px"
+      },
+      {
+        "name": "desktop-max",
+        "value": "1440px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Outline CTA",
+      "kind": "button",
+      "refersTo": "cta-outline",
+      "description": "Moonshot-like transparent pill CTA for the landing page and mode entry.",
+      "html": "<a class=\"ds-cta\" href=\"#\">打开工作台<span aria-hidden=\"true\">↑</span></a>",
+      "css": ".ds-cta { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 20px; border-radius: 999px; border: 1px solid oklch(96% 0 0 / 0.42); background: transparent; color: oklch(96% 0 0 / 0.66); font: 450 16px/24px 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; text-decoration: none; white-space: nowrap; transition: border-color 0.2s, background 0.2s, color 0.2s; } .ds-cta span { opacity: 0; width: 0; overflow: hidden; transition: opacity 0.2s, width 0.2s; } .ds-cta:hover { border-color: oklch(96% 0 0); background: oklch(96% 0 0 / 0.05); color: oklch(96% 0 0); } .ds-cta:hover span { opacity: 1; width: 14px; } .ds-cta:focus-visible { outline: 0; box-shadow: 0 0 40px oklch(96% 0 0 / 0.24); }"
+    },
+    {
+      "name": "Graphite Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Default workbench surface: graphite, thin border, no external shadow.",
+      "html": "<section class=\"ds-panel\"><h3>配置图像与拟合</h3><p>选择 X/Y 轴、曲线和拟合方式，生成前会自动检查条件。</p></section>",
+      "css": ".ds-panel { padding: 24px; border: 1px solid oklch(100% 0 0 / 0.12); border-radius: 12px; background: oklch(12.5% 0 0); color: oklch(96% 0 0); font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; box-shadow: none; } .ds-panel h3 { margin: 0 0 8px; font-size: 18px; font-weight: 500; line-height: 1.52; } .ds-panel p { margin: 0; color: oklch(96% 0 0 / 0.66); font-size: 14px; line-height: 1.52; } .ds-panel:hover { border-color: oklch(100% 0 0 / 0.42); }"
+    },
+    {
+      "name": "Mode Choice",
+      "kind": "card",
+      "refersTo": "media-card",
+      "description": "Two-entry mode selector, monochrome and low-noise.",
+      "html": "<button class=\"ds-mode\"><span>简易模式</span><strong>拖入文件，自动生成基础图</strong><small>自动识别表头、X/Y 数值列，默认散点 + 连线。</small></button>",
+      "css": ".ds-mode { width: 100%; min-height: 160px; padding: 24px; border: 1px solid oklch(100% 0 0 / 0.12); border-radius: 16px; background: oklch(12.5% 0 0); color: oklch(96% 0 0); text-align: left; font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; box-shadow: none; transition: transform 0.2s, border-color 0.2s, background 0.2s; } .ds-mode span { display: block; margin-bottom: 24px; color: oklch(96% 0 0 / 0.42); font-size: 14px; line-height: 20px; } .ds-mode strong { display: block; font-size: 24px; font-weight: 500; line-height: 1.28; } .ds-mode small { display: block; margin-top: 12px; color: oklch(96% 0 0 / 0.66); font-size: 14px; line-height: 1.52; } .ds-mode:hover { transform: translateY(-4px); border-color: oklch(100% 0 0 / 0.42); background: oklch(17% 0 0); } .ds-mode:focus-visible { outline: 0; box-shadow: 0 0 40px oklch(96% 0 0 / 0.24); }"
+    },
+    {
+      "name": "Large Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Primary import or quick-start input surface, inspired by Moonshot's large translucent input but adapted away from chat.",
+      "html": "<label class=\"ds-input\"><span>选择 CSV / Excel 文件</span><input value=\"sample_03_abs_error.xlsx\"></label>",
+      "css": ".ds-input { display: grid; gap: 12px; padding: 18px 12px 12px; border: 1px solid transparent; border-radius: 24px; background: oklch(20% 0 0 / 0.30); color: oklch(96% 0 0 / 0.66); font: 450 14px/20px 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; box-shadow: inset 1px 1px 0 -0.5px oklch(100% 0 0 / 0.10); transition: background 0.2s, border-color 0.2s, box-shadow 0.2s; } .ds-input input { min-height: 44px; border: 0; background: transparent; color: oklch(96% 0 0); font-size: 18px; line-height: 36px; outline: 0; } .ds-input:focus-within { background: oklch(24% 0 0 / 0.36); border-color: oklch(100% 0 0 / 0.12); box-shadow: 0 0 40px oklch(96% 0 0 / 0.24); }"
+    },
+    {
+      "name": "Plot Paper",
+      "kind": "custom",
+      "refersTo": "plot-result-panel",
+      "description": "White chart output contained inside a monochrome graphite shell.",
+      "html": "<section class=\"ds-plot-shell\"><div class=\"ds-plot-paper\"><strong>Analytical calibration curve</strong><p>R² = 0.9986 · RMSE = 0.012</p></div></section>",
+      "css": ".ds-plot-shell { padding: 16px; border: 1px solid oklch(100% 0 0 / 0.12); border-radius: 16px; background: oklch(12.5% 0 0); } .ds-plot-paper { min-height: 180px; padding: 24px; border: 1px solid oklch(76% 0.004 260 / 0.36); border-radius: 4px; background: oklch(97% 0.004 260); color: oklch(16% 0.005 260); font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; } .ds-plot-paper strong { display: block; font-size: 16px; font-weight: 500; line-height: 24px; } .ds-plot-paper p { margin: 12px 0 0; color: oklch(48% 0.006 260); font: 500 13px/1.45 'SFMono-Regular', Menlo, monospace; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "黑场科学工作台",
+    "overview": "LabPlot Lite 的视觉系统应向 Moonshot 官网的克制黑场、清晰文字秩序和低色彩密度靠拢。它不复制 Moonshot 的品牌和内容，而是吸收黑白灰、强留白、轻 CTA 和少装饰的设计方法。",
+    "keyCharacteristics": [
+      "黑白灰优先：品牌层面不使用绿、琥珀、紫、蓝作为主视觉。",
+      "低装饰：少图标、少徽章、少彩色状态，避免 AI 模板感。",
+      "大留白：landing 和说明区使用 80px 级别分区间距，移动端收敛到 24px。",
+      "轻 CTA：圆角 pill、细边框、透明背景、hover 时轻微显现箭头或浅白底。",
+      "内容可信：图表、拟合指标和导出结果必须保持严谨可查，不被品牌视觉淹没。"
+    ],
+    "rules": [
+      {
+        "name": "The Monochrome First Rule",
+        "body": "默认任何新界面都先用黑、白、灰完成层级；只有语义状态和数据曲线允许使用彩色。",
+        "section": "colors"
+      },
+      {
+        "name": "The No Accent Branding Rule",
+        "body": "不允许再用墨绿、琥珀、紫蓝渐变或荧光色作为 LabPlot Lite 的品牌主色。",
+        "section": "colors"
+      },
+      {
+        "name": "The Quiet Type Rule",
+        "body": "字重保持 400 到 500 为主，只有关键工具标签可到 600。禁止到处使用 760 以上的强粗体。",
+        "section": "typography"
+      },
+      {
+        "name": "The Border Over Shadow Rule",
+        "body": "优先用 1px 半透明白边、灰阶背景和间距建立层级，不给每个面板加阴影。",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do 用黑、白、灰先完成所有视觉层级，再考虑语义色。",
+      "Do 使用 80px 级别分区留白，让首页像克制的产品展示，而不是表单集合。",
+      "Do 让 CTA 轻量化：透明底、细边框、pill、hover 轻反馈。",
+      "Do 保留图表白底输出，但把它限制在结果和导出区域。"
+    ],
+    "donts": [
+      "Don't 像复杂版 OriginLab，不要把大量按钮、菜单和参数一次性压给学生。",
+      "Don't 像泛 SaaS 官网，不要用大面积营销文案、装饰卡片网格或夸张转化话术替代真实工具。",
+      "Don't 像 AI 工具模板，不要使用彩色渐变、紫蓝 glow、玻璃拟态卡片、聊天框式首屏来暗示智能。",
+      "Don't 使用绿色或琥珀色作为品牌主色。它们只能作为图表数据色或语义状态色。"
+    ]
+  }
+}

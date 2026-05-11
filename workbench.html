@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link rel="icon" href="./static/logo_dark.png" type="image/png">
   <title>LabPlot Lite 工作台</title>
   <script src="./static/theme.js"></script>
@@ -24,50 +24,38 @@
 <body>
   <main class="site workbench-page">
     <header class="nav">
-      <a class="brand" href="./index.html">
-        <picture class="brand-logo-wrap">
-          <img
-            class="brand-logo"
-            src="./static/logo_light.png"
-            data-light="./static/logo_light.png"
-            data-dark="./static/logo_dark.png"
-            alt="LabPlot Lite logo"
-          >
-        </picture>
+      <a class="brand" href="./index.html" aria-label="LabPlot Lite 首页">
+        <span class="brand-mark" aria-hidden="true"></span>
         <span class="brand-text">LabPlot Lite</span>
       </a>
 
-      <div class="nav-actions">
-        <label class="theme-select-wrap" for="themeSelect">
-          <span>主题</span>
-          <select id="themeSelect" class="theme-select" aria-label="选择主题">
-            <option value="system">跟随系统</option>
-            <option value="light">亮色</option>
-            <option value="dark">深色</option>
-          </select>
-        </label>
+      <nav class="nav-links" aria-label="工作台导航">
+        <a href="./index.html#samples">示例图</a>
+        <a href="./index.html#workflow">工作流</a>
+      </nav>
 
+      <div class="nav-actions">
         <a class="nav-cta" href="#upload-section">导入数据</a>
       </div>
     </header>
 
     <section class="mode-landing" id="modeLanding" aria-labelledby="modeLandingTitle">
       <div class="mode-landing-copy">
-        <span class="section-kicker">选择入口</span>
-        <h1 id="modeLandingTitle">先选一种处理方式</h1>
-        <p>简易模式适合快速出一张基础图；功能模式保留完整的数据范围、计算列、多曲线、拟合和导出流程。</p>
+        <span class="section-kicker">LabPlot Lite 工作台</span>
+        <h1 id="modeLandingTitle">先走最短路径，需要时再展开功能</h1>
+        <p>简易模式适合快速出一张基础图；功能模式保留数据范围、计算列、多曲线、拟合和导出配置。</p>
       </div>
 
       <div class="mode-choice-grid" aria-label="工作模式">
         <button type="button" class="mode-choice-card" id="enterSimpleMode">
           <span>简易模式</span>
-          <strong>拖入文件，自动生成基础图</strong>
-          <small>自动识别表头、X/Y 数值列，默认散点 + 连线，不进行拟合。</small>
+          <strong>拖入文件，生成基础图</strong>
+          <small>自动识别表头和 X/Y 数值列，默认散点连线，不强迫配置参数。</small>
         </button>
 
         <button type="button" class="mode-choice-card" id="enterAdvancedMode">
           <span>功能模式</span>
-          <strong>进入完整工作台</strong>
+          <strong>手动控制完整流程</strong>
           <small>手动确认数据范围，配置多曲线、计算列、拟合指标和报告素材。</small>
         </button>
       </div>
@@ -77,8 +65,8 @@
       <div class="simple-mode-head">
         <div>
           <span class="section-kicker">简易模式</span>
-          <h1 id="simpleModeTitle">把 Excel / CSV 拖到这里，自动生成基础图</h1>
-          <p>第一版只选择一组 X/Y，默认散点 + 连线，不做自动拟合。</p>
+          <h1 id="simpleModeTitle">把 Excel / CSV 拖到这里，生成基础图</h1>
+          <p>系统只选择一组 X/Y，默认散点连线，不做自动拟合。</p>
         </div>
         <button type="button" class="btn btn-secondary" id="simpleToAdvancedTop">进入功能模式手动调整</button>
       </div>

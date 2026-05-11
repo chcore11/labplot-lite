@@ -1,35 +1,52 @@
-# LabPlot Lite Product Context
+# Product
 
 ## Register
+
 product
 
-## Product Purpose
-LabPlot Lite is a static browser tool for student lab data processing. It helps students upload CSV or Excel files, identify usable data ranges, create derived columns, plot curves, run basic fitting, and export report-ready assets without installing heavyweight software.
-
 ## Users
-- Primary users are students writing physics, chemistry, electronics, or general science lab reports.
-- They usually have limited time, uneven spreadsheet skills, and need clear guidance more than advanced configuration.
-- They may use school computers or personal laptops, often through a browser with no install permissions.
 
-## Core Jobs
-- Load an experiment table with messy title or metadata rows.
-- Confirm the header row and data start row from a preview.
-- Generate common calculation columns such as unit conversions, error columns, logs, square roots, and ratios.
-- Plot one or more curves and optionally run linear or quadratic fitting.
-- Download PNG, CSV, TXT, and ZIP assets for a lab report.
+LabPlot Lite 的核心用户是不想学习 OriginLab 等复杂工具、但需要快速完成实验数据绘图和报告素材整理的学生。
 
-## Tone
-Clear, calm, and practical. Use short Chinese labels and direct task verbs: upload, identify, calculate, plot, export. Avoid marketing language, vague confidence claims, and decorative copy.
+他们通常处在课程实验、基础科研训练、竞赛项目或实验报告提交场景中。时间有限，数据处理经验不稳定，目标不是掌握完整专业软件，而是用最短路径把 CSV / Excel 表格变成清晰、可检查、可提交的图件和报告素材。
+
+## Product Purpose
+
+LabPlot Lite 是一个面向学生实验数据处理的轻量网页工具。它帮助用户在浏览器中完成数据导入、表头识别、数据范围确认、计算列生成、绘图、基础拟合、指标检查和报告素材导出。
+
+产品定位是“学生实验报告工具 + Origin 的轻量网页版替代”。它不试图复刻完整 OriginLab，而是提取学生最高频、最容易卡住的路径：快速理解数据表，快速生成科学图件，快速导出 PNG、CSV、TXT 和 ZIP。
+
+成功的体验应该让学生不需要先学习复杂软件，也能完成一次可信的实验图表输出；同时在需要更细配置时，可以进入更专业的功能模式。
+
+## Brand Personality
+
+清晰、可靠、轻量专业且不可替代。
+
+语气应直接、克制、像实验指导书和专业软件之间的结合。界面不卖弄技术感，不使用空泛营销句，而是用明确步骤、可见结果和可检查的参数建立信任。
+
+## Anti-references
+
+- 不要像复杂版 OriginLab，不要把大量按钮、菜单和参数一次性压给学生。
+- 不要像泛 SaaS 官网，不要用大面积营销文案、装饰卡片网格或夸张转化话术替代真实工具。
+- 不要像 AI 工具模板，不要依赖深色渐变、玻璃拟态、炫酷动效来暗示专业。
+- 不要像儿童教育软件，不要过度可爱、游戏化或降低学术严肃性。
+- 不要隐藏核心流程。上传、识别、计算、绘图、拟合、导出必须保持清晰线性逻辑。
 
 ## Design Principles
-- Task-first: the workbench must be easier to scan than the hero.
-- Earned familiarity: use standard form controls, predictable buttons, clear panels, and visible focus states.
-- Local trust: make browser-only processing and export outcomes clear without overstating security.
-- Low friction: keep advanced settings available but secondary.
-- Report ready: the final chart, metrics, and download actions should feel reliable and inspectable.
 
-## Anti-References
-- Do not make the tool look like a generic SaaS landing page.
-- Do not use large decorative card grids as the primary product experience.
-- Do not hide core workflow controls behind playful or unfamiliar affordances.
-- Do not rely on dark mode or gradients to imply technical quality.
+- Fast path first: 默认路径要服务“快速出一张可靠图”，高级配置只能作为进阶层，不应阻塞新手。
+- Origin familiarity without Origin complexity: 保留学生熟悉的表格、曲线、拟合、导出概念，但移除复杂菜单和低频参数。
+- Report-ready by default: 输出结果应默认接近实验报告和学术图件习惯，尤其是白底图、清晰坐标轴、可读图例和 300 DPI 导出。
+- Inspectable trust: 自动识别、拟合指标和导出结果都要可检查，不让用户盲信系统。
+- Paper first, instrument when needed: 默认气质靠近实验报告纸张和科学图件，进入功能模式时可以呈现更密集的仪器面板和数据工作台感。
+
+## Accessibility & Inclusion
+
+LabPlot Lite 应优先保证中文界面清晰可读，并在常见学生设备上稳定使用。
+
+- 移动端 390px 宽度下文字、按钮、表格和图表控制不能重叠。
+- 核心流程应支持键盘操作，并保留明显的 focus 状态。
+- 按钮和可点击控件应有足够触控面积。
+- 支持减少动效偏好，动效只用于状态反馈，不影响理解。
+- 图表配色应尽量兼顾色弱识别，不只依赖颜色区分曲线。
+- 错误、警告和拟合提醒要用明确文本说明，不能只靠颜色表达状态。
