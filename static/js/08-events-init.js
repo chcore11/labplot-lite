@@ -44,6 +44,12 @@ function getInitialSampleUrl() {
   return `./samples/${fileName}`;
 }
 
+function getInitialMode() {
+  const params = new URLSearchParams(window.location.search);
+  const mode = params.get("mode");
+  return mode === "simple" || mode === "advanced" ? mode : "";
+}
+
 async function loadInitialSampleFromUrl() {
   const sampleUrl = getInitialSampleUrl();
   if (!sampleUrl) {
@@ -93,6 +99,14 @@ function setupTheme() {
       });
     },
   });
+}
+
+function loadInitialModeFromUrl() {
+  const mode = getInitialMode();
+  if (mode) {
+    showMode(mode);
+    window.history.replaceState(null, "", window.location.pathname);
+  }
 }
 
 function showMode(mode) {
@@ -450,4 +464,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupEvents();
   updateWorkflowNav();
   await loadInitialSampleFromUrl();
+  if (!getInitialSampleUrl()) {
+    loadInitialModeFromUrl();
+  }
 });
