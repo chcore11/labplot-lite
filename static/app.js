@@ -43,13 +43,13 @@ const LINE_DASHES = {
 };
 
 const CURVE_COLORS = {
-  "#2563EB": "蓝色",
-  "#F97316": "橙色",
-  "#16A34A": "绿色",
-  "#DC2626": "红色",
-  "#7C3AED": "紫色",
-  "#111827": "黑色",
-  "#6B7280": "灰色",
+  "#1F77B4": "学术蓝",
+  "#D62728": "学术红",
+  "#2CA02C": "学术绿",
+  "#9467BD": "学术紫",
+  "#FF7F0E": "学术橙",
+  "#4B5563": "深灰",
+  "#8C564B": "棕红",
 };
 
 const DEFAULT_CURVE_COLORS = Object.keys(CURVE_COLORS);
@@ -71,6 +71,112 @@ const AVAILABLE_METRICS = {
 
 const BASIC_METRICS = ["r2", "rmse", "mae", "max_abs_error"];
 const MULTI_Y_FIT_NOTICE = "多曲线模式下暂不进行拟合，如需拟合请只保留一条曲线。";
+const SAMPLE_FILES = new Set([
+  "sample_01_temp_c_to_k.xlsx",
+  "sample_02_voltage_scale.xlsx",
+  "sample_03_abs_error.xlsx",
+  "sample_04_invalid_log.xlsx",
+]);
+
+const SAMPLE_GUIDES = {
+  "sample_01_temp_c_to_k.xlsx": {
+    title: "荧光发射光谱对比",
+    goal: "练习多曲线光谱绘图。三条发射曲线带有不同峰位和峰强，更接近论文里的 spectroscopy panel。",
+    steps: [
+      "确认 wavelength_nm 和三组强度列已识别。",
+      "使用推荐绘图填入三条 emission curve。",
+      "保留白底、黑色坐标框和清晰图例，检查峰形是否可读。",
+      "导出 PNG 和 ZIP，用作报告中的光谱对比图。",
+    ],
+    plotActions: [{
+      label: "填入光谱叠图",
+      xCol: "wavelength_nm",
+      yCols: ["sample_low_a_u", "sample_high_a_u", "reference_a_u"],
+      chartType: "line_marker",
+      fitType: "none",
+      showGrid: false,
+      title: "Fluorescence emission spectra",
+      xLabel: "Wavelength (nm)",
+      yLabel: "Intensity (a.u.)",
+    }],
+  },
+  "sample_02_voltage_scale.xlsx": {
+    title: "反应动力学多曲线",
+    goal: "练习多组时间序列绘图。曲线包含不同衰减速率和恢复峰，适合测试图例、曲线配色和导出观感。",
+    steps: [
+      "确认 time_min 是 X 轴，四组 response 都是数值列。",
+      "使用推荐绘图生成多曲线动力学图。",
+      "对比 control、low dose、high dose 和 pulse recovery 的趋势。",
+      "导出图像，检查图例和曲线间距是否清楚。",
+    ],
+    plotActions: [{
+      label: "填入动力学图",
+      xCol: "time_min",
+      yCols: ["control_pct", "low_dose_pct", "high_dose_pct", "pulse_recovery_pct"],
+      chartType: "line_marker",
+      fitType: "none",
+      showGrid: false,
+      title: "Reaction kinetics under different conditions",
+      xLabel: "Time (min)",
+      yLabel: "Normalized response (%)",
+    }],
+  },
+  "sample_03_abs_error.xlsx": {
+    title: "标准曲线与残差",
+    goal: "练习一次线性拟合和残差检查。这个示例更像实验报告或论文补充材料里的 calibration curve。",
+    steps: [
+      "确认 concentration_um 和 absorbance_mean 已识别。",
+      "使用标准曲线按钮，选择一次线性拟合。",
+      "生成图像后重点查看拟合方程、R²、RMSE 和 MAE。",
+      "也可以切换到残差图，检查点是否系统性偏离。",
+    ],
+    plotActions: [
+      {
+        label: "填入标准曲线",
+        xCol: "concentration_um",
+        yCols: ["absorbance_mean"],
+        chartType: "scatter",
+        fitType: "linear",
+        showGrid: false,
+        title: "Analytical calibration curve",
+        xLabel: "Concentration (uM)",
+        yLabel: "Absorbance (a.u.)",
+      },
+      {
+        label: "填入残差图",
+        xCol: "concentration_um",
+        yCols: ["residual_a_u"],
+        chartType: "line_marker",
+        fitType: "none",
+        showGrid: false,
+        title: "Calibration residuals",
+        xLabel: "Concentration (uM)",
+        yLabel: "Residual (a.u.)",
+      },
+    ],
+  },
+  "sample_04_invalid_log.xlsx": {
+    title: "拉曼谱峰对比",
+    goal: "练习多峰谱图和多样品叠图。D/G 峰变化明显，适合验证期刊风格线条、图例和导出清晰度。",
+    steps: [
+      "确认 raman_shift_cm 和三组 intensity 列已识别。",
+      "使用推荐绘图填入 pristine、annealed 和 doped 三条谱线。",
+      "观察 D 峰和 G 峰的相对强度变化。",
+      "导出白底 PNG，检查谱峰和图例是否适合报告使用。",
+    ],
+    plotActions: [{
+      label: "填入拉曼谱图",
+      xCol: "raman_shift_cm",
+      yCols: ["pristine_a_u", "annealed_a_u", "doped_a_u"],
+      chartType: "line_marker",
+      fitType: "none",
+      showGrid: false,
+      title: "Raman spectra comparison",
+      xLabel: "Raman shift (cm^-1)",
+      yLabel: "Intensity (a.u.)",
+    }],
+  },
+};
 
 const HEADER_KEYWORDS = [
   "时间", "温度", "电压", "电流", "功率", "电阻", "浓度", "吸光度",
@@ -91,6 +197,7 @@ const state = {
   isPlotGenerating: false,
   activeStep: "upload",
   objectUrls: [],
+  sampleGuide: null,
 };
 
 const WORKFLOW_STEPS = ["upload", "range", "calc", "plot", "result"];
@@ -628,6 +735,138 @@ function renderColumnsBox(target, label) {
   });
 }
 
+function getSampleGuide(fileName) {
+  return SAMPLE_GUIDES[fileName] || null;
+}
+
+function columnOptionExists(column) {
+  return Boolean(column && state.numericColumns.includes(column));
+}
+
+function setSelectIfExists(selector, value) {
+  const select = qs(selector);
+  if (!select || value === undefined || value === null) {
+    return false;
+  }
+
+  const exists = Array.from(select.options).some((option) => option.value === value);
+  if (!exists) {
+    return false;
+  }
+
+  select.value = value;
+  return true;
+}
+
+function renderSampleGuide() {
+  const box = qs("#sampleGuideBox");
+  if (!box) {
+    return;
+  }
+
+  const guide = state.sampleGuide;
+  if (!guide) {
+    hide(box);
+    return;
+  }
+
+  qs("#sampleGuideTitle").textContent = guide.title;
+  qs("#sampleGuideGoal").textContent = guide.goal;
+
+  const steps = qs("#sampleGuideSteps");
+  steps.replaceChildren();
+  guide.steps.forEach((step) => {
+    const item = document.createElement("li");
+    item.textContent = step;
+    steps.appendChild(item);
+  });
+
+  const actions = qs("#sampleGuideActions");
+  actions.replaceChildren();
+
+  (guide.calcActions || []).forEach((action, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn btn-secondary";
+    button.dataset.sampleAction = "calc";
+    button.dataset.sampleActionIndex = String(index);
+    button.textContent = action.label;
+    actions.appendChild(button);
+  });
+
+  (guide.plotActions || []).forEach((action, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = index === 0 ? "btn btn-primary" : "btn btn-secondary";
+    button.dataset.sampleAction = "plot";
+    button.dataset.sampleActionIndex = String(index);
+    button.textContent = action.label;
+    actions.appendChild(button);
+  });
+
+  show(box);
+}
+
+function applySampleCalcAction(index) {
+  const guide = state.sampleGuide;
+  const action = guide?.calcActions?.[index];
+  if (!action) {
+    return;
+  }
+
+  if (!columnOptionExists(action.firstCol)) {
+    showMessage("error", `示例列不存在：${action.firstCol}`);
+    return;
+  }
+
+  setSelectIfExists("#calcTemplate", action.template);
+  setSelectIfExists("#firstCol", action.firstCol);
+  if (action.secondCol) {
+    if (!setSelectIfExists("#secondCol", action.secondCol)) {
+      showMessage("error", `示例列不存在：${action.secondCol}`);
+      return;
+    }
+  }
+  qs("#constantK").value = action.constantK || "";
+  qs("#newColName").value = action.newColName || "";
+
+  clearMessage();
+  setActiveStep("calc", { scroll: true });
+}
+
+function applySamplePlotAction(index = 0) {
+  const action = state.sampleGuide?.plotActions?.[index];
+  if (!action) {
+    return;
+  }
+
+  const yCols = action.yCols || [action.yCol];
+  if (!columnOptionExists(action.xCol) || yCols.some((column) => !columnOptionExists(column))) {
+    showMessage("error", "推荐绘图列不存在，请重新确认数据范围。");
+    return;
+  }
+
+  setSelectIfExists("#xCol", action.xCol);
+  setSelectIfExists("#chartType", action.chartType);
+  setSelectIfExists("#fitType", action.fitType);
+  qs("#plotTitle").value = action.title || "";
+  qs("#xLabel").value = action.xLabel || "";
+  qs("#yLabel").value = action.yLabel || "";
+  if (typeof action.showGrid === "boolean") {
+    qs("#showGrid").checked = action.showGrid;
+  }
+
+  renderCurveRows(yCols.map((yCol, yIndex) => ({
+    yCol,
+    color: DEFAULT_CURVE_COLORS[yIndex % DEFAULT_CURVE_COLORS.length],
+    lineWidth: 1.8,
+    lineStyle: "solid",
+  })));
+  updatePlotReadiness();
+  clearMessage();
+  setActiveStep("plot", { scroll: true });
+}
+
 function renderStaticOptions() {
   setOptions(qs("#calcTemplate"), objectEntriesToOptions(CALC_TEMPLATES));
   setOptions(qs("#chartType"), objectEntriesToOptions(CHART_TYPES), "line_marker");
@@ -769,6 +1008,7 @@ function renderDataControls() {
   setOptions(qs("#secondCol"), numericOptions, state.numericColumns[1] || state.numericColumns[0]);
   setOptions(qs("#xCol"), numericOptions, state.numericColumns[0]);
   renderCurveRows(getDefaultCurveConfigs());
+  renderSampleGuide();
   updatePlotReadiness();
 
   if (state.numericColumns.length >= 2) {
@@ -807,6 +1047,7 @@ function reloadDataFromRange(showSuccess = false) {
 
 function setDataset(rows, fileName) {
   state.fileName = fileName;
+  state.sampleGuide = getSampleGuide(fileName);
   state.rawRows = rows.map((row) => Array.isArray(row) ? row.map(cellText) : []);
 
   if (!state.rawRows.length) {
@@ -963,9 +1204,9 @@ function getSelectedCurveSummary() {
 }
 
 function readOutputSize() {
-  const figWidth = parsePositiveFloat(qs("#figWidth").value, 6.5, "图片宽度", 3, 20);
-  const figHeight = parsePositiveFloat(qs("#figHeight").value, 4.2, "图片高度", 2, 16);
-  const figDpi = Math.round(parsePositiveFloat(qs("#figDpi").value, 150, "图片 DPI", 72, 600));
+  const figWidth = parsePositiveFloat(qs("#figWidth").value, 7, "图片宽度", 3, 20);
+  const figHeight = parsePositiveFloat(qs("#figHeight").value, 4.6, "图片高度", 2, 16);
+  const figDpi = Math.round(parsePositiveFloat(qs("#figDpi").value, 300, "图片 DPI", 72, 600));
   return {
     width: Math.round(figWidth * figDpi),
     height: Math.round(figHeight * figDpi),
@@ -1383,12 +1624,12 @@ function buildPlotPayload() {
     throw new Error("请选择正确的拟合方式。");
   }
 
-  const figWidth = parsePositiveFloat(qs("#figWidth").value, 6.5, "图片宽度", 3, 20);
-  const figHeight = parsePositiveFloat(qs("#figHeight").value, 4.2, "图片高度", 2, 16);
-  const figDpi = Math.round(parsePositiveFloat(qs("#figDpi").value, 150, "图片 DPI", 72, 600));
-  const titleFontsize = parsePositiveFloat(qs("#titleFontsize").value, 13, "标题字体大小", 8, 40);
-  const labelFontsize = parsePositiveFloat(qs("#labelFontsize").value, 11, "坐标轴字体大小", 8, 32);
-  const legendFontsize = parsePositiveFloat(qs("#legendFontsize").value, 9, "图例字体大小", 6, 24);
+  const figWidth = parsePositiveFloat(qs("#figWidth").value, 7, "图片宽度", 3, 20);
+  const figHeight = parsePositiveFloat(qs("#figHeight").value, 4.6, "图片高度", 2, 16);
+  const figDpi = Math.round(parsePositiveFloat(qs("#figDpi").value, 300, "图片 DPI", 72, 600));
+  const titleFontsize = parsePositiveFloat(qs("#titleFontsize").value, 15, "标题字体大小", 8, 40);
+  const labelFontsize = parsePositiveFloat(qs("#labelFontsize").value, 13, "坐标轴字体大小", 8, 32);
+  const legendFontsize = parsePositiveFloat(qs("#legendFontsize").value, 11, "图例字体大小", 6, 24);
   const showGrid = qs("#showGrid").checked;
 
   const xLabel = cellText(qs("#xLabel").value) || xCol;
@@ -1447,8 +1688,10 @@ function buildPlotPayload() {
         label: "Data",
         data: pairs,
         showLine: false,
-        pointRadius: 4,
-        pointHoverRadius: 5,
+        pointRadius: 4.2,
+        pointHoverRadius: 5.2,
+        pointBorderWidth: 1.2,
+        pointBorderColor: "rgb(252, 252, 249)",
         borderColor: config.color,
         backgroundColor: config.color,
       });
@@ -1457,10 +1700,10 @@ function buildPlotPayload() {
         data: fitResult.fitPoints,
         showLine: true,
         pointRadius: 0,
-        borderColor: config.color,
-        backgroundColor: config.color,
-        borderWidth: config.lineWidth,
-        borderDash: LINE_DASHES[config.lineStyle],
+        borderColor: "rgb(31, 41, 55)",
+        backgroundColor: "rgb(31, 41, 55)",
+        borderWidth: Math.max(config.lineWidth + 0.5, 2),
+        borderDash: [9, 5],
       });
 
       const fitColumn = fitType === "linear" ? "linear_fit_y" : "quadratic_fit_y";
@@ -1587,26 +1830,29 @@ function makeChartDataset(label, pairs, config, chartType) {
     label,
     data: pairs,
     showLine: !isScatter,
-    pointRadius: isLineOnly ? 0 : 4,
-    pointHoverRadius: isLineOnly ? 0 : 5,
+    pointRadius: isLineOnly ? 0 : 3.6,
+    pointHoverRadius: isLineOnly ? 0 : 4.8,
+    pointBorderWidth: isLineOnly ? 0 : 1,
+    pointBorderColor: "rgb(252, 252, 249)",
     borderColor: config.color,
     backgroundColor: config.color,
-    borderWidth: config.lineWidth,
+    borderWidth: Math.max(config.lineWidth, 1.7),
     borderDash: LINE_DASHES[config.lineStyle],
     tension: 0,
+    spanGaps: true,
   };
 }
 
 function getThemeColors() {
-  const styles = getComputedStyle(document.documentElement);
   return {
-    text: styles.getPropertyValue("--text-main").trim() || "rgb(15, 23, 42)",
-    muted: styles.getPropertyValue("--text-muted").trim() || "rgb(88, 101, 125)",
-    line: styles.getPropertyValue("--chart-grid").trim() || "rgba(148, 163, 184, 0.3)",
-    surface: styles.getPropertyValue("--chart-bg").trim() || "rgb(248, 250, 252)",
-    fitLabelBg: styles.getPropertyValue("--chart-label-bg").trim() || "rgba(248, 250, 252, 0.92)",
-    fitLabelText: styles.getPropertyValue("--chart-label-text").trim() || "rgb(15, 23, 42)",
-    fitLabelBorder: styles.getPropertyValue("--chart-label-border").trim() || "rgba(148, 163, 184, 0.42)",
+    text: "rgb(17, 24, 39)",
+    muted: "rgb(75, 85, 99)",
+    axis: "rgb(17, 24, 39)",
+    line: "rgba(17, 24, 39, 0.13)",
+    surface: "rgb(252, 252, 249)",
+    fitLabelBg: "rgba(252, 252, 249, 0.94)",
+    fitLabelText: "rgb(17, 24, 39)",
+    fitLabelBorder: "rgba(17, 24, 39, 0.28)",
   };
 }
 
@@ -1665,6 +1911,22 @@ function ensureChartPlugin() {
     },
   });
 
+  Chart.register({
+    id: "journalFrame",
+    afterDraw(chart, args, options) {
+      if (!options || options.display === false) {
+        return;
+      }
+
+      const { ctx, chartArea } = chart;
+      ctx.save();
+      ctx.strokeStyle = options.color || "rgb(17, 24, 39)";
+      ctx.lineWidth = options.width || 1.2;
+      ctx.strokeRect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
+      ctx.restore();
+    },
+  });
+
   window.__labplotFitLabelPluginRegistered = true;
 }
 
@@ -1697,24 +1959,49 @@ function renderChart(payload) {
       animation: false,
       devicePixelRatio: 1,
       parsing: false,
+      layout: {
+        padding: {
+          top: 22,
+          right: 28,
+          bottom: 18,
+          left: 20,
+        },
+      },
+      elements: {
+        line: {
+          borderCapStyle: "round",
+          borderJoinStyle: "round",
+        },
+        point: {
+          hitRadius: 8,
+        },
+      },
       plugins: {
         title: {
           display: true,
           text: payload.plotTitle,
           color: colors.text,
+          align: "center",
           font: {
             size: payload.titleFontsize,
-            weight: "700",
+            weight: "650",
           },
           padding: {
-            bottom: 10,
+            bottom: 18,
           },
         },
         legend: {
+          position: "top",
+          align: "end",
           labels: {
             color: colors.text,
+            usePointStyle: true,
+            boxWidth: 9,
+            boxHeight: 9,
+            padding: 14,
             font: {
               size: payload.legendFontsize,
+              weight: "500",
             },
           },
         },
@@ -1727,20 +2014,36 @@ function renderChart(payload) {
         canvasBackground: {
           color: colors.surface,
         },
+        journalFrame: {
+          display: true,
+          color: colors.axis,
+          width: 1.2,
+        },
       },
       scales: {
         x: {
           type: "linear",
+          border: {
+            display: true,
+            color: colors.axis,
+            width: 1.4,
+          },
           title: {
             display: true,
             text: payload.xLabel,
             color: colors.text,
             font: {
               size: payload.labelFontsize,
+              weight: "600",
+            },
+            padding: {
+              top: 10,
             },
           },
           ticks: {
             color: colors.muted,
+            padding: 7,
+            maxTicksLimit: 8,
             font: {
               size: Math.max(payload.labelFontsize - 2, 6),
             },
@@ -1748,20 +2051,32 @@ function renderChart(payload) {
           grid: {
             display: payload.showGrid,
             color: colors.line,
-            borderDash: [4, 4],
+            tickColor: colors.axis,
+            tickLength: 5,
           },
         },
         y: {
+          border: {
+            display: true,
+            color: colors.axis,
+            width: 1.4,
+          },
           title: {
             display: true,
             text: payload.yLabel,
             color: colors.text,
             font: {
               size: payload.labelFontsize,
+              weight: "600",
+            },
+            padding: {
+              bottom: 10,
             },
           },
           ticks: {
             color: colors.muted,
+            padding: 7,
+            maxTicksLimit: 7,
             font: {
               size: Math.max(payload.labelFontsize - 2, 6),
             },
@@ -1769,7 +2084,8 @@ function renderChart(payload) {
           grid: {
             display: payload.showGrid,
             color: colors.line,
-            borderDash: [4, 4],
+            tickColor: colors.axis,
+            tickLength: 5,
           },
         },
       },
@@ -1990,7 +2306,7 @@ async function handlePlotSubmit() {
 }
 
 async function loadSample(url) {
-  const response = await fetch(url);
+  const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) {
     throw new Error("示例文件加载失败，请确认正在通过本地服务器或 GitHub Pages 访问页面。");
   }
@@ -2002,6 +2318,36 @@ async function loadSample(url) {
   setDataset(rows, fileName);
   qs("#upload-section").scrollIntoView({ behavior: "smooth", block: "start" });
   showMessage("success", `已加载示例数据：${fileName}`);
+}
+
+function getInitialSampleUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const requestedSample = params.get("sample");
+  if (!requestedSample) {
+    return "";
+  }
+
+  const fileName = requestedSample.split(/[\\/]/).pop();
+  if (!SAMPLE_FILES.has(fileName)) {
+    return "";
+  }
+
+  return `./samples/${fileName}`;
+}
+
+async function loadInitialSampleFromUrl() {
+  const sampleUrl = getInitialSampleUrl();
+  if (!sampleUrl) {
+    return;
+  }
+
+  clearMessage();
+  try {
+    await loadSample(sampleUrl);
+    window.history.replaceState(null, "", window.location.pathname);
+  } catch (error) {
+    showMessage("error", error.message);
+  }
 }
 
 function setupTheme() {
@@ -2162,6 +2508,20 @@ function setupEvents() {
     });
   });
 
+  qs("#sampleGuideActions").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-sample-action]");
+    if (!button) {
+      return;
+    }
+
+    const action = button.dataset.sampleAction;
+    if (action === "calc") {
+      applySampleCalcAction(Number(button.dataset.sampleActionIndex || 0));
+    } else if (action === "plot") {
+      applySamplePlotAction(Number(button.dataset.sampleActionIndex || 0));
+    }
+  });
+
   qsa(".sample-load-button").forEach((button) => {
     button.addEventListener("click", async () => {
       clearMessage();
@@ -2174,9 +2534,10 @@ function setupEvents() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   renderStaticOptions();
   setupTheme();
   setupEvents();
   updateWorkflowNav();
+  await loadInitialSampleFromUrl();
 });

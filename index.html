@@ -3,18 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LabPlot Lite</title>
+  <title>LabPlot Lite - 实验数据处理网页工具</title>
   <link rel="stylesheet" href="./static/style.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <script defer src="./static/app.js"></script>
+  <script defer src="./static/theme.js"></script>
 </head>
 
 <body>
-  <main class="site">
+  <main class="site landing-page">
     <header class="nav">
-      <a class="brand" href="#">
+      <a class="brand" href="./index.html">
         <picture class="brand-logo-wrap">
           <img
             class="brand-logo"
@@ -28,9 +25,9 @@
       </a>
 
       <nav class="nav-links" aria-label="页面导航">
-        <a href="#upload-section">工作台</a>
-        <a href="#samples">示例数据</a>
-        <a href="#guide-section">使用说明</a>
+        <a href="#features">产品能力</a>
+        <a href="#samples">示例流程</a>
+        <a href="#guide-section">常见问题</a>
       </nav>
 
       <div class="nav-actions">
@@ -43,69 +40,67 @@
           </select>
         </label>
 
-        <a class="nav-cta" href="#upload-section">打开工作台</a>
+        <a class="nav-cta" href="./workbench.html">打开工作台</a>
       </div>
     </header>
 
-    <section class="hero">
+    <section class="hero landing-hero">
       <div class="hero-copy">
         <div class="eyebrow">
           <span class="eyebrow-dot"></span>
-          学生实验数据处理工具
+          浏览器实验数据处理
         </div>
 
-        <h1>实验数据进来，报告图表出去</h1>
+        <h1>LabPlot Lite 实验数据工作台</h1>
 
         <p class="hero-desc">
-          上传 Excel / CSV，识别表头，选择坐标轴，生成图像、拟合结果和报告素材包。
-          整个流程在浏览器中完成。
+          面向学生实验报告的网页工具。上传 Excel / CSV，识别表头，生成计算列，完成多曲线绘图、拟合分析和报告素材导出。
         </p>
 
         <div class="hero-actions">
-          <a href="#upload-section" class="btn btn-primary">开始处理数据</a>
-          <a href="#samples" class="btn btn-secondary">先跑示例</a>
+          <a href="./workbench.html" class="btn btn-primary">进入工作台</a>
+          <a href="#samples" class="btn btn-secondary">用示例体验</a>
         </div>
       </div>
 
       <div class="hero-preview" aria-hidden="true">
-        <div class="preview-window">
+        <div class="preview-window landing-preview">
           <div class="preview-top">
             <div>
               <span class="status-dot"></span>
-              <strong>LabPlot 工作台</strong>
+              <strong>独立工作台</strong>
             </div>
-            <span class="preview-badge">Ready</span>
+            <span class="preview-badge">Browser only</span>
           </div>
 
           <div class="preview-body">
             <div class="preview-sidebar">
-              <span class="is-current">配置图像</span>
+              <span>导入数据</span>
               <span>识别范围</span>
               <span>数据加工</span>
-              <span>查看结果</span>
+              <span class="is-current">配置图像</span>
             </div>
 
             <div class="mock-chart">
-              <div class="chart-title">温度换算结果</div>
+              <div class="chart-title">Fluorescence emission spectra</div>
               <div class="chart-area">
-                <span class="fit-line"></span>
-                <span class="point p1"></span>
-                <span class="point p2"></span>
-                <span class="point p3"></span>
-                <span class="point p4"></span>
-                <span class="point p5"></span>
-                <span class="point p6"></span>
+                <span class="spectrum-line spectrum-a"></span>
+                <span class="spectrum-line spectrum-b"></span>
+                <span class="spectrum-line spectrum-c"></span>
+                <span class="peak-marker peak-1"></span>
+                <span class="peak-marker peak-2"></span>
+                <span class="peak-marker peak-3"></span>
               </div>
-              <div class="axis-label">摄氏温度 -> 开尔文温度</div>
+              <div class="axis-label">Wavelength (nm) / Intensity (a.u.)</div>
             </div>
 
             <div class="fit-card">
-              <h3>拟合结果</h3>
-              <div><span>方程</span><strong>y = 1.0000x + 273.1500</strong></div>
-              <div><span>R²</span><strong>1.000000</strong></div>
-              <div><span>RMSE</span><strong>0.000000</strong></div>
-              <div><span>数据点</span><strong>8</strong></div>
-              <span class="preview-download-pill">下载 ZIP 素材包</span>
+              <h3>期刊图输出</h3>
+              <div><span>默认尺寸</span><strong>7.0 in × 4.6 in</strong></div>
+              <div><span>导出精度</span><strong>300 DPI</strong></div>
+              <div><span>图形风格</span><strong>白底、黑轴、学术配色</strong></div>
+              <div><span>导出</span><strong>PNG / CSV / TXT / ZIP</strong></div>
+              <span class="preview-download-pill">生成报告素材包</span>
             </div>
           </div>
         </div>
@@ -114,452 +109,88 @@
 
     <section class="quick-start" id="samples">
       <div class="quick-start-copy">
-        <span class="section-kicker">示例数据</span>
-        <h2>不确定怎么用？先用示例跑一遍</h2>
-        <p>示例文件的真实表头在第 9 行，数据从第 10 行开始，适合快速验证上传、识别、绘图和导出流程。</p>
+        <span class="section-kicker">示例流程</span>
+        <h2>先跑一份数据，再处理自己的实验表格</h2>
+        <p>示例会直接打开工作台并载入数据。你可以从识别表头、确认数据范围开始，不需要先研究复杂菜单。</p>
       </div>
 
       <div class="sample-list compact">
-        <button type="button" class="sample-load-button" data-sample="./samples/sample_01_temp_c_to_k.xlsx">
+        <a class="sample-load-button" href="./workbench.html?sample=sample_01_temp_c_to_k.xlsx">
           <span>1</span>
-          摄氏度转开尔文
-        </button>
-        <button type="button" class="sample-load-button" data-sample="./samples/sample_02_voltage_scale.xlsx">
+          <span class="sample-copy">
+            <strong>荧光发射光谱</strong>
+            <small>多峰光谱，三组曲线对比</small>
+          </span>
+        </a>
+        <a class="sample-load-button" href="./workbench.html?sample=sample_02_voltage_scale.xlsx">
           <span>2</span>
-          电压比例换算
-        </button>
-        <button type="button" class="sample-load-button" data-sample="./samples/sample_03_abs_error.xlsx">
+          <span class="sample-copy">
+            <strong>反应动力学</strong>
+            <small>多组衰减曲线，期刊线图</small>
+          </span>
+        </a>
+        <a class="sample-load-button" href="./workbench.html?sample=sample_03_abs_error.xlsx">
           <span>3</span>
-          绝对误差
-        </button>
-        <button type="button" class="sample-load-button" data-sample="./samples/sample_04_invalid_log.xlsx">
+          <span class="sample-copy">
+            <strong>标准曲线拟合</strong>
+            <small>线性校准，残差检查</small>
+          </span>
+        </a>
+        <a class="sample-load-button" href="./workbench.html?sample=sample_04_invalid_log.xlsx">
           <span>4</span>
-          非法 log 拦截
-        </button>
+          <span class="sample-copy">
+            <strong>拉曼谱峰对比</strong>
+            <small>D/G 峰，多样品叠图</small>
+          </span>
+        </a>
       </div>
     </section>
 
     <section class="process-section" id="features">
       <div class="section-heading">
-        <span>处理流程</span>
-        <h2>按实验报告的顺序组织界面</h2>
+        <span>产品能力</span>
+        <h2>保留 OriginLab 常用路径，降低学生入门成本</h2>
       </div>
 
-      <div class="process-grid">
-        <article>
-          <span>01</span>
-          <h3>导入</h3>
-          <p>上传自己的表格，或用示例数据进入完整流程。</p>
-        </article>
-        <article>
-          <span>02</span>
-          <h3>识别</h3>
-          <p>根据预览确认表头行、数据起始行和结束行。</p>
-        </article>
-        <article>
-          <span>03</span>
-          <h3>配置</h3>
-          <p>选择 X/Y、图表类型和拟合方式，生成前检查有效点数。</p>
-        </article>
-        <article>
-          <span>04</span>
-          <h3>导出</h3>
-          <p>下载 PNG、CSV、TXT 和 ZIP，直接放进实验报告。</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="workbench" id="upload-section">
-      <aside class="workbench-sidebar" aria-label="数据处理步骤">
-        <div class="workbench-sidebar-head">
-          <span class="section-kicker">工作台</span>
-          <h2>数据处理流程</h2>
-          <p>按步骤完成，左侧会显示当前能操作的位置。</p>
+      <div class="origin-map">
+        <div class="origin-map-row">
+          <strong>表格整理</strong>
+          <span>脏表头预览、行号识别、数据起止范围确认</span>
+          <em>适合实验记录表、仪器导出表、带说明行的 Excel</em>
         </div>
-
-        <nav class="step-nav" aria-label="工作台步骤">
-          <button type="button" class="step-nav-item is-active" data-step-target="upload" aria-controls="step-upload" aria-current="step">
-            <span class="step-index">1</span>
-            <span><strong>导入数据</strong><small>上传或试用示例</small></span>
-          </button>
-          <button type="button" class="step-nav-item" data-step-target="range" aria-controls="previewSection" disabled>
-            <span class="step-index">2</span>
-            <span><strong>识别范围</strong><small>确认表头和数据行</small></span>
-          </button>
-          <button type="button" class="step-nav-item optional" data-step-target="calc" aria-controls="calcSection" disabled>
-            <span class="step-index">3</span>
-            <span><strong>数据加工</strong><small>可选，生成计算列</small></span>
-          </button>
-          <button type="button" class="step-nav-item" data-step-target="plot" aria-controls="plotSection" disabled>
-            <span class="step-index">4</span>
-            <span><strong>配置图像</strong><small>坐标轴、曲线、拟合</small></span>
-          </button>
-          <button type="button" class="step-nav-item" data-step-target="result" aria-controls="resultSection" disabled>
-            <span class="step-index">5</span>
-            <span><strong>查看结果</strong><small>检查并下载素材</small></span>
-          </button>
-        </nav>
-
-        <div class="workflow-status">
-          <span>当前状态</span>
-          <strong id="workflowStatusText">等待导入数据</strong>
+        <div class="origin-map-row">
+          <strong>计算列</strong>
+          <span>单位换算、误差、平方、根号、log、ln、两列运算</span>
+          <em>常见报告计算不需要手写公式</em>
         </div>
-      </aside>
-
-      <div class="workbench-main">
-        <div class="workbench-head">
-          <span class="section-kicker">开始处理</span>
-          <h2>上传数据，生成图表和拟合结果</h2>
-          <p>每一步只保留当前需要填写的内容。高级设置仍然可用，但默认收起。</p>
+        <div class="origin-map-row">
+          <strong>绘图分析</strong>
+          <span>折线、散点、散点连线、多曲线、线型和颜色</span>
+          <em>默认参数直接生成可检查图像</em>
         </div>
-
-        <section id="statusMessage" class="message is-hidden" role="status" aria-live="polite"></section>
-
-        <section id="step-upload" class="panel workbench-step-panel is-active" data-step="upload">
-          <div class="step-head">
-            <span>1</span>
-            <div>
-              <h3>导入数据</h3>
-              <p>上传 CSV / Excel，或直接载入示例数据跑通一次。</p>
-            </div>
-          </div>
-
-          <div class="upload-layout">
-            <form id="uploadForm" class="form-card upload-card">
-              <label for="dataFile">选择 CSV / Excel 文件</label>
-              <input id="dataFile" name="dataFile" type="file" accept=".csv,.xls,.xlsx" required>
-
-              <p class="hint">
-                文件前几行有实验名称、姓名、日期也没关系。下一步可以指定真正的表头行。
-              </p>
-
-              <button type="submit" class="btn btn-primary form-button">上传并预览</button>
-            </form>
-
-            <div class="sample-card inline-samples">
-              <h3>使用示例数据</h3>
-              <p>没有文件时，先载入示例，页面会自动进入识别范围。</p>
-              <div class="sample-list">
-                <button type="button" class="sample-load-button" data-sample="./samples/sample_01_temp_c_to_k.xlsx">
-                  <span>1</span>
-                  摄氏度转开尔文
-                </button>
-                <button type="button" class="sample-load-button" data-sample="./samples/sample_02_voltage_scale.xlsx">
-                  <span>2</span>
-                  电压比例换算
-                </button>
-                <button type="button" class="sample-load-button" data-sample="./samples/sample_03_abs_error.xlsx">
-                  <span>3</span>
-                  绝对误差
-                </button>
-                <button type="button" class="sample-load-button" data-sample="./samples/sample_04_invalid_log.xlsx">
-                  <span>4</span>
-                  非法 log 拦截
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="previewSection" class="panel workbench-step-panel is-hidden" data-step="range">
-          <div class="step-head">
-            <span>2</span>
-            <div>
-              <h3>识别表头和数据范围</h3>
-              <p>看预览，确认哪一行是列名，哪一行开始是真正数据。</p>
-            </div>
-          </div>
-
-          <div class="file-banner">
-            当前文件：<strong id="currentFileName"></strong>
-          </div>
-
-          <div id="headerGuessBox" class="info-box">
-            <strong>自动识别提示</strong>
-            <p id="headerGuessMessage"></p>
-          </div>
-
-          <div class="table-wrap">
-            <table class="preview-table">
-              <tbody id="previewBody"></tbody>
-            </table>
-          </div>
-
-          <form id="rangeForm" class="form-card range-card">
-            <div class="form-grid">
-              <div>
-                <label for="headerRow">表头在第几行</label>
-                <input id="headerRow" name="headerRow" type="number" min="1" value="1" required>
-              </div>
-
-              <div>
-                <label for="dataStartRow">数据从第几行开始</label>
-                <input id="dataStartRow" name="dataStartRow" type="number" min="1" value="2" required>
-              </div>
-
-              <div>
-                <label for="dataEndRow">数据到第几行结束</label>
-                <input id="dataEndRow" name="dataEndRow" type="number" min="1" placeholder="不填则读取到文件末尾">
-              </div>
-            </div>
-
-            <p class="hint">
-              例如第 5 行是 <code>voltage,current</code>，第 6 行开始是数字数据，就填写 5 和 6。
-            </p>
-
-            <button type="submit" class="btn btn-primary form-button">确认数据范围</button>
-          </form>
-        </section>
-
-        <section id="calcSection" class="panel workbench-step-panel is-hidden" data-step="calc">
-          <div class="step-head">
-            <span>3</span>
-            <div>
-              <h3>数据加工</h3>
-              <p>可选步骤。用已有列生成单位换算、误差、对数或比值列。</p>
-            </div>
-          </div>
-
-          <div id="numericColumnsBox" class="columns-box"></div>
-
-          <form id="calcForm" class="form-card">
-            <div class="form-grid">
-              <div>
-                <label for="calcTemplate">计算类型</label>
-                <select id="calcTemplate" name="calcTemplate" required></select>
-              </div>
-
-              <div>
-                <label for="newColName">新列名</label>
-                <input
-                  id="newColName"
-                  name="newColName"
-                  placeholder="例如 power、temp_k、abs_error"
-                  required
-                >
-              </div>
-            </div>
-
-            <div class="formula-grid">
-              <div>
-                <label for="firstCol">第一列 A</label>
-                <select id="firstCol" name="firstCol" required></select>
-              </div>
-
-              <div>
-                <label for="secondCol">第二列 B</label>
-                <select id="secondCol" name="secondCol"></select>
-              </div>
-
-              <div>
-                <label for="constantK">常数 k</label>
-                <input id="constantK" name="constantK" placeholder="例如 273.15、1000、0.01">
-              </div>
-            </div>
-
-            <p class="hint">
-              两列运算使用 A 和 B；常数运算使用 A 和 k；sqrt / log10 / ln / abs / A² 只使用 A。
-            </p>
-
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary form-button">生成新计算列</button>
-              <button type="button" class="btn btn-secondary" data-step-target="plot">跳到配置图像</button>
-            </div>
-          </form>
-        </section>
-
-        <section id="plotSection" class="panel workbench-step-panel is-hidden" data-step="plot">
-          <div class="step-head">
-            <span>4</span>
-            <div>
-              <h3>配置图像与拟合</h3>
-              <p>选择 X/Y 轴、曲线和拟合方式，生成前会自动检查条件。</p>
-            </div>
-          </div>
-
-          <div id="plotColumnsBox" class="columns-box"></div>
-
-          <form id="plotForm" class="form-card">
-            <div class="plot-config-layout">
-              <div class="plot-config-main">
-                <div class="section-label">基础设置</div>
-
-                <div class="form-grid">
-                  <div>
-                    <label for="xCol">X 轴数据列</label>
-                    <select id="xCol" name="xCol" required></select>
-                  </div>
-
-                  <div>
-                    <label for="chartType">图表类型</label>
-                    <select id="chartType" name="chartType" required></select>
-                  </div>
-
-                  <div>
-                    <label for="fitType">拟合方式</label>
-                    <select id="fitType" name="fitType" required></select>
-                  </div>
-                </div>
-
-                <div class="section-label">曲线配置</div>
-
-                <div class="curve-config-box" id="curveConfigBox"></div>
-                <button type="button" class="btn btn-secondary curve-add-button" id="addCurveButton">添加一条曲线</button>
-              </div>
-
-              <div id="plotReadinessBox" class="plot-readiness" aria-live="polite">
-                <div class="plot-readiness-main">
-                  <span id="plotReadyStatus">等待选择绘图列</span>
-                  <strong id="plotReadyHint">选择 X/Y 轴后会自动检查有效数据点。</strong>
-                </div>
-                <div class="plot-readiness-grid">
-                  <div><span>有效点数</span><strong id="plotReadyPoints">--</strong></div>
-                  <div><span>拟合状态</span><strong id="plotReadyFit">--</strong></div>
-                  <div><span>导出尺寸</span><strong id="plotReadyExport">--</strong></div>
-                </div>
-              </div>
-            </div>
-
-            <details class="advanced-box">
-              <summary>高级选项：标题、坐标轴、导出尺寸、拟合指标</summary>
-
-              <label for="plotTitle">图表标题</label>
-              <input id="plotTitle" name="plotTitle" value="X-Y Curve" placeholder="不填则自动生成，例如 power vs voltage">
-
-              <div class="form-grid">
-                <div>
-                  <label for="xLabel">X 轴显示名称</label>
-                  <input id="xLabel" name="xLabel" placeholder="例如：时间 / s、Voltage / V">
-                </div>
-
-                <div>
-                  <label for="yLabel">Y 轴显示名称</label>
-                  <input id="yLabel" name="yLabel" placeholder="例如：温度 / C、Power / W">
-                </div>
-              </div>
-
-              <div class="section-label">图像输出设置</div>
-
-              <div class="form-grid compact-grid">
-                <div>
-                  <label for="figWidth">图片宽度</label>
-                  <input id="figWidth" name="figWidth" type="number" min="3" max="20" step="0.1" value="6.5" required>
-                </div>
-
-                <div>
-                  <label for="figHeight">图片高度</label>
-                  <input id="figHeight" name="figHeight" type="number" min="2" max="16" step="0.1" value="4.2" required>
-                </div>
-
-                <div>
-                  <label for="figDpi">图片 DPI</label>
-                  <input id="figDpi" name="figDpi" type="number" min="72" max="600" step="1" value="150" required>
-                </div>
-              </div>
-
-              <div class="form-grid compact-grid">
-                <div>
-                  <label for="titleFontsize">标题字体大小</label>
-                  <input id="titleFontsize" name="titleFontsize" type="number" min="8" max="40" step="1" value="13" required>
-                </div>
-
-                <div>
-                  <label for="labelFontsize">坐标轴字体大小</label>
-                  <input id="labelFontsize" name="labelFontsize" type="number" min="8" max="32" step="1" value="11" required>
-                </div>
-
-                <div>
-                  <label for="legendFontsize">图例字体大小</label>
-                  <input id="legendFontsize" name="legendFontsize" type="number" min="6" max="24" step="1" value="9" required>
-                </div>
-              </div>
-
-              <label class="checkbox-row single-checkbox">
-                <input id="showGrid" type="checkbox" name="showGrid" checked>
-                显示网格线
-              </label>
-
-              <label for="metricMode">拟合指标输出模式</label>
-              <select id="metricMode" name="metricMode" required></select>
-
-              <div class="metric-box">
-                <strong>基础指标包含</strong>
-                <p>
-                  <code>R²</code>、<code>RMSE</code>、<code>MAE</code>、<code>最大绝对误差</code>。
-                  不想花时间选择时，保持基础指标即可。
-                </p>
-
-                <div id="metricBox" class="checkbox-grid"></div>
-              </div>
-
-              <div class="warning-box">
-                <strong>拟合提醒</strong>
-                <p>一次拟合适合近似 <code>y = ax + b</code> 的数据；二次拟合适合近似 <code>y = ax² + bx + c</code> 的数据。</p>
-                <p>不要只看 R²，必须结合实验原理判断模型是否合理。</p>
-              </div>
-            </details>
-
-            <div class="plot-generate-row">
-              <button type="submit" class="btn btn-primary form-button" id="plotSubmitButton">生成图像与拟合结果</button>
-              <div id="plotProgress" class="plot-progress is-hidden" role="status" aria-live="polite">
-                <span class="plot-progress-dot"></span>
-                <span id="plotProgressText">准备生成</span>
-              </div>
-            </div>
-          </form>
-        </section>
-
-        <section id="resultSection" class="panel result-panel workbench-step-panel is-hidden" data-step="result">
-          <div class="step-head">
-            <span>5</span>
-            <div>
-              <h3>查看结果并下载</h3>
-              <p>先检查图像和拟合摘要，再下载实验报告素材。</p>
-            </div>
-          </div>
-
-          <div class="result-layout">
-            <div class="plot-wrap">
-              <canvas id="plotCanvas" class="plot" aria-label="X-Y plot"></canvas>
-            </div>
-
-            <div class="result-side">
-              <div class="summary-card">
-                <h4>拟合与数据摘要</h4>
-                <div id="summaryRows"></div>
-              </div>
-
-              <div class="download-panel">
-                <h4>下载文件</h4>
-                <a id="downloadZip" href="#">下载报告素材包 ZIP</a>
-                <a id="downloadPng" href="#">下载 PNG 图片</a>
-                <a id="downloadFitReport" href="#">下载拟合报告 TXT</a>
-                <a id="downloadOriginCsv" href="#">下载绘图数据 CSV</a>
-                <a id="downloadFullCsv" href="#">下载完整数据 CSV</a>
-              </div>
-            </div>
-          </div>
-
-          <div id="statsGrid" class="stats"></div>
-        </section>
+        <div class="origin-map-row">
+          <strong>拟合导出</strong>
+          <span>一次拟合、二次拟合、R²、RMSE、MAE、报告 TXT</span>
+          <em>PNG、CSV、TXT、ZIP 一次打包</em>
+        </div>
       </div>
     </section>
 
     <section class="guide" id="guide-section">
       <div class="section-heading">
-        <span>使用说明</span>
-        <h2>常见问题</h2>
+        <span>常见问题</span>
+        <h2>把注意力放回实验报告</h2>
       </div>
 
       <div class="guide-grid">
         <div>
-          <h3>表头行是什么意思？</h3>
-          <p>真正写着列名的那一行就是表头行，例如 <code>voltage</code>、<code>current</code>、<code>temperature</code>。</p>
+          <h3>需要安装软件吗？</h3>
+          <p>不需要。工作台在浏览器中读取表格、绘图和导出文件，适合学校机房或没有安装权限的电脑。</p>
         </div>
 
         <div>
-          <h3>数据起始行是什么意思？</h3>
-          <p>第一行数字数据所在的位置。如果表头在第 5 行，数据通常从第 6 行开始。</p>
+          <h3>和电子表格有什么区别？</h3>
+          <p>流程按实验报告组织，表头识别、计算列、拟合指标和素材导出集中在一个页面里。</p>
         </div>
 
         <div>
