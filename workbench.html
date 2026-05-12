@@ -149,7 +149,6 @@
             <p id="sampleGuideGoal"></p>
           </div>
           <ol id="sampleGuideSteps" class="sample-guide-steps"></ol>
-          <div id="sampleGuideActions" class="sample-guide-actions"></div>
         </div>
 
         <section id="step-upload" class="panel workbench-step-panel is-active" data-step="upload">
@@ -321,118 +320,130 @@
             </div>
           </div>
 
-          <div id="plotColumnsBox" class="columns-box"></div>
+          <form id="plotForm" class="form-card visualize-form">
+            <div class="visualize-layout">
+              <div class="visualize-editor">
+                <div id="plotColumnsBox" class="columns-box"></div>
 
-          <form id="plotForm" class="form-card">
-            <div class="plot-config-layout">
-              <div class="plot-config-main">
-                <div class="section-label">基础设置</div>
+                <div id="sampleCoachMark" class="sample-coach is-hidden" aria-live="polite">
+                  <span>示例引导</span>
+                  <strong id="sampleCoachTitle"></strong>
+                  <p id="sampleCoachText"></p>
+                </div>
 
-                <div class="form-grid">
-                  <div>
-                    <cds-select id="xCol" name="xCol" label-text="X 轴数据列" required></cds-select>
+                <cds-accordion class="visualize-accordion">
+                  <cds-accordion-item title="Chart type" open>
+                    <div class="form-grid">
+                      <div>
+                        <cds-select id="xCol" name="xCol" label-text="X 轴数据列" required></cds-select>
+                      </div>
+
+                      <div>
+                        <cds-select id="chartType" name="chartType" label-text="图表类型" required></cds-select>
+                      </div>
+
+                      <div>
+                        <cds-select id="fitType" name="fitType" label-text="拟合方式" required></cds-select>
+                      </div>
+                    </div>
+                  </cds-accordion-item>
+
+                  <cds-accordion-item title="Refine" open>
+                    <div class="curve-config-box" id="curveConfigBox"></div>
+                    <cds-button type="button" kind="tertiary" class="curve-add-button" id="addCurveButton">添加一条曲线</cds-button>
+                  </cds-accordion-item>
+
+                  <cds-accordion-item title="Annotate">
+                    <div class="annotate-grid">
+                      <cds-text-input id="plotTitle" name="plotTitle" label="图表标题" value="X-Y Curve" placeholder="不填则自动生成，例如 power vs voltage"></cds-text-input>
+
+                      <div class="form-grid">
+                        <div>
+                          <cds-text-input id="xLabel" name="xLabel" label="X 轴显示名称" placeholder="例如：时间 / s、Voltage / V"></cds-text-input>
+                        </div>
+
+                        <div>
+                          <cds-text-input id="yLabel" name="yLabel" label="Y 轴显示名称" placeholder="例如：温度 / C、Power / W"></cds-text-input>
+                        </div>
+                      </div>
+                    </div>
+                  </cds-accordion-item>
+
+                  <cds-accordion-item title="Layout">
+                    <div class="section-label">图像输出设置</div>
+
+                    <div class="form-grid compact-grid">
+                      <div>
+                        <cds-number-input id="figWidth" name="figWidth" label="图片宽度" min="3" max="20" step="0.1" value="7" required></cds-number-input>
+                      </div>
+
+                      <div>
+                        <cds-number-input id="figHeight" name="figHeight" label="图片高度" min="2" max="16" step="0.1" value="4.6" required></cds-number-input>
+                      </div>
+
+                      <div>
+                        <cds-number-input id="figDpi" name="figDpi" label="图片 DPI" min="72" max="600" step="1" value="300" required></cds-number-input>
+                      </div>
+                    </div>
+
+                    <div class="form-grid compact-grid">
+                      <div>
+                        <cds-number-input id="titleFontsize" name="titleFontsize" label="标题字体大小" min="8" max="40" step="1" value="15" required></cds-number-input>
+                      </div>
+
+                      <div>
+                        <cds-number-input id="labelFontsize" name="labelFontsize" label="坐标轴字体大小" min="8" max="32" step="1" value="13" required></cds-number-input>
+                      </div>
+
+                      <div>
+                        <cds-number-input id="legendFontsize" name="legendFontsize" label="图例字体大小" min="6" max="24" step="1" value="11" required></cds-number-input>
+                      </div>
+                    </div>
+
+                    <cds-checkbox id="showGrid" name="showGrid" label-text="显示辅助网格线"></cds-checkbox>
+
+                    <cds-select id="metricMode" name="metricMode" label-text="拟合指标输出模式" required></cds-select>
+
+                    <div class="metric-box">
+                      <strong>基础指标包含</strong>
+                      <p>
+                        <code>R²</code>、<code>RMSE</code>、<code>MAE</code>、<code>最大绝对误差</code>。
+                        不想花时间选择时，保持基础指标即可。
+                      </p>
+
+                      <div id="metricBox" class="checkbox-grid"></div>
+                    </div>
+
+                    <div class="warning-box">
+                      <strong>拟合提醒</strong>
+                      <p>一次拟合适合近似 <code>y = ax + b</code> 的数据；二次拟合适合近似 <code>y = ax² + bx + c</code> 的数据。</p>
+                      <p>不要只看 R²，必须结合实验原理判断模型是否合理。</p>
+                    </div>
+                  </cds-accordion-item>
+                </cds-accordion>
+
+                <div class="plot-generate-row">
+                  <cds-button type="submit" kind="primary" class="form-button" id="plotSubmitButton">生成并进入 Publish & Embed</cds-button>
+                  <div id="plotProgress" class="plot-progress is-hidden" role="status" aria-live="polite">
+                    <span class="plot-progress-dot"></span>
+                    <span id="plotProgressText">准备生成</span>
                   </div>
-
-                  <div>
-                    <cds-select id="chartType" name="chartType" label-text="图表类型" required></cds-select>
-                  </div>
-
-                  <div>
-                    <cds-select id="fitType" name="fitType" label-text="拟合方式" required></cds-select>
-                  </div>
-                </div>
-
-                <div class="section-label">曲线配置</div>
-
-                <div class="curve-config-box" id="curveConfigBox"></div>
-                <cds-button type="button" kind="tertiary" class="curve-add-button" id="addCurveButton">添加一条曲线</cds-button>
-              </div>
-
-              <div id="plotReadinessBox" class="plot-readiness" aria-live="polite">
-                <div class="plot-readiness-main">
-                  <span id="plotReadyStatus">等待选择绘图列</span>
-                  <strong id="plotReadyHint">选择 X/Y 轴后会自动检查有效数据点。</strong>
-                </div>
-                <div class="plot-readiness-grid">
-                  <div><span>有效点数</span><strong id="plotReadyPoints">待选择</strong></div>
-                  <div><span>拟合状态</span><strong id="plotReadyFit">待选择</strong></div>
-                  <div><span>导出尺寸</span><strong id="plotReadyExport">待生成</strong></div>
                 </div>
               </div>
-            </div>
 
-            <cds-accordion class="advanced-box">
-              <cds-accordion-item title="高级选项：标题、坐标轴、导出尺寸、拟合指标">
-                <cds-text-input id="plotTitle" name="plotTitle" label="图表标题" value="X-Y Curve" placeholder="不填则自动生成，例如 power vs voltage"></cds-text-input>
-
-                <div class="form-grid">
-                  <div>
-                    <cds-text-input id="xLabel" name="xLabel" label="X 轴显示名称" placeholder="例如：时间 / s、Voltage / V"></cds-text-input>
+              <aside class="visualize-side" aria-label="生成前检查">
+                <div id="plotReadinessBox" class="plot-readiness" aria-live="polite">
+                  <div class="plot-readiness-main">
+                    <span id="plotReadyStatus">等待选择绘图列</span>
+                    <strong id="plotReadyHint">选择 X/Y 轴后会自动检查有效数据点。</strong>
                   </div>
-
-                  <div>
-                    <cds-text-input id="yLabel" name="yLabel" label="Y 轴显示名称" placeholder="例如：温度 / C、Power / W"></cds-text-input>
+                  <div class="plot-readiness-grid">
+                    <div><span>有效点数</span><strong id="plotReadyPoints">待选择</strong></div>
+                    <div><span>拟合状态</span><strong id="plotReadyFit">待选择</strong></div>
+                    <div><span>导出尺寸</span><strong id="plotReadyExport">待生成</strong></div>
                   </div>
                 </div>
-
-                <div class="section-label">图像输出设置</div>
-
-              <div class="form-grid compact-grid">
-                <div>
-                  <cds-number-input id="figWidth" name="figWidth" label="图片宽度" min="3" max="20" step="0.1" value="7" required></cds-number-input>
-                </div>
-
-                <div>
-                  <cds-number-input id="figHeight" name="figHeight" label="图片高度" min="2" max="16" step="0.1" value="4.6" required></cds-number-input>
-                </div>
-
-                <div>
-                  <cds-number-input id="figDpi" name="figDpi" label="图片 DPI" min="72" max="600" step="1" value="300" required></cds-number-input>
-                </div>
-              </div>
-
-              <div class="form-grid compact-grid">
-                <div>
-                  <cds-number-input id="titleFontsize" name="titleFontsize" label="标题字体大小" min="8" max="40" step="1" value="15" required></cds-number-input>
-                </div>
-
-                <div>
-                  <cds-number-input id="labelFontsize" name="labelFontsize" label="坐标轴字体大小" min="8" max="32" step="1" value="13" required></cds-number-input>
-                </div>
-
-                <div>
-                  <cds-number-input id="legendFontsize" name="legendFontsize" label="图例字体大小" min="6" max="24" step="1" value="11" required></cds-number-input>
-                </div>
-              </div>
-
-              <cds-checkbox id="showGrid" name="showGrid" label-text="显示辅助网格线"></cds-checkbox>
-
-              <cds-select id="metricMode" name="metricMode" label-text="拟合指标输出模式" required></cds-select>
-
-              <div class="metric-box">
-                <strong>基础指标包含</strong>
-                <p>
-                  <code>R²</code>、<code>RMSE</code>、<code>MAE</code>、<code>最大绝对误差</code>。
-                  不想花时间选择时，保持基础指标即可。
-                </p>
-
-                <div id="metricBox" class="checkbox-grid"></div>
-              </div>
-
-              <div class="warning-box">
-                <strong>拟合提醒</strong>
-                <p>一次拟合适合近似 <code>y = ax + b</code> 的数据；二次拟合适合近似 <code>y = ax² + bx + c</code> 的数据。</p>
-                <p>不要只看 R²，必须结合实验原理判断模型是否合理。</p>
-              </div>
-              </cds-accordion-item>
-            </cds-accordion>
-
-            <div class="plot-generate-row">
-              <cds-button type="submit" kind="primary" class="form-button" id="plotSubmitButton">生成并进入 Publish & Embed</cds-button>
-              <div id="plotProgress" class="plot-progress is-hidden" role="status" aria-live="polite">
-                <span class="plot-progress-dot"></span>
-                <span id="plotProgressText">准备生成</span>
-              </div>
+              </aside>
             </div>
           </form>
         </section>

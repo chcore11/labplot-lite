@@ -529,20 +529,6 @@ function setupEvents() {
     resetButton.addEventListener("click", resetWorkflow);
   }
 
-  qs("#sampleGuideActions").addEventListener("click", (event) => {
-    const button = event.target.closest("[data-sample-action]");
-    if (!button) {
-      return;
-    }
-
-    const action = button.dataset.sampleAction;
-    if (action === "calc") {
-      applySampleCalcAction(Number(button.dataset.sampleActionIndex || 0));
-    } else if (action === "plot") {
-      applySamplePlotAction(Number(button.dataset.sampleActionIndex || 0));
-    }
-  });
-
   qsa(".sample-load-button").forEach((button) => {
     button.addEventListener("click", async () => {
       clearMessage();

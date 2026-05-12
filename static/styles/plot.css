@@ -1,12 +1,107 @@
-.plot-config-layout {
+.visualize-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.52fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.34fr);
+  gap: 0;
   align-items: start;
 }
 
-.plot-config-main {
+.visualize-form {
+  padding: 0;
+  overflow: hidden;
+}
+
+.visualize-editor {
+  position: relative;
+  display: grid;
+  gap: 16px;
   min-width: 0;
+  padding: var(--surface-pad);
+}
+
+.visualize-side {
+  min-width: 0;
+  min-height: 100%;
+  border-left: 1px solid var(--line-soft);
+  background: var(--surface-soft);
+}
+
+.visualize-side .plot-readiness {
+  min-height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.visualize-accordion,
+.annotate-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.annotate-grid .form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sample-coach {
+  position: relative;
+  justify-self: end;
+  width: min(360px, 100%);
+  margin: -4px 8px 4px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-soft);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  font-size: 13px;
+  line-height: 1.45;
+  transform: translateY(-4px);
+}
+
+.sample-coach::before,
+.sample-coach::after {
+  position: absolute;
+  pointer-events: none;
+  content: "";
+}
+
+.sample-coach::before {
+  right: 58px;
+  bottom: -34px;
+  width: 46px;
+  height: 28px;
+  border-right: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  border-radius: 0 0 18px 0;
+  transform: skewX(-22deg);
+}
+
+.sample-coach::after {
+  right: 97px;
+  bottom: -38px;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  transform: rotate(45deg);
+}
+
+.sample-coach span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.sample-coach strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.sample-coach p {
+  margin: 4px 0 0;
 }
 
 .curve-config-box {
@@ -21,12 +116,12 @@
 .curve-row {
   display: grid;
   grid-template-columns:
-    minmax(0, 1.35fr)
-    minmax(86px, 0.75fr)
-    minmax(74px, 0.55fr)
-    minmax(78px, 0.6fr)
-    minmax(64px, 0.42fr);
-  gap: 10px;
+    minmax(220px, 1.5fr)
+    minmax(136px, 0.8fr)
+    minmax(122px, 0.65fr)
+    minmax(136px, 0.75fr)
+    minmax(84px, 0.35fr);
+  gap: 14px;
   align-items: end;
   padding: 12px;
   border-bottom: 1px solid var(--line-soft);
@@ -46,9 +141,9 @@
 }
 
 .curve-remove-button {
-  justify-self: end;
+  justify-self: stretch;
   width: 100%;
-  min-width: 64px;
+  min-width: 84px;
 }
 
 .plot-readiness {

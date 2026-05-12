@@ -76,6 +76,7 @@ function renderSampleGuide() {
   const guide = state.sampleGuide;
   if (!guide) {
     hide(box);
+    renderSampleCoach();
     return;
   }
 
@@ -87,63 +88,43 @@ function renderSampleGuide() {
   steps.replaceChildren();
   steps.append(...guide.steps.map((step) => createElement("li", { textContent: step })));
 
-  const actions = qs("#sampleGuideActions");
-  actions.replaceChildren();
-
-  (guide.calcActions || []).forEach((action, index) => {
-    actions.appendChild(createButton(action.label, "carbon-tertiary", {
-      sampleAction: "calc",
-      sampleActionIndex: index,
-    }));
-  });
-
-  (guide.plotActions || []).forEach((action, index) => {
-    actions.appendChild(createButton(action.label, index === 0 ? "carbon-primary" : "carbon-tertiary", {
-      sampleAction: "plot",
-      sampleActionIndex: index,
-    }));
-  });
-
   show(box);
+  renderSampleCoach();
 }
 
-function applySampleCalcAction(index) {
-  const guide = state.sampleGuide;
-  const action = guide?.calcActions?.[index];
+function renderSampleCoach() {
+  const coach = qs("#sampleCoachMark");
+  if (!coach) {
+    return;
+  }
+
+  const action = state.sampleGuide?.plotActions?.[0];
   if (!action) {
+    hide(coach);
     return;
   }
 
-  if (!columnOptionExists(action.firstCol)) {
-    showMessage("error", `示例列不存在：${action.firstCol}`);
-    return;
-  }
-
-  setSelectIfExists("#calcTemplate", action.template);
-  setSelectIfExists("#firstCol", action.firstCol);
-  if (action.secondCol) {
-    if (!setSelectIfExists("#secondCol", action.secondCol)) {
-      showMessage("error", `示例列不存在：${action.secondCol}`);
-      return;
-    }
-  }
-  setControlValue("#constantK", action.constantK || "");
-  setControlValue("#newColName", action.newColName || "");
-
-  clearMessage();
-  setActiveStep("calc", { scroll: true });
+  const yCols = action.yCols || [action.yCol].filter(Boolean);
+  setText("#sampleCoachTitle", "推荐配置已预填");
+  setText(
+    "#sampleCoachText",
+    `检查 Chart type 和 Refine：X 轴 ${action.xCol}，Y 轴 ${yCols.join(" / ")}，然后生成图像。`,
+  );
+  show(coach);
 }
 
-function applySamplePlotAction(index = 0) {
+function applySamplePlotAction(index = 0, options = {}) {
   const action = state.sampleGuide?.plotActions?.[index];
   if (!action) {
-    return;
+    return false;
   }
 
   const yCols = action.yCols || [action.yCol];
   if (!columnOptionExists(action.xCol) || yCols.some((column) => !columnOptionExists(column))) {
-    showMessage("error", "推荐绘图列不存在，请重新确认数据范围。");
-    return;
+    if (!options.silent) {
+      showMessage("error", "推荐绘图列不存在，请重新确认数据范围。");
+    }
+    return false;
   }
 
   setSelectIfExists("#xCol", action.xCol);
@@ -163,8 +144,13 @@ function applySamplePlotAction(index = 0) {
     lineStyle: "solid",
   })));
   updatePlotReadiness();
-  clearMessage();
-  setActiveStep("plot", { scroll: true });
+  if (!options.silent) {
+    clearMessage();
+  }
+  if (options.activate !== false) {
+    setActiveStep("plot", { scroll: true });
+  }
+  return true;
 }
 
 function renderStaticOptions() {
@@ -221,13 +207,13 @@ function createCurveRow(config, index) {
   const styleOptions = objectEntriesToOptions(LINE_STYLES);
 
   row.append(
-    createSelectField("Y 轴数据列", "curveYCols", yOptions, config.yCol),
-    createSelectField("线条颜色", "curveColors", colorOptions, config.color),
-    createInputField("线条粗细", "curveWidths", config.lineWidth),
+    createSelectField("Y 列", "curveYCols", yOptions, config.yCol),
+    createSelectField("颜色", "curveColors", colorOptions, config.color),
+    createInputField("线宽", "curveWidths", config.lineWidth),
     createSelectField("线型", "curveStyles", styleOptions, config.lineStyle),
   );
 
-  const button = createButton("删除", "curve-remove-button");
+  const button = createButton("移除", "curve-remove-button");
   button.disabled = index === 0 && qs("#curveConfigBox").children.length === 0;
   row.appendChild(button);
 
@@ -323,7 +309,7 @@ function resetWorkflow() {
   state.activeStep = "upload";
   state.sampleGuide = null;
 
-  ["#previewSection", "#calcSection", "#plotSection", "#resultSection", "#sampleGuideBox"].forEach((selector) => {
+  ["#previewSection", "#calcSection", "#plotSection", "#resultSection", "#sampleGuideBox", "#sampleCoachMark"].forEach((selector) => {
     hide(qs(selector));
   });
 
@@ -377,6 +363,9 @@ function reloadDataFromRange(showSuccess = false) {
   state.numericColumns = loaded.numericColumns;
 
   renderDataControls();
+  if (showSuccess && state.sampleGuide?.plotActions?.length) {
+    applySamplePlotAction(0, { activate: false, silent: true });
+  }
   hide(qs("#resultSection"));
   if (showSuccess) {
     showMessage("success", "已按新的表头和数据范围重新读取。");
@@ -407,6 +396,9 @@ function setDataset(rows, fileName) {
   renderPreview();
   show(qs("#previewSection"));
   reloadDataFromRange(false);
+  if (state.sampleGuide?.plotActions?.length) {
+    applySamplePlotAction(0, { activate: false, silent: true });
+  }
   setActiveStep("range", { scroll: true });
 }
 

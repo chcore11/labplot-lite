@@ -37,7 +37,6 @@
     border-bottom: 1px solid var(--line-soft);
   }
 
-  .plot-config-layout,
   .result-layout {
     grid-template-columns: 1fr;
   }
@@ -108,19 +107,23 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .visualize-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .visualize-side {
+    border-top: 1px solid var(--line-soft);
+    border-left: 0;
+  }
+
   .curve-remove-button {
     grid-column: 1 / -1;
   }
 
   .sample-guide-main,
-  .sample-guide-actions,
   .sample-guide-steps {
     grid-column: 1;
     grid-row: auto;
-  }
-
-  .sample-guide-actions {
-    justify-content: flex-start;
   }
 
   .sample-guide-steps {
@@ -308,9 +311,19 @@
   }
 
   .plot-generate-row,
-  .sample-guide-actions cds-button,
   #plotSubmitButton {
     width: 100%;
+  }
+
+  .sample-coach {
+    justify-self: stretch;
+    margin-right: 0;
+    transform: none;
+  }
+
+  .sample-coach::before,
+  .sample-coach::after {
+    display: none;
   }
 
   .plot-progress {
