@@ -96,6 +96,17 @@ http://127.0.0.1:8000/
 
 数据读取、计算、绘图和导出都在浏览器中完成。用户上传的文件不会被保存到仓库，也不会被这个项目主动上传到远程服务器。
 
+## 前端实现约束
+
+LabPlot Lite 采用 Carbon + Plotly 的职责分工，后续改动应保持一致：
+
+- IBM Carbon Web Components 接管通用工作台 UI：按钮、流程进度、文件上传、表单控件、通知、数据表格、折叠面板、标签和下载操作。
+- Plotly.js 接管科研绘图：图表类型、坐标轴、图例、交互工具栏、PNG / SVG 输出和图表布局。
+- 项目 JS 只保留产品特有逻辑：表格解析、表头识别、数据范围、派生列、拟合、指标、报告素材和状态流转。
+- 项目 CSS 只做品牌 token、页面布局、Plotly 外壳和 Carbon 必要宽度适配。不要重写一套按钮、表单、表格、通知或绘图系统。
+
+新增 UI 时先查 `workbench.html` 现有 `cds-*` 组件和 `static/js/01-dom-workflow-utils.js` 中的控件读写 helper。新增图表能力时优先扩展 `static/js/06-plot-build-render.js` 的 Plotly trace / layout。
+
 ## 第三方前端库
 
 页面通过 CDN 加载以下浏览器端库：

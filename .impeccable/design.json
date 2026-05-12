@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-05-12T00:00:00+08:00",
+  "generatedAt": "2026-05-12T12:16:13+08:00",
   "title": "Design System: LabPlot Lite",
   "extensions": {
     "colorMeta": {
@@ -119,9 +119,9 @@
     {
       "name": "Primary Button",
       "kind": "button",
-      "description": "Action-blue rectangular button for the main next step.",
-      "html": "<button class=\"btn btn-primary\">生成图像与拟合结果</button>",
-      "css": ".btn-primary { min-height: 44px; border-radius: 6px; background: oklch(48% 0.145 255); color: oklch(98% 0.004 255); border: 1px solid oklch(48% 0.145 255); }"
+      "description": "Carbon primary button for the main next step. Visual treatment belongs to Carbon; project CSS only handles placement and width.",
+      "html": "<cds-button kind=\"primary\" class=\"form-button\">生成图像与拟合结果</cds-button>",
+      "css": ".form-button { width: fit-content; }"
     },
     {
       "name": "Instrument Panel",
@@ -133,24 +133,39 @@
     {
       "name": "Step Nav Item",
       "kind": "navigation",
-      "description": "Task-list style step control with clear active and disabled states.",
-      "html": "<button class=\"step-nav-item is-active\"><span class=\"step-index\">1</span><span><strong>导入数据</strong><small>上传或试用示例</small></span></button>",
-      "css": ".step-nav-item.is-active { background: oklch(48% 0.145 255 / 0.10); color: oklch(20% 0.014 255); } .step-nav-item.is-active .step-index { background: oklch(48% 0.145 255); color: oklch(98% 0.004 255); }"
+      "description": "Carbon progress indicator for the upload, describe, visualize, and export path.",
+      "html": "<cds-progress-indicator><cds-progress-step label-text=\"Upload Data\" secondary-label-text=\"粘贴、上传或示例\"></cds-progress-step></cds-progress-indicator>",
+      "css": ".workflow-progress { width: 100%; }"
+    },
+    {
+      "name": "Carbon Data Preview",
+      "kind": "table",
+      "description": "Carbon data table for raw spreadsheet preview. Project code populates rows and cells only.",
+      "html": "<cds-table size=\"sm\"><cds-table-head><cds-table-header-row><cds-table-header-cell>行</cds-table-header-cell></cds-table-header-row></cds-table-head><cds-table-body></cds-table-body></cds-table>",
+      "css": ".table-wrap { overflow-x: auto; } .preview-table { min-width: 720px; }"
     },
     {
       "name": "Plot Paper",
       "kind": "custom",
-      "description": "White report chart canvas embedded in a neutral tool shell.",
-      "html": "<div class=\"plot-wrap\"><canvas class=\"plot\"></canvas></div>",
-      "css": ".plot { border: 1px solid oklch(24% 0.012 255 / 0.13); border-radius: 3px; background: oklch(98.7% 0.004 95); box-shadow: 0 18px 42px oklch(21% 0.014 255 / 0.13); }"
+      "description": "Plotly chart mounted inside a report-paper shell. Plot rendering and export belong to Plotly.",
+      "html": "<div class=\"plot-wrap\"><div id=\"plot\"></div></div>",
+      "css": ".plot-wrap { background: oklch(98.7% 0.004 95); }"
     }
   ],
   "narrative": {
     "northStar": "报告纸上的轻量仪器面板",
-    "overview": "LabPlot Lite uses a light report-paper surface, calm instrument panels, clear task steps, and report-ready chart output. The system borrows structure from Carbon, professional tool density from Spectrum, form clarity from GOV.UK, and chart workflow from Datawrapper and Prism.",
+    "overview": "LabPlot Lite uses a light report-paper surface, calm instrument panels, clear task steps, and report-ready chart output. Carbon Web Components own generic workbench UI, Plotly owns scientific charts and image export, and project code owns lab-data workflow logic. The system borrows structure from Carbon, professional tool density from Spectrum, form clarity from GOV.UK, and chart workflow from Datawrapper and Prism.",
+    "implementationContract": {
+      "ui": "Use IBM Carbon Web Components for buttons, progress, upload, form controls, notifications, data tables, accordions, tags, checkboxes, and download actions.",
+      "plot": "Use Plotly.js for chart types, axes, legends, toolbar behavior, interaction, PNG/SVG output, traces, and layouts.",
+      "app": "Keep custom JavaScript focused on parsing, header detection, ranges, derived columns, fitting, metrics, export packages, and workflow state.",
+      "css": "Project CSS may define brand tokens, layout, Plotly shell, and minimal Carbon width/layout adaptation, but should not rebuild Carbon visual controls."
+    },
     "keyCharacteristics": [
       "Light report-paper background with white chart output.",
       "Neutral dense panels for the workbench.",
+      "Carbon components for generic UI controls.",
+      "Plotly for chart rendering and export.",
       "Action blue only for primary actions, active steps, selected states, and links.",
       "Data colors only inside charts and semantic states.",
       "Readable Chinese labels and compact controls for repeated work."
@@ -170,11 +185,23 @@
         "name": "The Scan First Rule",
         "body": "Workbench UI prioritizes labels, current state, and next action over expressive hero typography.",
         "section": "typography"
+      },
+      {
+        "name": "The Component Ownership Rule",
+        "body": "Generic UI belongs to Carbon; custom code may wrap it for LabPlot workflow but must not duplicate its visual system.",
+        "section": "components"
+      },
+      {
+        "name": "The Plot Ownership Rule",
+        "body": "Scientific chart rendering belongs to Plotly; custom code builds traces, layout, metrics, and export payloads.",
+        "section": "components"
       }
     ],
     "dos": [
       "Use report-paper neutrals and white chart output.",
       "Keep the linear workflow visible.",
+      "Use Carbon components before creating any new generic UI.",
+      "Extend Plotly traces and layouts before adding any drawing code.",
       "Use dense but consistent controls.",
       "Use fit metrics, axes, and export dimensions as professional signals."
     ],
@@ -182,6 +209,8 @@
       "Do not use dark gradients, glassmorphism, AI-tool chrome, or decorative glow.",
       "Do not copy a single reference brand.",
       "Do not hide errors behind color alone.",
+      "Do not rebuild buttons, forms, tables, notifications, accordions, or tags outside Carbon.",
+      "Do not build a parallel canvas or SVG chart engine outside Plotly.",
       "Do not make the workbench feel like a marketing page."
     ]
   }
