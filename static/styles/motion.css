@@ -56,6 +56,35 @@
   }
 }
 
+@keyframes spectralDrift {
+  0% {
+    opacity: 0.46;
+    filter: blur(5px);
+    transform: translateX(-50%) translate3d(-18px, 0, 0);
+  }
+  50% {
+    opacity: 0.72;
+    filter: blur(3px);
+  }
+  100% {
+    opacity: 0.5;
+    filter: blur(5px);
+    transform: translateX(-50%) translate3d(18px, 0, 0);
+  }
+}
+
+@keyframes orbitalPulse {
+  0%,
+  100% {
+    opacity: 0.48;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 0.84;
+    transform: scale(1.04);
+  }
+}
+
 .nav {
   animation: revealDown 0.45s var(--ease-out) both;
 }
@@ -66,6 +95,14 @@
 
 .landing-hero .hero-product {
   animation: measuredScaleIn 0.64s var(--ease-out) 0.16s both;
+}
+
+.landing-hero::before {
+  animation: spectralDrift 7.5s ease-in-out infinite alternate;
+}
+
+.landing-hero::after {
+  animation: orbitalPulse 4.8s ease-in-out infinite;
 }
 
 .mode-landing .mode-landing-copy {
