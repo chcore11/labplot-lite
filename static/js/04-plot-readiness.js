@@ -67,9 +67,17 @@ function inspectPlotReadiness() {
   const xCol = getControlValue("#xCol");
   const yCols = getSelectedCurveSummary();
   const fitType = getControlValue("#fitType");
+  const xAxisScale = getControlValue("#xAxisScale") || "linear";
+  const yAxisScale = getControlValue("#yAxisScale") || "linear";
 
   if (!xCol || !yCols.length) {
     return getPendingReadiness("等待选择绘图列", "选择 X 轴和至少一条 Y 轴曲线。");
+  }
+  if (!AXIS_SCALE_TYPES[xAxisScale] || !AXIS_SCALE_TYPES[yAxisScale]) {
+    return getPendingReadiness("坐标轴设置需要检查", "请选择正确的 X/Y 轴刻度。", {
+      level: "danger",
+      fit: "待检查",
+    });
   }
 
   if (yCols.includes(xCol)) {
@@ -112,6 +120,31 @@ function inspectPlotReadiness() {
     };
   }
 
+  const xValues = curveInfos.flatMap((info) => info.pairs.map((point) => point.x));
+  const yValues = curveInfos.flatMap((info) => info.pairs.map((point) => point.y));
+  if (xAxisScale === "log" && xValues.some((value) => value <= 0)) {
+    return {
+      level: "danger",
+      canGenerate: false,
+      status: "X 轴对数刻度不可用",
+      hint: "对数坐标要求 X 轴所有有效数值都大于 0。",
+      points: pointLabel,
+      fit: "待检查",
+      exportSize: `${outputSize.width} × ${outputSize.height}px`,
+    };
+  }
+  if (yAxisScale === "log" && yValues.some((value) => value <= 0)) {
+    return {
+      level: "danger",
+      canGenerate: false,
+      status: "Y 轴对数刻度不可用",
+      hint: "对数坐标要求 Y 轴所有有效数值都大于 0。",
+      points: pointLabel,
+      fit: "待检查",
+      exportSize: `${outputSize.width} × ${outputSize.height}px`,
+    };
+  }
+
   if (yCols.length > 1) {
     return {
       level: "warning",
@@ -119,7 +152,7 @@ function inspectPlotReadiness() {
       status: "多曲线绘图就绪",
       hint: "多曲线模式会生成图像，但暂不输出拟合结果。",
       points: pointLabel,
-      fit: "多曲线不拟合",
+      fit: MULTI_Y_FIT_LABEL,
       exportSize: `${outputSize.width} × ${outputSize.height}px`,
     };
   }

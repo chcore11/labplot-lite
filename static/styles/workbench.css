@@ -402,8 +402,7 @@
 .warning-box,
 .metric-box,
 .calc-card,
-.plot-readiness,
-.stats div {
+.plot-readiness {
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
   background: var(--surface-soft);

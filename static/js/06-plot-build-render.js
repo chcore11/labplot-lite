@@ -30,6 +30,12 @@ function buildPlotPayload() {
   const labelFontsize = parsePositiveFloat(getControlValue("#labelFontsize"), 13, "坐标轴字体大小", 8, 32);
   const legendFontsize = parsePositiveFloat(getControlValue("#legendFontsize"), 11, "图例字体大小", 6, 24);
   const showGrid = getControlChecked("#showGrid");
+  const xAxisScale = getControlValue("#xAxisScale") || "linear";
+  const yAxisScale = getControlValue("#yAxisScale") || "linear";
+
+  if (!AXIS_SCALE_TYPES[xAxisScale] || !AXIS_SCALE_TYPES[yAxisScale]) {
+    throw new Error("请选择正确的坐标轴刻度。");
+  }
 
   const xLabel = cellText(getControlValue("#xLabel")) || xCol;
   const yLabel = cellText(getControlValue("#yLabel")) || (curveConfigs.length > 1 ? uniqueYCols.join(" / ") : yCols[0]);
@@ -126,6 +132,13 @@ function buildPlotPayload() {
   const xMin = Math.min(...xValues);
   const xMax = Math.max(...xValues);
   const yValues = allPairs.map((point) => point.y);
+  if (xAxisScale === "log" && xValues.some((value) => value <= 0)) {
+    throw new Error("X 轴对数刻度要求所有 X 值都大于 0。");
+  }
+  if (yAxisScale === "log" && yValues.some((value) => value <= 0)) {
+    throw new Error("Y 轴对数刻度要求所有 Y 值都大于 0。");
+  }
+
   const maxValue = Math.max(...yValues);
   const minValue = Math.min(...yValues);
   const avgValue = yValues.reduce((sum, value) => sum + value, 0) / yValues.length;
@@ -155,6 +168,10 @@ function buildPlotPayload() {
     fit_notice: curveConfigs.length > 1 ? MULTI_Y_FIT_NOTICE : "",
     x_label: xLabel,
     y_label: yLabel,
+    x_axis_scale: xAxisScale,
+    y_axis_scale: yAxisScale,
+    x_axis_scale_label: AXIS_SCALE_TYPES[xAxisScale],
+    y_axis_scale_label: AXIS_SCALE_TYPES[yAxisScale],
     max_value: formatShortNumber(maxValue),
     min_value: formatShortNumber(minValue),
     avg_value: formatShortNumber(avgValue),
@@ -165,7 +182,7 @@ function buildPlotPayload() {
     data_end_row: dataEndRow ? String(dataEndRow) : "未限制",
     chart_type: CHART_TYPES[chartType],
     fit_type: fitType,
-    fit_type_label: curveConfigs.length > 1 ? MULTI_Y_FIT_NOTICE : FIT_TYPES[fitType],
+    fit_type_label: curveConfigs.length > 1 ? MULTI_Y_FIT_LABEL : FIT_TYPES[fitType],
     has_fit: Boolean(fitResult),
     equation: fitResult ? fitResult.equation : null,
     fit_quality: fitResult ? describeFitQuality(fitResult.allMetrics) : "",
@@ -210,6 +227,8 @@ function buildPlotPayload() {
     labelFontsize,
     legendFontsize,
     showGrid,
+    xAxisScale,
+    yAxisScale,
     xMin,
     xMax,
     yMin: minValue,
@@ -398,6 +417,18 @@ function makePlotDomain(minValue, maxValue, axisMaxValue) {
   return [minValue - pad, maxValue + pad];
 }
 
+function isLogScale(scaleType) {
+  return scaleType === "log";
+}
+
+function getAxisRange(scaleType, minValue, maxValue, axisMaxValue) {
+  return isLogScale(scaleType) ? undefined : makePlotDomain(minValue, maxValue, axisMaxValue);
+}
+
+function getHoverMode(payload) {
+  return payload.datasets.length > 1 ? "x unified" : "closest";
+}
+
 function getFitAnnotation(payload, scale, colors) {
   if (!payload.fitText) {
     return [];
@@ -488,8 +519,8 @@ function makePlotlyTraces(payload, scale, colors) {
     }
 
     return {
-      fill: dataset.chartType === "area" ? "tozeroy" : undefined,
-      fillcolor: dataset.chartType === "area" ? plotlyFillColor(fill) : undefined,
+      fill: dataset.chartType === "area" && !isLogScale(payload.yAxisScale) ? "tozeroy" : undefined,
+      fillcolor: dataset.chartType === "area" && !isLogScale(payload.yAxisScale) ? plotlyFillColor(fill) : undefined,
       hovertemplate: `${payload.xLabel}: %{x}<br>${dataset.label}: %{y}<extra></extra>`,
       line: {
         color: stroke,
@@ -539,7 +570,9 @@ async function renderPlotlyChart(payload, selector) {
   const colors = getThemeColors();
   const scale = 1;
   const margin = getPlotlyMargins(payload, previewSize.width, scale);
-  const yAxisMax = shouldAxisStartAtZero(payload.yMin, payload.yMax) ? nicePositiveAxisMax(payload.yMax) : undefined;
+  const yAxisMax = !isLogScale(payload.yAxisScale) && shouldAxisStartAtZero(payload.yMin, payload.yMax)
+    ? nicePositiveAxisMax(payload.yMax)
+    : undefined;
 
   const graphDiv = document.createElement("div");
   graphDiv.className = "plotly-export-surface";
@@ -559,7 +592,12 @@ async function renderPlotlyChart(payload, selector) {
     },
     dragmode: "zoom",
     height: previewSize.height,
-    hovermode: "closest",
+    hoverlabel: {
+      bgcolor: colors.surface,
+      bordercolor: colors.line,
+      font: { color: colors.text },
+    },
+    hovermode: getHoverMode(payload),
     legend: {
       bgcolor: "rgba(0,0,0,0)",
       font: {
@@ -579,13 +617,20 @@ async function renderPlotlyChart(payload, selector) {
     width: previewSize.width,
     xaxis: {
       automargin: true,
+      exponentformat: "power",
       gridcolor: colors.line,
       linecolor: colors.axis,
       linewidth: 1.05 * scale,
       mirror: true,
-      range: makePlotDomain(payload.xMin, payload.xMax),
+      range: getAxisRange(payload.xAxisScale, payload.xMin, payload.xMax),
       showgrid: payload.showGrid,
       showline: true,
+      showspikes: true,
+      spikecolor: colors.line,
+      spikedash: "solid",
+      spikemode: "across",
+      spikesnap: "cursor",
+      spikethickness: 1 * scale,
       ticks: "outside",
       tickfont: { size: Math.max((payload.labelFontsize - 3) * scale, 7 * scale) },
       title: {
@@ -594,17 +639,25 @@ async function renderPlotlyChart(payload, selector) {
         standoff: 12 * scale,
         text: payload.xLabel,
       },
+      type: payload.xAxisScale,
       zeroline: false,
     },
     yaxis: {
       automargin: true,
+      exponentformat: "power",
       gridcolor: colors.line,
       linecolor: colors.axis,
       linewidth: 1.05 * scale,
       mirror: true,
-      range: makePlotDomain(payload.yMin, payload.yMax, yAxisMax),
+      range: getAxisRange(payload.yAxisScale, payload.yMin, payload.yMax, yAxisMax),
       showgrid: payload.showGrid,
       showline: true,
+      showspikes: true,
+      spikecolor: colors.line,
+      spikedash: "solid",
+      spikemode: "across",
+      spikesnap: "cursor",
+      spikethickness: 1 * scale,
       ticks: "outside",
       tickfont: { size: Math.max((payload.labelFontsize - 3) * scale, 7 * scale) },
       title: {
@@ -613,6 +666,7 @@ async function renderPlotlyChart(payload, selector) {
         standoff: 12 * scale,
         text: payload.yLabel,
       },
+      type: payload.yAxisScale,
       zeroline: false,
     },
   };
@@ -621,6 +675,7 @@ async function renderPlotlyChart(payload, selector) {
     displayModeBar: true,
     displaylogo: false,
     doubleClick: "reset+autosize",
+    modeBarButtonsToRemove: ["lasso2d", "select2d"],
     responsive: false,
     scrollZoom: true,
     staticPlot: false,

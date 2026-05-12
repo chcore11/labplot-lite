@@ -30,6 +30,11 @@ const FIT_TYPES = {
   quadratic: "二次拟合 y = ax² + bx + c",
 };
 
+const AXIS_SCALE_TYPES = {
+  linear: "线性",
+  log: "对数",
+};
+
 const LINE_STYLES = {
   solid: "实线",
   dashed: "虚线",
@@ -72,6 +77,7 @@ const AVAILABLE_METRICS = {
 };
 
 const BASIC_METRICS = ["r2", "rmse", "mae", "max_abs_error"];
+const MULTI_Y_FIT_LABEL = "多曲线不拟合";
 const MULTI_Y_FIT_NOTICE = "多曲线模式下暂不进行拟合，如需拟合请只保留一条曲线。";
 const SAMPLE_FILES = new Set([
   "sample_01_temp_c_to_k.xlsx",

@@ -385,6 +385,16 @@
                       </div>
                     </div>
 
+                    <div class="form-grid compact-grid">
+                      <div>
+                        <cds-select id="xAxisScale" name="xAxisScale" label-text="X 轴刻度" required></cds-select>
+                      </div>
+
+                      <div>
+                        <cds-select id="yAxisScale" name="yAxisScale" label-text="Y 轴刻度" required></cds-select>
+                      </div>
+                    </div>
+
                     <cds-checkbox id="showGrid" name="showGrid" label-text="显示辅助网格线"></cds-checkbox>
 
                     <cds-select id="metricMode" name="metricMode" label-text="拟合指标输出模式" required></cds-select>
@@ -463,7 +473,15 @@
             <div class="result-side">
               <div class="summary-card">
                 <h3>拟合与数据摘要</h3>
-                <div id="summaryRows"></div>
+                <cds-table id="summaryRows" class="result-table" size="sm">
+                  <cds-table-head>
+                    <cds-table-header-row>
+                      <cds-table-header-cell>项目</cds-table-header-cell>
+                      <cds-table-header-cell>值</cds-table-header-cell>
+                    </cds-table-header-row>
+                  </cds-table-head>
+                  <cds-table-body id="summaryBody"></cds-table-body>
+                </cds-table>
               </div>
 
               <div class="download-panel">
@@ -478,7 +496,15 @@
             </div>
           </div>
 
-          <div id="statsGrid" class="stats"></div>
+          <cds-table id="statsGrid" class="stats result-table" size="sm">
+            <cds-table-head>
+              <cds-table-header-row>
+                <cds-table-header-cell>项目</cds-table-header-cell>
+                <cds-table-header-cell>值</cds-table-header-cell>
+              </cds-table-header-row>
+            </cds-table-head>
+            <cds-table-body id="statsBody"></cds-table-body>
+          </cds-table>
         </section>
       </div>
     </section>

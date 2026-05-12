@@ -112,6 +112,8 @@ function renderStaticOptions() {
   setOptions(qs("#chartType"), objectEntriesToOptions(CHART_TYPES), "line_marker");
   setOptions(qs("#fitType"), objectEntriesToOptions(FIT_TYPES), "none");
   setOptions(qs("#metricMode"), objectEntriesToOptions(METRIC_MODES), "basic");
+  setOptions(qs("#xAxisScale"), objectEntriesToOptions(AXIS_SCALE_TYPES), "linear");
+  setOptions(qs("#yAxisScale"), objectEntriesToOptions(AXIS_SCALE_TYPES), "linear");
 
   const metricBox = qs("#metricBox");
   metricBox.replaceChildren();
@@ -282,8 +284,8 @@ function resetWorkflow() {
   qs("#numericColumnsBox").replaceChildren();
   qs("#plotColumnsBox").replaceChildren();
   qs("#curveConfigBox").replaceChildren();
-  qs("#summaryRows").replaceChildren();
-  qs("#statsGrid").replaceChildren();
+  qs("#summaryBody").replaceChildren();
+  qs("#statsBody").replaceChildren();
   resetResultFigure();
   hide(qs("#simpleResult"));
   clearNotification(qs("#simpleMessage"));

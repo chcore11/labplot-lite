@@ -192,16 +192,6 @@ function getControlOptions(control) {
   return Array.from(control?.querySelectorAll("option, cds-select-item") || []);
 }
 
-function createValueItem(label, value, className = "") {
-  return createElement("div", {
-    className,
-    children: [
-      createElement("span", { textContent: label }),
-      createElement("strong", { textContent: value }),
-    ],
-  });
-}
-
 function getWorkflowPanel(step) {
   const id = WORKFLOW_PANELS[step];
   return id ? qs(`#${id}`) : null;

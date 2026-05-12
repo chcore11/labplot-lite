@@ -28,6 +28,8 @@ function buildFitReport(stats, title) {
   lines.push(`Y 数据列：${stats.y_col}`);
   lines.push(`X 轴显示名称：${stats.x_label}`);
   lines.push(`Y 轴显示名称：${stats.y_label}`);
+  lines.push(`X 轴刻度：${stats.x_axis_scale_label}`);
+  lines.push(`Y 轴刻度：${stats.y_axis_scale_label}`);
   lines.push(`图表类型：${stats.chart_type}`);
   lines.push(`数据点数：${stats.points}`);
   lines.push("");
@@ -296,12 +298,22 @@ async function renderSimpleDownloads(payload) {
   setDownloadLink("#simpleDownloadPng", pngBlob, payload.filenames.png);
 }
 
-function addSummaryRow(container, label, value, large = false) {
-  container.appendChild(createValueItem(label, value, large ? "summary-row large" : "summary-row"));
+function addResultTableRow(body, label, value, options = {}) {
+  body.appendChild(createElement("cds-table-row", {
+    className: options.large ? "result-row-large" : "",
+    children: [
+      createElement("cds-table-cell", { textContent: label }),
+      createElement("cds-table-cell", { textContent: value ?? "" }),
+    ],
+  }));
 }
 
-function addStat(container, label, value) {
-  container.appendChild(createValueItem(label, value));
+function addSummaryRow(body, label, value, large = false) {
+  addResultTableRow(body, label, value, { large });
+}
+
+function addStat(body, label, value) {
+  addResultTableRow(body, label, value);
 }
 
 function renderResult(payload) {
@@ -310,7 +322,7 @@ function renderResult(payload) {
   qs("#resultFigureMeta").textContent = `${stats.fig_width} × ${stats.fig_height} in / ${stats.fig_dpi} DPI`;
   qs("#resultFigureCurves").textContent = `${stats.curve_count} 条曲线`;
 
-  const summary = qs("#summaryRows");
+  const summary = qs("#summaryBody");
   summary.replaceChildren();
 
   if (stats.has_fit) {
@@ -332,10 +344,12 @@ function renderResult(payload) {
   addSummaryRow(summary, "曲线数量", stats.curve_count);
   addSummaryRow(summary, "图表类型", stats.chart_type);
 
-  const statsGrid = qs("#statsGrid");
+  const statsGrid = qs("#statsBody");
   statsGrid.replaceChildren();
   addStat(statsGrid, "X 轴显示名称", stats.x_label);
   addStat(statsGrid, "Y 轴显示名称", stats.y_label);
+  addStat(statsGrid, "X 轴刻度", stats.x_axis_scale_label);
+  addStat(statsGrid, "Y 轴刻度", stats.y_axis_scale_label);
   addStat(statsGrid, "Y 最大值", stats.max_value);
   addStat(statsGrid, "Y 最小值", stats.min_value);
   addStat(statsGrid, "Y 平均值", stats.avg_value);
