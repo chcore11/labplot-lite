@@ -559,7 +559,7 @@ function setPlotPreviewSize(target, graphDiv, previewSize, outputSize) {
 
 async function renderPlotlyChart(payload, selector) {
   if (!window.Plotly) {
-    throw new Error("Plotly.js 绘图库未加载，请检查网络后刷新页面。");
+    await ensureExternalLibrary("plotly");
   }
 
   const target = getPlotTarget(selector);

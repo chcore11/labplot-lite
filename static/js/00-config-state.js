@@ -79,6 +79,25 @@ const AVAILABLE_METRICS = {
 const BASIC_METRICS = ["r2", "rmse", "mae", "max_abs_error"];
 const MULTI_Y_FIT_LABEL = "多曲线不拟合";
 const MULTI_Y_FIT_NOTICE = "多曲线模式下暂不进行拟合，如需拟合请只保留一条曲线。";
+
+const EXTERNAL_LIBRARIES = {
+  xlsx: {
+    label: "Excel 解析库",
+    src: "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",
+    isLoaded: () => Boolean(window.XLSX),
+  },
+  plotly: {
+    label: "图表绘制库",
+    src: "https://cdn.plot.ly/plotly-3.4.0.min.js",
+    isLoaded: () => Boolean(window.Plotly),
+  },
+  jszip: {
+    label: "ZIP 打包库",
+    src: "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js",
+    isLoaded: () => Boolean(window.JSZip),
+  },
+};
+
 const SAMPLE_FILES = new Set([
   "sample_01_temp_c_to_k.xlsx",
   "sample_02_voltage_scale.xlsx",
@@ -149,6 +168,7 @@ const state = {
   isPlotGenerating: false,
   activeStep: "upload",
   objectUrls: [],
+  libraryPromises: {},
   samplePreset: null,
 };
 

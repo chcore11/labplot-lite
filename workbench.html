@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link rel="icon" href="./static/logo_dark.png" type="image/png">
+  <link rel="preconnect" href="https://1.www.s81c.com" crossorigin>
+  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="//cdn.plot.ly">
   <title>LabPlot Lite 工作台</title>
   <script src="./static/theme.js"></script>
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/accordion.min.js"></script>
@@ -19,9 +22,6 @@
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/text-input.min.js"></script>
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/textarea.min.js"></script>
   <link rel="stylesheet" href="./static/style.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script defer src="https://cdn.plot.ly/plotly-3.4.0.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script defer src="./static/js/00-config-state.js"></script>
   <script defer src="./static/js/01-dom-workflow-utils.js"></script>
   <script defer src="./static/js/02-data-parse.js"></script>
@@ -47,27 +47,7 @@
       </nav>
     </header>
 
-    <cds-actionable-notification id="dependencyMessage" class="message is-hidden" kind="error" title="依赖未加载" hide-close-button low-contrast inline role="alert"></cds-actionable-notification>
-
-    <section class="mode-landing" id="modeLanding" aria-labelledby="modeLandingTitle">
-      <div class="mode-landing-copy">
-        <span class="section-kicker">LabPlot Lite 工作台</span>
-        <h1 id="modeLandingTitle">先走最短路径，需要时再展开功能</h1>
-        <p>简易模式只需要选择文件并下载 PNG。功能模式保留表头范围、计算列、多曲线、拟合和素材包导出。</p>
-        <ol class="mode-flow" aria-label="默认流程">
-          <li>上传</li>
-          <li>识别</li>
-          <li>成图</li>
-          <li>导出</li>
-        </ol>
-        <div class="mode-actions" aria-label="工作模式">
-          <cds-button id="enterSimpleMode" href="./workbench.html?mode=simple" data-mode-choice="simple" kind="primary" size="lg">打开简易模式</cds-button>
-          <cds-button id="enterAdvancedMode" href="./workbench.html?mode=advanced" data-mode-choice="advanced" kind="tertiary" size="lg">打开功能模式</cds-button>
-        </div>
-      </div>
-    </section>
-
-    <section class="simple-mode is-hidden" id="simpleMode" aria-labelledby="simpleModeTitle">
+    <section class="simple-mode" id="simpleMode" aria-labelledby="simpleModeTitle">
       <div class="simple-mode-head">
         <div>
           <span class="section-kicker">简易模式</span>

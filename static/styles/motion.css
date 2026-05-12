@@ -68,26 +68,6 @@
   animation: measuredScaleIn 0.64s var(--ease-out) 0.16s both;
 }
 
-.mode-landing .mode-landing-copy {
-  animation: riseFadeIn 0.5s var(--ease-out) 0.04s both;
-}
-
-.mode-landing .mode-actions {
-  animation: measuredScaleIn 0.58s var(--ease-out) 0.12s both;
-}
-
-.mode-actions cds-button {
-  animation: tableRowIn 0.34s var(--ease-out) both;
-}
-
-.mode-actions cds-button:nth-child(1) {
-  animation-delay: 0.2s;
-}
-
-.mode-actions cds-button:nth-child(2) {
-  animation-delay: 0.26s;
-}
-
 .simple-mode:not(.is-hidden),
 #advancedMode:not(.is-hidden) .workbench {
   animation: measuredScaleIn 0.42s var(--ease-out) both;

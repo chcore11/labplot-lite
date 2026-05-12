@@ -89,8 +89,12 @@ function parsePastedTable(text) {
 }
 
 async function parseFile(file) {
-  const buffer = await file.arrayBuffer();
   const extension = file.name.split(".").pop().toLowerCase();
+  if (extension === "xlsx" || extension === "xls") {
+    await ensureExternalLibrary("xlsx");
+  }
+
+  const buffer = await file.arrayBuffer();
   return parseBuffer(buffer, extension);
 }
 
@@ -101,7 +105,7 @@ function parseBuffer(buffer, extension) {
 
   if (extension === "xlsx" || extension === "xls") {
     if (!window.XLSX) {
-      throw new Error("Excel 解析库未加载，请检查网络后刷新页面。");
+      throw new Error("Excel 解析库未加载，请稍后重试。");
     }
 
     const workbook = XLSX.read(buffer, { type: "array" });

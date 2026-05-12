@@ -250,9 +250,20 @@ function clearDownloadLink(selector) {
   link.setAttribute("aria-disabled", "true");
 }
 
+function clearResultDownloadLinks() {
+  [
+    "#downloadPng",
+    "#downloadSvg",
+    "#downloadOriginCsv",
+    "#downloadFullCsv",
+    "#downloadFitReport",
+    "#downloadZip",
+  ].forEach(clearDownloadLink);
+}
+
 async function renderDownloads(payload) {
   if (!window.JSZip) {
-    throw new Error("ZIP 打包库未加载，请检查网络后刷新页面。");
+    await ensureExternalLibrary("jszip");
   }
 
   revokeDownloadUrls();

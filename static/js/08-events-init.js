@@ -1,87 +1,45 @@
 "use strict";
 
-const REQUIRED_DEPENDENCIES = [
-  { key: "xlsx", label: "Excel 解析库", affects: "XLS / XLSX 文件和示例数据", isLoaded: () => Boolean(window.XLSX) },
-  {
-    key: "chart",
-    label: "图表绘制库",
-    affects: "图像生成和 SVG 导出",
-    isLoaded: () => Boolean(window.Plotly),
-  },
-  { key: "zip", label: "ZIP 打包库", affects: "报告素材包导出", isLoaded: () => Boolean(window.JSZip) },
-];
-
-function disableControl(control) {
-  setControlDisabled(control, true);
-}
-
-function showDependencyMessage(missingDependencies) {
-  const box = qs("#dependencyMessage");
-  if (!box || !missingDependencies.length) {
-    return;
-  }
-
-  const missingLabels = missingDependencies.map((dependency) => dependency.label).join("、");
-  const affectedAreas = missingDependencies.map((dependency) => dependency.affects).join("、");
-  renderNotification(
-    box,
-    "error",
-    `部分功能依赖未加载：${missingLabels}。请检查网络后刷新页面。受影响：${affectedAreas}。`,
-    "依赖未加载",
-  );
-}
-
-function checkRequiredDependencies() {
-  const missingDependencies = REQUIRED_DEPENDENCIES.filter((dependency) => !dependency.isLoaded());
-  const missingKeys = new Set(missingDependencies.map((dependency) => dependency.key));
-
-  showDependencyMessage(missingDependencies);
-
-  if (missingKeys.has("xlsx")) {
-    qsa(".sample-load-button").forEach(disableControl);
-  }
-
-  if (missingKeys.has("chart")) {
-    qsa("#plotSubmitButton, #simpleFileInput, #enterSimpleMode").forEach(disableControl);
-  }
-
-  if (missingKeys.has("zip")) {
-    const zipLink = qs("#downloadZip");
-    if (zipLink) {
-      zipLink.setAttribute("aria-disabled", "true");
-    }
-  }
-
-  return {
-    blocksSampleLoad: missingKeys.has("xlsx"),
-  };
-}
-
 async function handlePlotSubmit() {
   setPlotProgress("正在检查绘图设置...");
+  await nextFrame();
+
   const payload = buildPlotPayload();
   state.lastPlotPayload = payload;
-  setPlotProgress("正在绘制图像...");
+  clearResultDownloadLinks();
+  setPlotProgress(window.Plotly ? "正在绘制图像..." : "正在加载绘图库...");
   show(qs("#resultSection"));
   setActiveStep("result");
+  await nextFrame();
   await renderChart(payload);
-  setPlotProgress("正在生成下载文件...");
-  await renderDownloads(payload);
+
   setPlotProgress("正在整理结果摘要...");
   renderResult(payload);
-  showMessage("success", "已生成图像、CSV、拟合报告和 ZIP 素材包。");
   setActiveStep("result", { scroll: true });
+  showMessage("success", "图像已生成，正在准备下载素材。");
+  await nextFrame();
+
+  setPlotProgress(window.JSZip ? "正在生成下载文件..." : "正在加载 ZIP 打包库...");
+  await renderDownloads(payload);
+  showMessage("success", "已生成图像、CSV、拟合报告和 ZIP 素材包。");
 }
 
 async function loadSample(url) {
+  showMessage("info", "正在加载示例数据...");
+  await nextFrame();
+
+  const fileName = url.split("/").pop();
+  const extension = fileName.split(".").pop().toLowerCase();
+  const parserReady = fileNeedsSpreadsheetLibrary(fileName)
+    ? ensureExternalLibrary("xlsx")
+    : Promise.resolve();
   const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) {
     throw new Error("示例文件加载失败，请确认正在通过本地服务器或 GitHub Pages 访问页面。");
   }
 
   const buffer = await response.arrayBuffer();
-  const fileName = url.split("/").pop();
-  const extension = fileName.split(".").pop().toLowerCase();
+  await parserReady;
   const rows = parseBuffer(buffer, extension);
   setDataset(rows, fileName);
   scrollToElement(qs("#upload-section"));
@@ -168,11 +126,11 @@ function syncPendingUploadFile(file) {
 
 function showMode(mode, options = {}) {
   const sections = {
-    landing: qs("#modeLanding"),
     simple: qs("#simpleMode"),
     advanced: qs("#advancedMode"),
   };
-  const target = sections[mode] || sections.landing;
+  const targetMode = mode === "advanced" ? "advanced" : "simple";
+  const target = sections[targetMode];
 
   Object.values(sections).forEach((section) => {
     if (section) {
@@ -180,7 +138,7 @@ function showMode(mode, options = {}) {
     }
   });
 
-  if (mode === "advanced") {
+  if (targetMode === "advanced") {
     updateWorkflowNav();
   }
 
@@ -191,12 +149,11 @@ function showMode(mode, options = {}) {
 
 function loadInitialModeFromUrl() {
   const mode = getInitialMode();
-  if (!mode) {
-    return;
-  }
 
-  showMode(mode, { skipScroll: true });
-  window.history.replaceState(null, "", window.location.pathname);
+  showMode(mode || "simple", { skipScroll: true });
+  if (mode) {
+    window.history.replaceState(null, "", window.location.pathname);
+  }
 }
 
 function setSimpleMessage(type, text) {
@@ -262,15 +219,20 @@ function loadSimpleRows(rows, fileName) {
 async function handleSimpleFile(file) {
   clearSimpleMessage();
 
-  if (!window.Plotly) {
-    throw new Error("图表绘制库未加载，暂时不能生成简易模式图像。请检查网络后刷新页面。");
-  }
   if (!file) {
     throw new Error("请先选择 CSV / Excel 文件。");
   }
   if (file.size > 5 * 1024 * 1024) {
     throw new Error("建议单个文件不超过 5MB。");
   }
+
+  setSimpleMessage("info", "正在准备文件解析和绘图环境...");
+  const parserReady = fileNeedsSpreadsheetLibrary(file.name)
+    ? ensureExternalLibrary("xlsx")
+    : Promise.resolve();
+  const plotReady = ensureExternalLibrary("plotly");
+  await nextFrame();
+  await parserReady;
 
   setSimpleMessage("info", "正在读取文件并识别绘图列...");
   const rows = await parseFile(file);
@@ -302,6 +264,8 @@ async function handleSimpleFile(file) {
   const payload = buildPlotPayload();
   state.simplePlotPayload = payload;
   state.lastPlotPayload = payload;
+  setSimpleMessage("info", "正在绘制图像...");
+  await plotReady;
   await renderChart(payload, "#simplePlotCanvas");
   await renderSimpleDownloads(payload);
 
@@ -313,16 +277,6 @@ async function handleSimpleFile(file) {
 }
 
 function setupModeEvents() {
-  qsa("[data-mode-choice]").forEach((entry) => {
-    entry.addEventListener("click", (event) => {
-      event.preventDefault();
-      if (entry.disabled || entry.getAttribute("aria-disabled") === "true") {
-        return;
-      }
-      showMode(entry.dataset.modeChoice);
-    });
-  });
-
   qsa("#simpleToAdvanced, #simpleToAdvancedTop").forEach((button) => {
     button.addEventListener("click", () => {
       showMode("advanced");
@@ -426,6 +380,8 @@ function setupEvents() {
         throw new Error("建议单个文件不超过 5MB。");
       }
 
+      showMessage("info", fileNeedsSpreadsheetLibrary(file.name) ? "正在加载 Excel 解析库并读取文件..." : "正在读取 CSV 文件...");
+      await nextFrame();
       const rows = await parseFile(file);
       setDataset(rows, file.name);
       showMessage("success", `已读取文件：${file.name}`);
@@ -546,12 +502,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupTheme();
   setupModeEvents();
   setupEvents();
-  const dependencyStatus = checkRequiredDependencies();
   updateWorkflowNav();
-  if (!dependencyStatus.blocksSampleLoad) {
+
+  if (getInitialSampleUrl()) {
     await loadInitialSampleFromUrl();
-  }
-  if (!getInitialSampleUrl()) {
+  } else {
     loadInitialModeFromUrl();
   }
 });

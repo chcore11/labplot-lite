@@ -192,6 +192,55 @@ function getControlOptions(control) {
   return Array.from(control?.querySelectorAll("option, cds-select-item") || []);
 }
 
+function nextFrame() {
+  return new Promise((resolve) => {
+    window.requestAnimationFrame(() => resolve());
+  });
+}
+
+function getFileExtension(fileName) {
+  return cellText(fileName).split(".").pop().toLowerCase();
+}
+
+function fileNeedsSpreadsheetLibrary(fileName) {
+  const extension = getFileExtension(fileName);
+  return extension === "xlsx" || extension === "xls";
+}
+
+function ensureExternalLibrary(key) {
+  const library = EXTERNAL_LIBRARIES[key];
+  if (!library) {
+    return Promise.reject(new Error(`未知依赖：${key}`));
+  }
+  if (library.isLoaded()) {
+    return Promise.resolve();
+  }
+  if (state.libraryPromises[key]) {
+    return state.libraryPromises[key];
+  }
+
+  state.libraryPromises[key] = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = library.src;
+    script.onload = () => {
+      if (library.isLoaded()) {
+        resolve();
+      } else {
+        delete state.libraryPromises[key];
+        reject(new Error(`${library.label}加载后不可用，请检查网络后重试。`));
+      }
+    };
+    script.onerror = () => {
+      delete state.libraryPromises[key];
+      reject(new Error(`${library.label}加载失败，请检查网络后重试。`));
+    };
+    document.head.appendChild(script);
+  });
+
+  return state.libraryPromises[key];
+}
+
 function getWorkflowPanel(step) {
   const id = WORKFLOW_PANELS[step];
   return id ? qs(`#${id}`) : null;
