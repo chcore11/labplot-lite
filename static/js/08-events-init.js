@@ -42,9 +42,7 @@ function checkRequiredDependencies() {
   }
 
   if (missingKeys.has("chart")) {
-    qsa(
-      "#pasteForm [type='submit'], #uploadForm [type='submit'], .sample-load-button, #plotSubmitButton",
-    ).forEach(disableControl);
+    qsa("#plotSubmitButton").forEach(disableControl);
   }
 
   if (missingKeys.has("zip")) {
@@ -55,7 +53,7 @@ function checkRequiredDependencies() {
   }
 
   return {
-    blocksSampleLoad: missingKeys.has("xlsx") || missingKeys.has("chart"),
+    blocksSampleLoad: missingKeys.has("xlsx"),
   };
 }
 
@@ -120,6 +118,47 @@ async function loadInitialSampleFromUrl() {
   }
 }
 
+function getFirstFileFromFileList(files) {
+  if (!files || !files.length) {
+    return null;
+  }
+  return files[0] || null;
+}
+
+function getFileFromUploaderButton(uploaderButton) {
+  if (!uploaderButton) {
+    return null;
+  }
+
+  const directFile =
+    getFirstFileFromFileList(uploaderButton.files) ||
+    getFirstFileFromFileList(uploaderButton.addedFiles);
+  if (directFile) {
+    return directFile;
+  }
+
+  const input =
+    uploaderButton.querySelector?.("input[type='file']") ||
+    uploaderButton.shadowRoot?.querySelector?.("input[type='file']");
+  return getFirstFileFromFileList(input?.files);
+}
+
+function getFileFromUploadEvent(event) {
+  const detail = event?.detail || {};
+  return (
+    getFirstFileFromFileList(detail.addedFiles) ||
+    getFirstFileFromFileList(detail.files) ||
+    getFirstFileFromFileList(detail.selectedFiles) ||
+    getFirstFileFromFileList(event?.target?.files) ||
+    getFileFromUploaderButton(qs("#dataFile"))
+  );
+}
+
+function syncPendingUploadFile(file) {
+  state.pendingUploadFile = file || null;
+  setText("#selectedFileHint", file ? `已选择：${file.name}` : "尚未选择文件。");
+}
+
 function setupTheme() {
   async function refreshRenderedResult() {
     try {
@@ -166,18 +205,23 @@ function setupEvents() {
     }
   });
 
-  qs("#dataFile")?.addEventListener("cds-file-uploader-button-changed", (event) => {
-    const file = event.detail?.addedFiles?.[0] || null;
-    state.pendingUploadFile = file;
-    setText("#selectedFileHint", file ? `已选择：${file.name}` : "尚未选择文件。");
-  });
+  const uploadForm = qs("#uploadForm");
+  const dataFileButton = qs("#dataFile");
+  const handleUploadFileChange = (event) => {
+    syncPendingUploadFile(getFileFromUploadEvent(event));
+  };
+  dataFileButton?.addEventListener("cds-file-uploader-button-changed", handleUploadFileChange);
+  dataFileButton?.addEventListener("change", handleUploadFileChange);
+  uploadForm.addEventListener("cds-file-uploader-button-changed", handleUploadFileChange);
+  uploadForm.addEventListener("change", handleUploadFileChange);
 
-  qs("#uploadForm").addEventListener("submit", async (event) => {
+  uploadForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     clearMessage();
 
     try {
-      const file = state.pendingUploadFile;
+      const file = state.pendingUploadFile || getFileFromUploaderButton(dataFileButton);
+      syncPendingUploadFile(file);
       if (!file) {
         throw new Error("请先上传 CSV / Excel 文件。");
       }
