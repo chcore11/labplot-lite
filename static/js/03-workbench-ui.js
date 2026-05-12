@@ -162,16 +162,23 @@ function createCurveRow(config, index) {
   const colorOptions = objectEntriesToOptions(CURVE_COLORS);
   const styleOptions = objectEntriesToOptions(LINE_STYLES);
 
-  row.append(
-    createSelectField("Y 列", "curveYCols", yOptions, config.yCol),
-    createSelectField("颜色", "curveColors", colorOptions, config.color),
-    createInputField("线宽", "curveWidths", config.lineWidth),
-    createSelectField("线型", "curveStyles", styleOptions, config.lineStyle),
-  );
-
   const button = createButton("移除", "curve-remove-button");
   button.disabled = index === 0 && qs("#curveConfigBox").children.length === 0;
-  row.appendChild(button);
+  row.append(
+    createElement("div", {
+      className: "curve-fields",
+      children: [
+        createSelectField("Y 列", "curveYCols", yOptions, config.yCol),
+        createSelectField("颜色", "curveColors", colorOptions, config.color),
+        createInputField("线宽", "curveWidths", config.lineWidth),
+        createSelectField("线型", "curveStyles", styleOptions, config.lineStyle),
+      ],
+    }),
+    createElement("div", {
+      className: "curve-actions",
+      children: [button],
+    }),
+  );
 
   return row;
 }
@@ -278,7 +285,7 @@ function resetWorkflow() {
   setControlValue("#dataEndRow", "");
   setText("#selectedFileHint", "尚未选择文件。");
   qs("#currentFileName").textContent = "";
-  qs("#headerGuessMessage").textContent = "";
+  renderContextNotification(qs("#headerGuessBox"), "info", "", "自动识别提示");
   qs("#previewHeaderRow").replaceChildren(createElement("cds-table-header-cell", { textContent: "行" }));
   qs("#previewBody").replaceChildren();
   qs("#numericColumnsBox").replaceChildren();
@@ -345,7 +352,7 @@ function setDataset(rows, fileName) {
 
   const guess = guessHeaderAndDataRows(state.rawRows);
   qs("#currentFileName").textContent = fileName;
-  qs("#headerGuessMessage").textContent = guess.message;
+  renderContextNotification(qs("#headerGuessBox"), "info", guess.message, "自动识别提示");
   setControlValue("#headerRow", String(guess.headerRow));
   setControlValue("#dataStartRow", String(guess.dataStartRow));
   setControlValue("#dataEndRow", "");

@@ -14,13 +14,16 @@
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/checkbox.min.js"></script>
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/data-table.min.js"></script>
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/file-uploader.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/inline-loading.min.js"></script>
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/notification.min.js"></script>
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/number-input.min.js"></script>
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/progress-indicator.min.js"></script>
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/select.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/structured-list.min.js"></script>
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/tag.min.js"></script>
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/text-input.min.js"></script>
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/textarea.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/tile.min.js"></script>
   <link rel="stylesheet" href="./static/style.css">
   <script defer src="./static/js/00-config-state.js"></script>
   <script defer src="./static/js/01-dom-workflow-utils.js"></script>
@@ -78,11 +81,22 @@
             <span>识别结果</span>
             <h2 id="simpleResultTitle">基础图已生成</h2>
           </div>
-          <div class="simple-meta-grid">
-            <div><span>X 列</span><strong id="simpleXCol">待识别</strong></div>
-            <div><span>Y 列</span><strong id="simpleYCol">待识别</strong></div>
-            <div><span>有效点数</span><strong id="simplePointCount">待生成</strong></div>
-          </div>
+          <cds-structured-list class="simple-meta-list" condensed>
+            <cds-structured-list-body>
+              <cds-structured-list-row>
+                <cds-structured-list-cell>X 列</cds-structured-list-cell>
+                <cds-structured-list-cell><strong id="simpleXCol">待识别</strong></cds-structured-list-cell>
+              </cds-structured-list-row>
+              <cds-structured-list-row>
+                <cds-structured-list-cell>Y 列</cds-structured-list-cell>
+                <cds-structured-list-cell><strong id="simpleYCol">待识别</strong></cds-structured-list-cell>
+              </cds-structured-list-row>
+              <cds-structured-list-row>
+                <cds-structured-list-cell>有效点数</cds-structured-list-cell>
+                <cds-structured-list-cell><strong id="simplePointCount">待生成</strong></cds-structured-list-cell>
+              </cds-structured-list-row>
+            </cds-structured-list-body>
+          </cds-structured-list>
         </div>
 
         <div class="simple-plot-wrap">
@@ -161,7 +175,7 @@
               <cds-button type="submit" kind="primary" class="form-button">上传并预览</cds-button>
             </form>
 
-            <div class="sample-card inline-samples">
+            <cds-tile class="sample-card inline-samples">
               <h3>使用示例数据</h3>
               <p>四个示例分别覆盖光谱、多曲线动力学、标准曲线拟合和谱峰对比。</p>
               <div class="sample-list">
@@ -170,7 +184,7 @@
                 <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/sample_03_abs_error.xlsx">3 标准曲线拟合</cds-button>
                 <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/sample_04_invalid_log.xlsx">4 拉曼谱峰对比</cds-button>
               </div>
-            </div>
+            </cds-tile>
           </div>
         </section>
 
@@ -186,10 +200,17 @@
             当前文件：<strong id="currentFileName"></strong>
           </div>
 
-          <div id="headerGuessBox" class="info-box">
-            <strong>自动识别提示</strong>
-            <p id="headerGuessMessage"></p>
-          </div>
+          <cds-actionable-notification
+            id="headerGuessBox"
+            class="context-note"
+            kind="info"
+            title="自动识别提示"
+            hide-close-button
+            low-contrast
+            inline
+            role="status"
+            aria-live="polite"
+          ></cds-actionable-notification>
 
           <p class="table-scroll-hint" id="previewTableHint">窄屏可左右滑动查看完整表格。</p>
           <div class="table-wrap" tabindex="0" aria-describedby="previewTableHint">
@@ -373,7 +394,7 @@
 
                     <cds-select id="metricMode" name="metricMode" label-text="拟合指标输出模式" required></cds-select>
 
-                    <div class="metric-box">
+                    <cds-tile class="metric-box">
                       <strong>基础指标包含</strong>
                       <p>
                         <code>R²</code>、<code>RMSE</code>、<code>MAE</code>、<code>最大绝对误差</code>。
@@ -381,13 +402,18 @@
                       </p>
 
                       <div id="metricBox" class="checkbox-grid"></div>
-                    </div>
+                    </cds-tile>
 
-                    <div class="warning-box">
-                      <strong>拟合提醒</strong>
-                      <p>一次拟合适合近似 <code>y = ax + b</code> 的数据；二次拟合适合近似 <code>y = ax² + bx + c</code> 的数据。</p>
-                      <p>不要只看 R²，必须结合实验原理判断模型是否合理。</p>
-                    </div>
+                    <cds-actionable-notification
+                      class="context-note"
+                      kind="warning"
+                      title="拟合提醒"
+                      subtitle="一次拟合适合近似 y = ax + b 的数据；二次拟合适合近似 y = ax² + bx + c 的数据。不要只看 R²，必须结合实验原理判断模型是否合理。"
+                      hide-close-button
+                      low-contrast
+                      inline
+                      open
+                    ></cds-actionable-notification>
                   </cds-accordion-item>
                 </cds-accordion>
               </div>
@@ -398,24 +424,39 @@
                   <p>配置会实时检查，不通过时生成按钮不可用。</p>
                 </div>
 
-                <div id="plotReadinessBox" class="plot-readiness" aria-live="polite">
-                  <div class="plot-readiness-main">
-                    <span id="plotReadyStatus">等待选择绘图列</span>
-                    <strong id="plotReadyHint">选择 X/Y 轴后会自动检查有效数据点。</strong>
-                  </div>
-                  <div class="plot-readiness-grid">
-                    <div><span>有效点数</span><strong id="plotReadyPoints">待选择</strong></div>
-                    <div><span>拟合状态</span><strong id="plotReadyFit">待选择</strong></div>
-                    <div><span>导出尺寸</span><strong id="plotReadyExport">待生成</strong></div>
-                  </div>
-                </div>
+                <cds-tile id="plotReadinessBox" class="plot-readiness" aria-live="polite">
+                  <cds-actionable-notification
+                    id="plotReadinessMessage"
+                    class="plot-readiness-message"
+                    kind="info"
+                    title="等待选择绘图列"
+                    subtitle="选择 X/Y 轴后会自动检查有效数据点。"
+                    hide-close-button
+                    low-contrast
+                    inline
+                    open
+                  ></cds-actionable-notification>
+                  <cds-table size="sm" class="plot-readiness-table">
+                    <cds-table-body>
+                      <cds-table-row>
+                        <cds-table-cell>有效点数</cds-table-cell>
+                        <cds-table-cell><strong id="plotReadyPoints">待选择</strong></cds-table-cell>
+                      </cds-table-row>
+                      <cds-table-row>
+                        <cds-table-cell>拟合状态</cds-table-cell>
+                        <cds-table-cell><strong id="plotReadyFit">待选择</strong></cds-table-cell>
+                      </cds-table-row>
+                      <cds-table-row>
+                        <cds-table-cell>导出尺寸</cds-table-cell>
+                        <cds-table-cell><strong id="plotReadyExport">待生成</strong></cds-table-cell>
+                      </cds-table-row>
+                    </cds-table-body>
+                  </cds-table>
+                </cds-tile>
 
                 <div class="plot-generate-row">
                   <cds-button type="submit" kind="primary" class="form-button" id="plotSubmitButton">生成图表</cds-button>
-                  <div id="plotProgress" class="plot-progress is-hidden" role="status" aria-live="polite">
-                    <span class="plot-progress-dot"></span>
-                    <span id="plotProgressText">准备生成</span>
-                  </div>
+                  <cds-inline-loading id="plotProgress" class="plot-progress is-hidden" status="active" description="准备生成"></cds-inline-loading>
                 </div>
               </aside>
             </div>
@@ -449,7 +490,7 @@
             </div>
 
             <div class="result-side">
-              <div class="summary-card">
+              <cds-tile class="summary-card">
                 <h3>拟合与数据摘要</h3>
                 <cds-table id="summaryRows" class="result-table" size="sm">
                   <cds-table-head>
@@ -460,9 +501,9 @@
                   </cds-table-head>
                   <cds-table-body id="summaryBody"></cds-table-body>
                 </cds-table>
-              </div>
+              </cds-tile>
 
-              <div class="download-panel">
+              <cds-tile class="download-panel">
                 <h3>下载文件</h3>
                 <cds-button id="downloadZip" href="#" kind="primary">下载报告素材包 ZIP</cds-button>
                 <cds-button id="downloadPng" href="#" kind="tertiary">下载 PNG 图片</cds-button>
@@ -470,7 +511,7 @@
                 <cds-button id="downloadFitReport" href="#" kind="tertiary">下载拟合报告 TXT</cds-button>
                 <cds-button id="downloadOriginCsv" href="#" kind="tertiary">下载绘图数据 CSV</cds-button>
                 <cds-button id="downloadFullCsv" href="#" kind="tertiary">下载完整数据 CSV</cds-button>
-              </div>
+              </cds-tile>
             </div>
           </div>
 

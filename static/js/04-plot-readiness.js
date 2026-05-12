@@ -225,8 +225,9 @@ function updatePlotReadiness() {
 
   const info = inspectPlotReadiness();
   box.className = `plot-readiness ${info.level}`;
-  qs("#plotReadyStatus").textContent = info.status;
-  qs("#plotReadyHint").textContent = info.hint;
+  const message = qs("#plotReadinessMessage");
+  renderContextNotification(message, info.level, info.hint, info.status);
+  message?.classList.add("plot-readiness-message");
   qs("#plotReadyPoints").textContent = info.points;
   qs("#plotReadyFit").textContent = info.fit;
   qs("#plotReadyExport").textContent = info.exportSize;
@@ -237,12 +238,13 @@ function updatePlotReadiness() {
 
 function setPlotProgress(text, visible = true) {
   const progress = qs("#plotProgress");
-  const progressText = qs("#plotProgressText");
-  if (!progress || !progressText) {
+  if (!progress) {
     return;
   }
 
-  progressText.textContent = text;
+  progress.description = text;
+  progress.setAttribute("description", text);
+  progress.setAttribute("status", visible ? "active" : "inactive");
   progress.classList.toggle("is-hidden", !visible);
 }
 

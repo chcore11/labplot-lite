@@ -375,7 +375,23 @@ function renderNotification(box, type, text, title = "状态") {
     return;
   }
 
-  const kind = type === "error" ? "error" : type === "warning" ? "warning" : type === "success" ? "success" : "info";
+  setNotificationState(box, type, text, title);
+  box.className = `message ${type}`;
+  show(box);
+}
+
+function renderContextNotification(box, type, text, title = "状态") {
+  if (!box) {
+    return;
+  }
+
+  setNotificationState(box, type, text, title);
+  box.className = `context-note ${type}`;
+  show(box);
+}
+
+function setNotificationState(box, type, text, title) {
+  const kind = getNotificationKind(type);
   box.kind = kind;
   box.title = title;
   box.subtitle = text;
@@ -383,8 +399,13 @@ function renderNotification(box, type, text, title = "状态") {
   box.setAttribute("title", title);
   box.setAttribute("subtitle", text);
   box.setAttribute("open", "");
-  box.className = `message ${type}`;
-  show(box);
+}
+
+function getNotificationKind(type) {
+  if (type === "error" || type === "danger") return "error";
+  if (type === "warning") return "warning";
+  if (type === "success" || type === "ready") return "success";
+  return "info";
 }
 
 function clearNotification(box) {

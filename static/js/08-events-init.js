@@ -202,7 +202,7 @@ function loadSimpleRows(rows, fileName) {
 
   const guess = guessHeaderAndDataRows(state.rawRows);
   qs("#currentFileName").textContent = fileName;
-  qs("#headerGuessMessage").textContent = guess.message;
+  renderContextNotification(qs("#headerGuessBox"), "info", guess.message, "自动识别提示");
   setControlValue("#headerRow", String(guess.headerRow));
   setControlValue("#dataStartRow", String(guess.dataStartRow));
   setControlValue("#dataEndRow", "");

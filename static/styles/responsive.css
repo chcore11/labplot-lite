@@ -45,9 +45,6 @@
     align-items: start;
   }
 
-  .plot-readiness-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 900px) {
@@ -99,10 +96,6 @@
     grid-template-columns: 1fr;
   }
 
-  .curve-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .visualize-layout {
     grid-template-columns: 1fr;
   }
@@ -110,10 +103,6 @@
   .visualize-side {
     border-top: 1px solid var(--line-soft);
     border-left: 0;
-  }
-
-  .curve-remove-button {
-    grid-column: 1 / -1;
   }
 
 }
@@ -221,10 +210,6 @@
   #plotSubmitButton {
     width: 100%;
   }
-  .simple-meta-grid {
-    grid-template-columns: 1fr;
-  }
-
   .workbench-head,
   .panel {
     padding-left: 16px;
@@ -265,8 +250,6 @@
     display: block;
   }
 
-  .curve-row,
-  .plot-readiness-grid,
   .checkbox-grid {
     grid-template-columns: 1fr;
   }

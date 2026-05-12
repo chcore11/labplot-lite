@@ -69,15 +69,12 @@
   margin-bottom: 12px;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
-  container-type: inline-size;
   overflow: hidden;
 }
 
 .curve-row {
   display: grid;
-  grid-template-columns: minmax(150px, 1.45fr) minmax(122px, 0.9fr) minmax(108px, 0.62fr) minmax(112px, 0.72fr) auto;
   gap: 12px;
-  align-items: end;
   padding: 12px;
   border-bottom: 1px solid var(--line-soft);
   background: var(--surface);
@@ -95,34 +92,27 @@
   min-width: 0;
 }
 
+.curve-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.curve-actions {
+  display: flex;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
 .curve-remove-button {
-  justify-self: start;
   width: auto;
-  min-width: 82px;
-}
-
-@container (max-width: 760px) {
-  .curve-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .curve-remove-button {
-    grid-column: 1 / -1;
-  }
-}
-
-@container (max-width: 560px) {
-  .curve-row {
-    grid-template-columns: 1fr;
-  }
 }
 
 .plot-readiness {
   display: grid;
-  gap: 14px;
-  padding: 16px;
+  gap: 10px;
   align-self: stretch;
-  background: var(--surface-soft);
 }
 
 .visualize-side .plot-generate-row {
@@ -139,49 +129,19 @@
   justify-content: center;
 }
 
-.plot-readiness-main {
-  display: grid;
-  gap: 7px;
+.plot-readiness-message,
+.plot-readiness-table {
+  width: 100%;
 }
 
-.plot-readiness-main span {
-  color: var(--text-main);
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.plot-readiness-main strong {
-  color: var(--text-muted);
-  font-size: 14px;
-  font-weight: 650;
-  line-height: 1.55;
-}
-
-.plot-readiness-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1px;
+.plot-readiness-table {
+  display: block;
   overflow: hidden;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-sm);
-  background: var(--line-soft);
 }
 
-.plot-readiness-grid div {
-  padding: 12px;
-  background: var(--surface);
-}
-
-.plot-readiness-grid span {
-  display: block;
-  margin-bottom: 5px;
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 650;
-}
-
-.plot-readiness-grid strong {
-  display: block;
+.plot-readiness-table strong {
   color: var(--text-main);
   font-size: 13px;
   font-weight: 700;
@@ -195,18 +155,6 @@
   background: var(--accent-soft);
 }
 
-.plot-readiness.warning {
-  --tone-text: var(--warning-text);
-  --tone-border: var(--warning-border);
-  --tone-bg: var(--warning-bg);
-}
-
-.plot-readiness.danger {
-  --tone-text: var(--danger-text);
-  --tone-border: var(--danger-border);
-  --tone-bg: var(--danger-bg);
-}
-
 .checkbox-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -215,42 +163,7 @@
 }
 
 .plot-progress {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
   min-height: 38px;
-  padding: 0 13px;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-pill);
-  color: var(--text-soft);
-  background: var(--surface-soft);
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.plot-progress-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: var(--radius-pill);
-  background: var(--accent);
-  box-shadow: 0 0 0 4px oklch(48% 0.145 255 / 0.16);
-}
-
-#plotForm[aria-busy="true"] .plot-progress-dot {
-  animation: plotPulse 1s var(--ease-out) infinite;
-}
-
-@keyframes plotPulse {
-  0%,
-  100% {
-    opacity: 0.45;
-    transform: scale(0.85);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 
 .result-layout {
