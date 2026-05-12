@@ -101,7 +101,7 @@ http://127.0.0.1:8000/
 页面通过 CDN 加载以下浏览器端库：
 
 - SheetJS：读取 Excel 文件
-- D3 + Observable Plot：绘制工作台图表和 SVG 输出
+- Plotly.js：绘制工作台图表和 PNG / SVG 输出
 - JSZip：生成 ZIP 素材包
 
 如需完全离线使用，可以把这些库下载到 `static/vendor/`，再把 `workbench.html` 中的 CDN 地址替换成本地路径。

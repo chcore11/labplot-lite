@@ -327,10 +327,23 @@
 }
 
 .plot-viewport > svg,
+.plot-viewport > .plotly-export-surface,
 .plot-canvas {
   display: block;
+}
+
+.plot-viewport > svg,
+.plot-canvas {
   width: 100%;
   height: auto;
+}
+
+.plotly-export-surface {
+  will-change: transform;
+}
+
+.plotly-export-surface .main-svg {
+  display: block;
 }
 
 .result-side {

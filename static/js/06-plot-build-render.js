@@ -245,6 +245,7 @@ function makeChartDataset(label, pairs, config, chartType) {
     backgroundColor: config.color,
     borderWidth: Math.max(config.lineWidth, 1.7),
     borderDash: LINE_DASHES[config.lineStyle],
+    lineStyle: config.lineStyle,
     tension: 0,
     spanGaps: true,
   };
@@ -322,14 +323,11 @@ function getPlotTarget(selector) {
 }
 
 function clearRenderedPlot(target) {
-  target.replaceChildren();
-}
-
-function dashArrayToString(dashArray, scale) {
-  if (!Array.isArray(dashArray) || !dashArray.length) {
-    return null;
+  if (target._labPlotGraphDiv && window.Plotly) {
+    Plotly.purge(target._labPlotGraphDiv);
   }
-  return dashArray.map((value) => Math.max(value * scale, 1).toFixed(2)).join(" ");
+  target._labPlotGraphDiv = null;
+  target.replaceChildren();
 }
 
 function estimateLegendRows(datasets, width, margins, scale, fontSize) {
@@ -337,7 +335,9 @@ function estimateLegendRows(datasets, width, margins, scale, fontSize) {
     return 0;
   }
 
-  const availableWidth = Math.max(width - margins.left - margins.right, 320 * scale);
+  const left = margins.left ?? margins.l ?? 0;
+  const right = margins.right ?? margins.r ?? 0;
+  const availableWidth = Math.max(width - left - right, 320 * scale);
   let rows = 1;
   let usedWidth = 0;
 
@@ -354,16 +354,16 @@ function estimateLegendRows(datasets, width, margins, scale, fontSize) {
   return rows;
 }
 
-function getObservablePlotLayout(payload, width, scale) {
+function getPlotlyMargins(payload, width, scale) {
   const margins = {
-    top: 34 * scale,
-    right: 36 * scale,
-    bottom: 64 * scale,
-    left: 78 * scale,
+    t: 34 * scale,
+    r: 36 * scale,
+    b: 64 * scale,
+    l: 78 * scale,
   };
   const legendRows = estimateLegendRows(payload.datasets, width, margins, scale, payload.legendFontsize * scale);
   if (legendRows) {
-    margins.top += (legendRows * 25 * scale) + (10 * scale);
+    margins.t += (legendRows * 25 * scale) + (10 * scale);
   }
   return margins;
 }
@@ -372,160 +372,130 @@ function makePlotDomain(minValue, maxValue, axisMaxValue) {
   if (!Number.isFinite(minValue) || !Number.isFinite(maxValue)) {
     return undefined;
   }
+  const range = maxValue - minValue;
+  const pad = range > 0 ? range * 0.04 : Math.max(Math.abs(maxValue) * 0.04, 1);
   if (shouldAxisStartAtZero(minValue, maxValue)) {
-    return [0, axisMaxValue || maxValue];
+    return [0, axisMaxValue || maxValue + pad];
   }
-  return undefined;
+  return [minValue - pad, maxValue + pad];
 }
 
-function appendObservableLegend(svg, payload, layout, scale, colors) {
-  if (payload.datasets.length <= 1) {
-    return;
-  }
-
-  const fontSize = payload.legendFontsize * scale;
-  const lineLength = 20 * scale;
-  const itemGap = 16 * scale;
-  const rowGap = 24 * scale;
-  const startX = layout.left;
-  const maxX = Number(svg.getAttribute("width")) - layout.right;
-  let x = startX;
-  let y = 26 * scale;
-
-  const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  group.setAttribute("aria-hidden", "true");
-  svg.appendChild(group);
-
-  payload.datasets.forEach((dataset) => {
-    const label = String(dataset.label || "Series");
-    const color = dataset.borderColor || dataset.backgroundColor || colors.axis;
-    const labelWidth = label.length * fontSize * 0.58;
-    const itemWidth = Math.min(Math.max(labelWidth + (58 * scale), 150 * scale), 360 * scale);
-
-    if (x > startX && x + itemWidth > maxX) {
-      x = startX;
-      y += rowGap;
-    }
-
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", String(x));
-    line.setAttribute("x2", String(x + lineLength));
-    line.setAttribute("y1", String(y));
-    line.setAttribute("y2", String(y));
-    line.setAttribute("stroke", color);
-    line.setAttribute("stroke-width", String(Math.max((dataset.borderWidth || 1.7) * scale, 1)));
-    const dash = dashArrayToString(dataset.borderDash, scale);
-    if (dash) {
-      line.setAttribute("stroke-dasharray", dash);
-    }
-    group.appendChild(line);
-
-    if (dataset.pointRadius) {
-      const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      dot.setAttribute("cx", String(x + (lineLength / 2)));
-      dot.setAttribute("cy", String(y));
-      dot.setAttribute("r", String(Math.max(dataset.pointRadius * scale, 2 * scale)));
-      dot.setAttribute("fill", dataset.backgroundColor || color);
-      dot.setAttribute("stroke", dataset.pointBorderColor || "rgb(252, 252, 249)");
-      dot.setAttribute("stroke-width", String(Math.max((dataset.pointBorderWidth || 0) * scale, 0.8)));
-      group.appendChild(dot);
-    }
-
-    const labelNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    labelNode.textContent = label;
-    labelNode.setAttribute("x", String(x + lineLength + (8 * scale)));
-    labelNode.setAttribute("y", String(y + (fontSize * 0.35)));
-    labelNode.setAttribute("fill", colors.text);
-    labelNode.setAttribute("font-size", String(fontSize));
-    labelNode.setAttribute("font-weight", "560");
-    group.appendChild(labelNode);
-
-    x += itemWidth + itemGap;
-  });
-}
-
-function appendObservableFitLabel(svg, payload, layout, scale, colors) {
+function getFitAnnotation(payload, scale, colors) {
   if (!payload.fitText) {
-    return;
+    return [];
   }
 
-  const lines = payload.fitText.split("\n");
-  const fontSize = 11 * scale;
-  const lineHeight = 16 * scale;
-  const padding = 8 * scale;
-  const x = layout.left + (14 * scale);
-  const y = layout.top + (12 * scale);
-  const textWidth = Math.max(...lines.map((line) => line.length * fontSize * 0.62));
-  const boxWidth = textWidth + (padding * 2);
-  const boxHeight = (lines.length * lineHeight) + (padding * 2);
-
-  const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  group.setAttribute("aria-hidden", "true");
-  svg.appendChild(group);
-
-  const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-  rect.setAttribute("x", String(x));
-  rect.setAttribute("y", String(y));
-  rect.setAttribute("width", String(boxWidth));
-  rect.setAttribute("height", String(boxHeight));
-  rect.setAttribute("rx", String(5 * scale));
-  rect.setAttribute("fill", colors.fitLabelBg);
-  rect.setAttribute("stroke", colors.fitLabelBorder);
-  rect.setAttribute("stroke-width", String(0.8 * scale));
-  group.appendChild(rect);
-
-  lines.forEach((line, index) => {
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.textContent = line;
-    text.setAttribute("x", String(x + padding));
-    text.setAttribute("y", String(y + padding + fontSize + (index * lineHeight)));
-    text.setAttribute("fill", colors.fitLabelText);
-    text.setAttribute("font-size", String(fontSize));
-    text.setAttribute("font-weight", "560");
-    group.appendChild(text);
-  });
+  return [{
+    align: "left",
+    bgcolor: colors.fitLabelBg,
+    bordercolor: colors.fitLabelBorder,
+    borderpad: 8 * scale,
+    borderwidth: 0.8 * scale,
+    font: {
+      color: colors.fitLabelText,
+      family: "SFMono-Regular, Menlo, Monaco, Cascadia Mono, Roboto Mono, Consolas, monospace",
+      size: 11 * scale,
+    },
+    opacity: 1,
+    showarrow: false,
+    text: payload.fitText.replace(/\n/g, "<br>"),
+    x: 0.02,
+    xanchor: "left",
+    xref: "paper",
+    y: 0.98,
+    yanchor: "top",
+    yref: "paper",
+  }];
 }
 
-function makeObservableMarks(payload, scale, colors) {
-  const marks = [];
-  payload.datasets.forEach((dataset) => {
+function plotlyDashStyle(dataset) {
+  if (dataset.lineDash) {
+    return dataset.lineDash;
+  }
+  if (dataset.lineStyle && dataset.lineStyle !== "solid") {
+    const dashMap = {
+      dashed: "dash",
+      dotted: "dot",
+      dashdot: "dashdot",
+    };
+    return dashMap[dataset.lineStyle] || "solid";
+  }
+  if (Array.isArray(dataset.borderDash) && dataset.borderDash.length) {
+    if (dataset.borderDash.length >= 4) {
+      return "dashdot";
+    }
+    return dataset.borderDash[0] <= 2 ? "dot" : "dash";
+  }
+  return "solid";
+}
+
+function getTraceMode(dataset) {
+  const hasLine = dataset.showLine !== false;
+  const hasPoint = (dataset.pointRadius || 0) > 0;
+  if (hasLine && hasPoint) return "lines+markers";
+  if (hasLine) return "lines";
+  return "markers";
+}
+
+function makePlotlyTraces(payload, scale, colors) {
+  return payload.datasets.map((dataset) => {
     const stroke = dataset.borderColor || colors.axis;
     const fill = dataset.backgroundColor || stroke;
-    const dash = dashArrayToString(dataset.borderDash, scale);
 
-    if (dataset.showLine !== false) {
-      marks.push(Plot.line(dataset.data, {
-        x: "x",
-        y: "y",
-        stroke,
-        strokeWidth: Math.max((dataset.borderWidth || 1.7) * scale, 1),
-        strokeDasharray: dash,
-        curve: "linear",
-      }));
-    }
-
-    if ((dataset.pointRadius || 0) > 0) {
-      marks.push(Plot.dot(dataset.data, {
-        x: "x",
-        y: "y",
-        r: Math.max(dataset.pointRadius * scale, 1.8 * scale),
-        fill,
-        stroke: dataset.pointBorderColor || "rgb(252, 252, 249)",
-        strokeWidth: Math.max((dataset.pointBorderWidth || 0) * scale, 0.6),
-      }));
-    }
+    return {
+      hovertemplate: `${payload.xLabel}: %{x}<br>${dataset.label}: %{y}<extra></extra>`,
+      line: {
+        color: stroke,
+        dash: plotlyDashStyle(dataset),
+        shape: "linear",
+        width: Math.max((dataset.borderWidth || 1.7) * scale, 1),
+      },
+      marker: {
+        color: fill,
+        line: {
+          color: dataset.pointBorderColor || "rgb(252, 252, 249)",
+          width: Math.max((dataset.pointBorderWidth || 0) * scale, 0.6),
+        },
+        size: Math.max((dataset.pointRadius || 0) * 2 * scale, 3 * scale),
+      },
+      mode: getTraceMode(dataset),
+      name: dataset.label || "Series",
+      type: "scatter",
+      x: dataset.data.map((point) => point.x),
+      y: dataset.data.map((point) => point.y),
+    };
   });
-
-  marks.push(Plot.frame({
-    stroke: colors.axis,
-    strokeWidth: 1.05 * scale,
-  }));
-  return marks;
 }
 
-function renderObservablePlot(payload, selector) {
-  if (!window.Plot) {
-    throw new Error("Observable Plot 绘图库未加载，请检查网络后刷新页面。");
+function setScaledPlotPreview(target, graphDiv, width, height) {
+  const parent = target.parentElement;
+  const parentRect = parent?.getBoundingClientRect();
+  const parentStyles = parent ? window.getComputedStyle(parent) : null;
+  const horizontalPadding = parentStyles
+    ? (parseFloat(parentStyles.paddingLeft) || 0) + (parseFloat(parentStyles.paddingRight) || 0)
+    : 0;
+  const availableWidth = Math.max(
+    Math.min((parentRect?.width || 980) - horizontalPadding, 980),
+    280,
+  );
+  const previewWidth = Math.min(width, availableWidth);
+  const previewHeight = Math.round((previewWidth / width) * height);
+  const scale = previewWidth / width;
+
+  target.style.width = `${previewWidth}px`;
+  target.style.height = `${previewHeight}px`;
+  target.style.setProperty("--plot-output-width", `${width}px`);
+  target.style.setProperty("--plot-output-height", `${height}px`);
+
+  graphDiv.style.width = `${width}px`;
+  graphDiv.style.height = `${height}px`;
+  graphDiv.style.transform = `scale(${scale})`;
+  graphDiv.style.transformOrigin = "top left";
+}
+
+async function renderPlotlyChart(payload, selector) {
+  if (!window.Plotly) {
+    throw new Error("Plotly.js 绘图库未加载，请检查网络后刷新页面。");
   }
 
   const target = getPlotTarget(selector);
@@ -534,50 +504,93 @@ function renderObservablePlot(payload, selector) {
   const { width, height } = getPlotPixelSize(payload);
   const colors = getThemeColors();
   const scale = chartRenderScale(payload);
-  const layout = getObservablePlotLayout(payload, width, scale);
+  const margin = getPlotlyMargins(payload, width, scale);
   const yAxisMax = shouldAxisStartAtZero(payload.yMin, payload.yMax) ? nicePositiveAxisMax(payload.yMax) : undefined;
-  const plot = Plot.plot({
-    width,
-    height,
-    marginTop: layout.top,
-    marginRight: layout.right,
-    marginBottom: layout.bottom,
-    marginLeft: layout.left,
-    style: {
-      background: colors.surface,
+
+  const graphDiv = document.createElement("div");
+  graphDiv.className = "plotly-export-surface";
+  graphDiv.setAttribute("aria-label", `${payload.plotTitle || "X-Y 图"}，${payload.xLabel} 对 ${payload.yLabel}`);
+  graphDiv.setAttribute("role", "img");
+  target.appendChild(graphDiv);
+  target._labPlotGraphDiv = graphDiv;
+
+  const layout = {
+    annotations: getFitAnnotation(payload, scale, colors),
+    autosize: false,
+    font: {
       color: colors.text,
-      fontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Arial, sans-serif",
-      fontSize: `${Math.max((payload.labelFontsize - 2) * scale, 8 * scale)}px`,
+      family: "-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Arial, sans-serif",
+      size: Math.max((payload.labelFontsize - 2) * scale, 8 * scale),
     },
-    x: {
-      label: payload.xLabel,
-      grid: payload.showGrid,
-      domain: makePlotDomain(payload.xMin, payload.xMax),
-      nice: true,
-      tickFormat: formatShortNumber,
+    height,
+    hovermode: "closest",
+    legend: {
+      bgcolor: "rgba(0,0,0,0)",
+      font: {
+        color: colors.text,
+        size: payload.legendFontsize * scale,
+      },
+      orientation: "h",
+      x: 0,
+      xanchor: "left",
+      y: 1.12,
+      yanchor: "bottom",
     },
-    y: {
-      label: payload.yLabel,
-      grid: payload.showGrid,
-      domain: makePlotDomain(payload.yMin, payload.yMax, yAxisMax),
-      nice: true,
-      tickFormat: formatShortNumber,
+    margin,
+    paper_bgcolor: colors.surface,
+    plot_bgcolor: colors.surface,
+    showlegend: payload.datasets.length > 1,
+    width,
+    xaxis: {
+      gridcolor: colors.line,
+      linecolor: colors.axis,
+      linewidth: 1.05 * scale,
+      mirror: true,
+      range: makePlotDomain(payload.xMin, payload.xMax),
+      showgrid: payload.showGrid,
+      showline: true,
+      ticks: "outside",
+      tickfont: { size: Math.max((payload.labelFontsize - 3) * scale, 7 * scale) },
+      title: {
+        font: { color: colors.text, size: payload.labelFontsize * scale },
+        standoff: 12 * scale,
+        text: payload.xLabel,
+      },
+      zeroline: false,
     },
-    marks: makeObservableMarks(payload, scale, colors),
-  });
+    yaxis: {
+      gridcolor: colors.line,
+      linecolor: colors.axis,
+      linewidth: 1.05 * scale,
+      mirror: true,
+      range: makePlotDomain(payload.yMin, payload.yMax, yAxisMax),
+      showgrid: payload.showGrid,
+      showline: true,
+      ticks: "outside",
+      tickfont: { size: Math.max((payload.labelFontsize - 3) * scale, 7 * scale) },
+      title: {
+        font: { color: colors.text, size: payload.labelFontsize * scale },
+        standoff: 12 * scale,
+        text: payload.yLabel,
+      },
+      zeroline: false,
+    },
+  };
 
-  plot.setAttribute("role", "img");
-  plot.setAttribute("aria-label", `${payload.plotTitle || "X-Y 图"}，${payload.xLabel} 对 ${payload.yLabel}`);
-  plot.classList.add("plot-svg");
-  appendObservableLegend(plot, payload, layout, scale, colors);
-  appendObservableFitLabel(plot, payload, layout, scale, colors);
+  const config = {
+    displayModeBar: false,
+    responsive: false,
+    staticPlot: false,
+  };
 
-  target.dataset.renderer = "observable-plot";
-  target.style.setProperty("--plot-output-width", `${width}px`);
-  target.style.setProperty("--plot-output-height", `${height}px`);
-  target.appendChild(plot);
+  await Plotly.newPlot(graphDiv, makePlotlyTraces(payload, scale, colors), layout, config);
+  setScaledPlotPreview(target, graphDiv, width, height);
+
+  target.dataset.renderer = "plotly";
+  target.dataset.outputWidth = String(width);
+  target.dataset.outputHeight = String(height);
 }
 
-function renderChart(payload, canvasSelector = "#plotCanvas") {
-  renderObservablePlot(payload, canvasSelector);
+async function renderChart(payload, canvasSelector = "#plotCanvas") {
+  await renderPlotlyChart(payload, canvasSelector);
 }

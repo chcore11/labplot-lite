@@ -6,7 +6,7 @@ const REQUIRED_DEPENDENCIES = [
     key: "chart",
     label: "图表绘制库",
     affects: "图像生成和 SVG 导出",
-    isLoaded: () => Boolean(window.Plot),
+    isLoaded: () => Boolean(window.Plotly),
   },
   { key: "zip", label: "ZIP 打包库", affects: "报告素材包导出", isLoaded: () => Boolean(window.JSZip) },
 ];
@@ -70,7 +70,7 @@ async function handlePlotSubmit() {
   const payload = buildPlotPayload();
   state.lastPlotPayload = payload;
   setPlotProgress("正在绘制图像...");
-  renderChart(payload);
+  await renderChart(payload);
   setPlotProgress("正在生成下载文件...");
   await renderDownloads(payload);
   setPlotProgress("正在整理结果摘要...");
@@ -131,7 +131,7 @@ function setupTheme() {
         return;
       }
 
-      renderChart(state.lastPlotPayload);
+      await renderChart(state.lastPlotPayload);
       await renderDownloads(state.lastPlotPayload);
     } catch (error) {
       showMessage("error", error.message);

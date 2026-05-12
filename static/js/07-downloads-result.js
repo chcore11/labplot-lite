@@ -117,6 +117,21 @@ function getRenderedSvg(target) {
   return target ? target.querySelector("svg") : null;
 }
 
+function getRenderedPlotlyGraph(target) {
+  if (!target) {
+    return null;
+  }
+  return target._labPlotGraphDiv || target.querySelector(".js-plotly-plot");
+}
+
+async function dataUrlToBlob(dataUrl) {
+  const response = await fetch(dataUrl);
+  if (!response.ok) {
+    throw new Error("图像导出失败。");
+  }
+  return response.blob();
+}
+
 function svgToBlob(svg) {
   if (!svg) {
     return null;
@@ -163,6 +178,18 @@ async function svgBlobToPngBlob(svgBlob, width, height) {
 
 async function renderedPlotToPngBlob(selector, payload) {
   const target = qs(selector);
+  const plotlyGraph = getRenderedPlotlyGraph(target);
+  if (plotlyGraph && window.Plotly) {
+    const { width, height } = getPlotPixelSize(payload);
+    const dataUrl = await Plotly.toImage(plotlyGraph, {
+      format: "png",
+      height,
+      scale: 1,
+      width,
+    });
+    return dataUrlToBlob(dataUrl);
+  }
+
   const canvas = getRenderedCanvas(target);
   if (canvas) {
     return canvasToBlob(canvas);
@@ -179,8 +206,21 @@ async function renderedPlotToPngBlob(selector, payload) {
   return svgBlobToPngBlob(svgBlob, width, height);
 }
 
-function renderedPlotToSvgBlob(selector) {
-  return svgToBlob(getRenderedSvg(qs(selector)));
+async function renderedPlotToSvgBlob(selector, payload) {
+  const target = qs(selector);
+  const plotlyGraph = getRenderedPlotlyGraph(target);
+  if (plotlyGraph && window.Plotly) {
+    const { width, height } = getPlotPixelSize(payload);
+    const dataUrl = await Plotly.toImage(plotlyGraph, {
+      format: "svg",
+      height,
+      scale: 1,
+      width,
+    });
+    return dataUrlToBlob(dataUrl);
+  }
+
+  return svgToBlob(getRenderedSvg(target));
 }
 
 function clearDownloadLink(selector) {
@@ -201,7 +241,7 @@ async function renderDownloads(payload) {
   revokeDownloadUrls();
 
   const pngBlob = await renderedPlotToPngBlob("#plotCanvas", payload);
-  const svgBlob = renderedPlotToSvgBlob("#plotCanvas");
+  const svgBlob = await renderedPlotToSvgBlob("#plotCanvas", payload);
   const originCsvBlob = new Blob(
     ["\uFEFF", rowsToCsv(payload.originRows, payload.originColumns)],
     { type: "text/csv;charset=utf-8" },
