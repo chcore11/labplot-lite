@@ -25,6 +25,7 @@
   .workbench-head,
   .step-nav,
   .message,
+  .workbench-main > .sample-guide,
   .workbench-step-panel {
     grid-column: 1;
   }
@@ -84,6 +85,7 @@
 
   .upload-layout,
   .mode-landing,
+  .sample-guide,
   .simple-result-meta,
   .result-side,
   .stats,
@@ -118,6 +120,15 @@
     grid-column: 1 / -1;
   }
 
+  .sample-guide-main,
+  .sample-guide-steps {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .sample-guide-steps {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -295,9 +306,24 @@
     grid-template-columns: 1fr;
   }
 
+  .sample-guide-steps {
+    display: none;
+  }
+
   .plot-generate-row,
   #plotSubmitButton {
     width: 100%;
+  }
+
+  .sample-coach {
+    justify-self: stretch;
+    margin-right: 0;
+    transform: none;
+  }
+
+  .sample-coach::before,
+  .sample-coach::after {
+    display: none;
   }
 
   .plot-progress {

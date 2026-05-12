@@ -236,7 +236,7 @@ function chooseSimpleXYColumns() {
 
 function loadSimpleRows(rows, fileName) {
   state.fileName = fileName;
-  state.samplePreset = null;
+  state.sampleGuide = null;
   state.rawRows = rows.map((row) => Array.isArray(row) ? row.map(cellText) : []);
 
   if (!state.rawRows.length) {
