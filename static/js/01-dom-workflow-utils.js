@@ -144,24 +144,27 @@ function updateWorkflowNav() {
     state.activeStep = getLastAvailableWorkflowStep();
   }
 
+  const activePanelId = WORKFLOW_PANELS[state.activeStep];
   WORKFLOW_STEPS.forEach((step) => {
     const panel = getWorkflowPanel(step);
     if (panel) {
-      panel.classList.toggle("is-active", step === state.activeStep && isWorkflowStepAvailable(step));
+      panel.classList.toggle("is-active", WORKFLOW_PANELS[step] === activePanelId && isWorkflowStepAvailable(state.activeStep));
     }
   });
 
   const activeIndex = WORKFLOW_STEPS.indexOf(state.activeStep);
+  const activeNavStep = state.activeStep === "calc" ? "range" : state.activeStep;
   qsa(".step-nav-item[data-step-target]").forEach((button) => {
     const step = button.dataset.stepTarget;
     const stepIndex = WORKFLOW_STEPS.indexOf(step);
     const available = isWorkflowStepAvailable(step);
+    const isActive = step === activeNavStep;
 
     button.disabled = !available;
-    button.classList.toggle("is-active", step === state.activeStep);
-    button.classList.toggle("is-complete", available && stepIndex >= 0 && stepIndex < activeIndex);
+    button.classList.toggle("is-active", isActive);
+    button.classList.toggle("is-complete", !isActive && available && stepIndex >= 0 && stepIndex < activeIndex);
 
-    if (step === state.activeStep) {
+    if (isActive) {
       button.setAttribute("aria-current", "step");
     } else {
       button.removeAttribute("aria-current");

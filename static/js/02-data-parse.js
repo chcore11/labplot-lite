@@ -72,6 +72,22 @@ function parseCsv(text) {
   return rows;
 }
 
+function parsePastedTable(text) {
+  const source = cellText(text);
+  if (!source) {
+    throw new Error("请先粘贴表格数据。");
+  }
+
+  if (source.includes("\t")) {
+    return source
+      .split(/\r?\n/)
+      .filter((line) => cellText(line))
+      .map((line) => line.split("\t").map(cellText));
+  }
+
+  return parseCsv(source);
+}
+
 async function parseFile(file) {
   const buffer = await file.arrayBuffer();
   const extension = file.name.split(".").pop().toLowerCase();
@@ -253,4 +269,3 @@ function loadDataFromRawRows(headerRow, dataStartRow, dataEndRow) {
 
   return { columns, data, numericColumns };
 }
-

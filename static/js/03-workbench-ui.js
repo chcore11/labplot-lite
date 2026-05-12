@@ -304,18 +304,12 @@ function renderDataControls() {
 function resetWorkflow() {
   revokeDownloadUrls();
 
-  if (state.chart) {
-    state.chart.destroy();
-    state.chart = null;
-  }
-
   state.fileName = "";
   state.rawRows = [];
   state.columns = [];
   state.data = [];
   state.numericColumns = [];
   state.lastPlotPayload = null;
-  state.simplePlotPayload = null;
   state.isPlotGenerating = false;
   state.activeStep = "upload";
   state.sampleGuide = null;
@@ -492,4 +486,3 @@ function calculateColumn() {
   showMessage("success", `已生成新列：${newColName}`);
   setActiveStep("plot", { scroll: true });
 }
-

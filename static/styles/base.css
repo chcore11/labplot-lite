@@ -113,9 +113,7 @@ body,
 .sample-list button,
 .sample-list a,
 .download-panel a,
-.sample-chart-card,
-.mode-entry,
-.mode-choice-card {
+.sample-chart-card {
   transition:
     background-color var(--duration-med) var(--ease-out),
     border-color var(--duration-med) var(--ease-out),

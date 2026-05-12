@@ -192,9 +192,7 @@ const state = {
   columns: [],
   data: [],
   numericColumns: [],
-  chart: null,
   lastPlotPayload: null,
-  simplePlotPayload: null,
   isPlotGenerating: false,
   activeStep: "upload",
   objectUrls: [],
@@ -206,25 +204,25 @@ const WORKFLOW_STEPS = ["upload", "range", "calc", "plot", "result"];
 const WORKFLOW_PANELS = {
   upload: "step-upload",
   range: "previewSection",
-  calc: "calcSection",
+  calc: "previewSection",
   plot: "plotSection",
   result: "resultSection",
 };
 
 const WORKFLOW_STATUS = {
   upload: "等待导入数据",
-  range: "检查表头和数据范围",
-  calc: "可以生成计算列，也可以跳过",
-  plot: "选择坐标轴、曲线和拟合方式",
-  result: "结果已生成，可检查并下载",
+  range: "检查与描述数据",
+  calc: "可选加工数据",
+  plot: "编辑可视化",
+  result: "导出报告素材",
 };
 
 const WORKFLOW_ACTION_LABELS = {
-  upload: "开始导入",
-  range: "继续识别范围",
-  calc: "继续数据加工",
-  plot: "继续配置图像",
-  result: "查看下载结果",
+  upload: "回到上传",
+  range: "查看数据",
+  calc: "查看加工",
+  plot: "编辑图像",
+  result: "查看导出",
 };
 
 const EMPTY_RESULT_STATE = {
@@ -238,4 +236,3 @@ const PLOT_PENDING_VALUES = {
   fit: "待选择",
   exportSize: "待生成",
 };
-

@@ -6,7 +6,7 @@ const REQUIRED_DEPENDENCIES = [
     key: "chart",
     label: "图表绘制库",
     affects: "图像生成和 SVG 导出",
-    isLoaded: () => Boolean(window.Plot || window.Chart),
+    isLoaded: () => Boolean(window.Plot),
   },
   { key: "zip", label: "ZIP 打包库", affects: "报告素材包导出", isLoaded: () => Boolean(window.JSZip) },
 ];
@@ -49,7 +49,7 @@ function checkRequiredDependencies() {
 
   if (missingKeys.has("chart")) {
     qsa(
-      ".workbench-page .nav-cta, #enterSimpleMode, #enterAdvancedMode, #simpleChooseFile, #uploadForm button[type='submit'], .sample-load-button, #plotSubmitButton",
+      ".workbench-page .nav-cta, #pasteForm button[type='submit'], #uploadForm button[type='submit'], .sample-load-button, #plotSubmitButton",
     ).forEach(disableControl);
   }
 
@@ -61,7 +61,6 @@ function checkRequiredDependencies() {
   }
 
   return {
-    blocksModeEntry: missingKeys.has("chart"),
     blocksSampleLoad: missingKeys.has("xlsx") || missingKeys.has("chart"),
   };
 }
@@ -110,12 +109,6 @@ function getInitialSampleUrl() {
   return `./samples/${fileName}`;
 }
 
-function getInitialMode() {
-  const params = new URLSearchParams(window.location.search);
-  const mode = params.get("mode");
-  return mode === "simple" || mode === "advanced" ? mode : "";
-}
-
 async function loadInitialSampleFromUrl() {
   const sampleUrl = getInitialSampleUrl();
   if (!sampleUrl) {
@@ -124,7 +117,6 @@ async function loadInitialSampleFromUrl() {
 
   clearMessage();
   try {
-    showMode("advanced", { skipAnim: true });
     await loadSample(sampleUrl);
     window.history.replaceState(null, "", window.location.pathname);
   } catch (error) {
@@ -135,18 +127,6 @@ async function loadInitialSampleFromUrl() {
 function setupTheme() {
   async function refreshRenderedResult() {
     try {
-      const simpleMode = qs("#simpleMode");
-      if (
-        state.simplePlotPayload &&
-        simpleMode &&
-        !simpleMode.classList.contains("is-hidden") &&
-        !qs("#simpleResult").classList.contains("is-hidden")
-      ) {
-        renderChart(state.simplePlotPayload, "#simplePlotCanvas");
-        await renderSimpleDownloads(state.simplePlotPayload);
-        return;
-      }
-
       if (!state.lastPlotPayload || qs("#resultSection").classList.contains("is-hidden")) {
         return;
       }
@@ -167,254 +147,20 @@ function setupTheme() {
   });
 }
 
-function loadInitialModeFromUrl() {
-  const mode = getInitialMode();
-  if (mode) {
-    showMode(mode, { skipAnim: true });
-    window.history.replaceState(null, "", window.location.pathname);
-  }
-}
-
-function showMode(mode, opts = {}) {
-  const landing = qs("#modeLanding");
-  const simple = qs("#simpleMode");
-  const advanced = qs("#advancedMode");
-  const sections = { landing, simple, advanced };
-  const target = sections[mode];
-
-  const visible = Object.values(sections).find((section) => section && !section.classList.contains("is-hidden"));
-
-  const showImmediate = (element) => {
-    Object.values(sections).forEach((section) => {
-      if (section) {
-        section.classList.toggle("is-hidden", section !== element);
-      }
-    });
-    element.classList.remove("mode-enter", "mode-exit");
-  };
-
-  const animateIn = (element) => {
-    element.classList.remove("is-hidden", "mode-exit");
-    void element.offsetWidth;
-    element.classList.add("mode-enter");
-    element.addEventListener("animationend", () => element.classList.remove("mode-enter"), { once: true });
-  };
-
-  const scrollToModeTarget = () => {
-    if (mode === "advanced") {
-      const targetStep = state.rawRows.length ? state.activeStep : "upload";
-      setActiveStep(targetStep, { scroll: false });
-      scrollToElement(qs("#upload-section") || advanced);
-    } else if (mode === "simple") {
-      scrollToElement(simple || document.body);
-    } else {
-      scrollToElement(landing || document.body);
-    }
-  };
-
-  if (opts.skipAnim || prefersReducedMotion() || !visible || visible === target) {
-    if (target) {
-      showImmediate(target);
-    }
-    scrollToModeTarget();
-    return;
-  }
-
-  if (visible !== target) {
-    visible.classList.add("mode-exit");
-    visible.addEventListener("animationend", () => {
-      visible.classList.add("is-hidden");
-      visible.classList.remove("mode-exit");
-      if (target) {
-        animateIn(target);
-      }
-      scrollToModeTarget();
-    }, { once: true });
-  }
-}
-
-function setSimpleMessage(type, text) {
-  const box = qs("#simpleMessage");
-  if (!box) {
-    return;
-  }
-
-  box.textContent = text;
-  box.className = `message ${type}`;
-  show(box);
-}
-
-function clearSimpleMessage() {
-  const box = qs("#simpleMessage");
-  if (!box) {
-    return;
-  }
-
-  box.textContent = "";
-  box.className = "message is-hidden";
-}
-
-function isLikelyXColumn(column) {
-  const text = cellText(column).toLowerCase();
-  const compact = text.replace(/[\s_-]+/g, "");
-  return (
-    text.includes("time") ||
-    text.includes("时间") ||
-    compact === "t" ||
-    compact === "x" ||
-    compact.startsWith("t") ||
-    compact.startsWith("x")
-  );
-}
-
-function chooseSimpleXYColumns() {
-  if (state.numericColumns.length < 2) {
-    throw new Error("无法自动识别 X/Y，请进入功能模式手动选择。");
-  }
-
-  const xCol = state.numericColumns.find(isLikelyXColumn) || state.numericColumns[0];
-  const yCol = state.numericColumns.find((column) => column !== xCol);
-  if (!yCol) {
-    throw new Error("无法自动识别 X/Y，请进入功能模式手动选择。");
-  }
-
-  return { xCol, yCol };
-}
-
-function loadSimpleRows(rows, fileName) {
-  state.fileName = fileName;
-  state.sampleGuide = null;
-  state.rawRows = rows.map((row) => Array.isArray(row) ? row.map(cellText) : []);
-
-  if (!state.rawRows.length) {
-    throw new Error("文件中没有可读取的数据。");
-  }
-
-  const guess = guessHeaderAndDataRows(state.rawRows);
-  qs("#currentFileName").textContent = fileName;
-  qs("#headerGuessMessage").textContent = guess.message;
-  qs("#headerRow").value = String(guess.headerRow);
-  qs("#dataStartRow").value = String(guess.dataStartRow);
-  qs("#dataEndRow").value = "";
-
-  const loaded = loadDataFromRawRows(guess.headerRow, guess.dataStartRow, null);
-  state.columns = loaded.columns;
-  state.data = loaded.data;
-  state.numericColumns = loaded.numericColumns;
-  state.activeStep = "range";
-
-  renderPreview();
-  renderDataControls();
-  show(qs("#previewSection"));
-  updateWorkflowNav();
-
-  return guess;
-}
-
-async function handleSimpleFile(file) {
-  clearSimpleMessage();
-
-  if (!file) {
-    throw new Error("请先选择 CSV / Excel 文件。");
-  }
-  if (file.size > 5 * 1024 * 1024) {
-    throw new Error("建议单个文件不超过 5MB。");
-  }
-
-  setSimpleMessage("success", "正在读取文件并识别绘图列...");
-  const rows = await parseFile(file);
-  const headerGuess = loadSimpleRows(rows, file.name);
-  const { xCol, yCol } = chooseSimpleXYColumns();
-  setSelectIfExists("#xCol", xCol);
-  setSelectIfExists("#chartType", "line_marker");
-  setSelectIfExists("#fitType", "none");
-  renderCurveRows([{
-    yCol,
-    color: DEFAULT_CURVE_COLORS[0],
-    lineWidth: 1.8,
-    lineStyle: "solid",
-  }]);
-  updatePlotReadiness();
-
-  const payload = buildSimplePlotPayload({ xCol, yCol, headerGuess });
-
-  state.simplePlotPayload = payload;
-  state.lastPlotPayload = payload;
-  renderChart(payload, "#simplePlotCanvas");
-  await renderSimpleDownloads(payload);
-
-  qs("#simpleXCol").textContent = xCol;
-  qs("#simpleYCol").textContent = yCol;
-  qs("#simplePointCount").textContent = `${payload.stats.points} 点`;
-  show(qs("#simpleResult"));
-  setSimpleMessage("success", `已自动生成基础图：${file.name}`);
-}
-
-function setupModeEvents() {
-  const simpleInput = qs("#simpleFileInput");
-  const dropzone = qs("#simpleDropzone");
-
-  qs("#enterSimpleMode").addEventListener("click", () => {
-    showMode("simple");
-  });
-
-  qs("#enterAdvancedMode").addEventListener("click", () => {
-    showMode("advanced");
-  });
-
-  const navImport = qs('.nav-cta[href="#upload-section"]');
-  if (navImport) {
-    navImport.addEventListener("click", (event) => {
-      event.preventDefault();
-      showMode("advanced");
-    });
-  }
-
-  qsa("#simpleToAdvanced, #simpleToAdvancedTop").forEach((button) => {
-    button.addEventListener("click", () => {
-      showMode("advanced");
-      if (state.rawRows.length) {
-        showMessage("success", "已进入功能模式。可继续手动确认数据范围和绘图配置。");
-      }
-    });
-  });
-
-  qs("#simpleChooseFile").addEventListener("click", () => {
-    simpleInput.click();
-  });
-
-  simpleInput.addEventListener("change", async () => {
-    try {
-      await handleSimpleFile(simpleInput.files[0]);
-    } catch (error) {
-      setSimpleMessage("error", error.message);
-    }
-  });
-
-  ["dragenter", "dragover"].forEach((eventName) => {
-    dropzone.addEventListener(eventName, (event) => {
-      event.preventDefault();
-      dropzone.classList.add("is-dragging");
-    });
-  });
-
-  ["dragleave", "drop"].forEach((eventName) => {
-    dropzone.addEventListener(eventName, (event) => {
-      event.preventDefault();
-      dropzone.classList.remove("is-dragging");
-    });
-  });
-
-  dropzone.addEventListener("drop", async (event) => {
-    try {
-      await handleSimpleFile(event.dataTransfer.files[0]);
-    } catch (error) {
-      setSimpleMessage("error", error.message);
-    }
-  });
-}
-
 function setupEvents() {
+  qs("#pasteForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    clearMessage();
+
+    try {
+      const rows = parsePastedTable(qs("#pasteData").value);
+      setDataset(rows, "pasted-data.csv");
+      showMessage("success", "已读取粘贴数据。请检查表头和数据范围。");
+    } catch (error) {
+      showMessage("error", error.message);
+    }
+  });
+
   qs("#uploadForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     clearMessage();
@@ -558,14 +304,10 @@ function setupEvents() {
 document.addEventListener("DOMContentLoaded", async () => {
   renderStaticOptions();
   setupTheme();
-  setupModeEvents();
   setupEvents();
   const dependencyStatus = checkRequiredDependencies();
   updateWorkflowNav();
   if (!dependencyStatus.blocksSampleLoad) {
     await loadInitialSampleFromUrl();
-  }
-  if (!getInitialSampleUrl() && !dependencyStatus.blocksModeEntry) {
-    loadInitialModeFromUrl();
   }
 });

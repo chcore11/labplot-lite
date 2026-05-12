@@ -235,28 +235,6 @@ async function renderDownloads(payload) {
   setDownloadLink("#downloadZip", zipBlob, payload.filenames.zip);
 }
 
-async function renderSimpleDownloads(payload) {
-  revokeDownloadUrls();
-
-  const pngBlob = await renderedPlotToPngBlob("#simplePlotCanvas", payload);
-  const svgBlob = renderedPlotToSvgBlob("#simplePlotCanvas");
-  const originCsvBlob = new Blob(
-    ["\uFEFF", rowsToCsv(payload.originRows, payload.originColumns)],
-    { type: "text/csv;charset=utf-8" },
-  );
-  const reportText = buildFitReport(payload.stats, payload.plotTitle);
-  const reportBlob = new Blob([reportText], { type: "text/plain;charset=utf-8" });
-
-  setDownloadLink("#simpleDownloadPng", pngBlob, payload.filenames.png);
-  if (svgBlob && payload.filenames.svg) {
-    setDownloadLink("#simpleDownloadSvg", svgBlob, payload.filenames.svg);
-  } else {
-    clearDownloadLink("#simpleDownloadSvg");
-  }
-  setDownloadLink("#simpleDownloadCsv", originCsvBlob, payload.filenames.originCsv);
-  setDownloadLink("#simpleDownloadTxt", reportBlob, payload.filenames.fitReport);
-}
-
 function addSummaryRow(container, label, value, large = false) {
   container.appendChild(createValueItem(label, value, large ? "summary-row large" : "summary-row"));
 }

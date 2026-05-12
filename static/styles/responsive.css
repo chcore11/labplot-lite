@@ -10,7 +10,6 @@
   }
 
   .sample-chart-grid,
-  .mode-entry-grid,
   .workflow-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -32,7 +31,7 @@
   }
 
   .step-nav {
-    grid-template-columns: repeat(5, minmax(150px, 1fr));
+    grid-template-columns: repeat(4, minmax(150px, 1fr));
     grid-row: auto;
     overflow-x: auto;
     border-right: 0;
@@ -96,12 +95,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .mode-landing {
-    grid-template-columns: 1fr;
-  }
-
-  .mode-choice-grid,
-  .simple-result-meta,
   .upload-layout,
   .sample-guide,
   .result-side,
@@ -116,8 +109,7 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .sample-chart-grid,
-  .mode-entry-grid {
+  .sample-chart-grid {
     grid-template-columns: 1fr;
   }
 
@@ -215,50 +207,13 @@
   }
 
   .workflow-section,
-  .sample-gallery,
-  .mode-entry-section {
+  .sample-gallery {
     padding-top: 34px;
     margin-bottom: 58px;
   }
 
   .section-heading h2 {
     font-size: 26px;
-  }
-
-  .mode-landing,
-  .simple-mode {
-    width: calc(100% - 24px);
-  }
-
-  .mode-landing-copy,
-  .simple-mode {
-    padding: 18px;
-  }
-
-  .mode-landing h1,
-  .simple-mode h1 {
-    font-size: 25px;
-  }
-
-  .mode-choice-grid,
-  .simple-upload-dropzone,
-  .simple-meta-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .mode-choice-card {
-    min-height: 180px;
-    padding: 18px;
-  }
-
-  .simple-mode-head {
-    display: grid;
-  }
-
-  .simple-result-actions .btn,
-  .simple-result-actions button,
-  .simple-upload-dropzone .btn {
-    width: 100%;
   }
 
   .workbench {
