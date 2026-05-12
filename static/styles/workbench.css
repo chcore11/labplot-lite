@@ -254,9 +254,11 @@
 }
 
 .step-nav {
-  display: block;
+  display: flex;
+  inline-size: 100%;
   grid-column: 1;
-  padding: 16px 22px 12px;
+  min-block-size: 72px;
+  padding: 16px 22px 28px;
   border-bottom: 1px solid var(--line-soft);
   background: var(--surface-soft);
 }

@@ -214,11 +214,11 @@ const WORKFLOW_PANELS = {
 };
 
 const WORKFLOW_STATUS = {
-  upload: "等待导入数据",
-  range: "检查与描述数据",
-  calc: "可选加工数据",
-  plot: "编辑可视化",
-  result: "导出报告素材",
+  upload: "Upload Data",
+  range: "Check & Describe",
+  calc: "Check & Describe",
+  plot: "Visualize",
+  result: "Publish & Embed",
 };
 
 const EMPTY_RESULT_STATE = {
