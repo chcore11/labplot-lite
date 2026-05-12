@@ -49,18 +49,6 @@
   justify-self: end;
   width: 100%;
   min-width: 64px;
-  min-height: var(--control-height);
-  padding: 0 12px;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-sm);
-  color: var(--danger-text);
-  background: var(--surface);
-  font-weight: 700;
-}
-
-.curve-remove-button:hover:not(:disabled) {
-  border-color: var(--danger-border);
-  background: var(--danger-bg);
 }
 
 .plot-readiness {

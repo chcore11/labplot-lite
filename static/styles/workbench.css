@@ -63,94 +63,19 @@
 }
 
 .workflow-reset-button {
-  min-height: var(--control-height-sm);
-  padding: 0 12px;
-  font-size: 13px;
+  justify-self: end;
 }
 
 .step-nav {
-  display: grid;
+  display: block;
   grid-column: 1;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  align-content: start;
-  align-self: stretch;
-  gap: 1px;
-  padding: 10px;
+  padding: 16px 22px 12px;
   border-bottom: 1px solid var(--line-soft);
   background: var(--surface-soft);
 }
 
-.step-nav-item {
-  display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  gap: 10px;
-  align-items: center;
-  width: 100%;
-  min-height: 64px;
-  padding: 10px 12px;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
-  background: var(--surface);
-  text-align: left;
-}
-
-.step-nav-item:hover:not(:disabled) {
-  color: var(--text-main);
-  background: oklch(96% 0.018 255);
-}
-
-.step-nav-item.is-active {
-  color: var(--text-main);
-  background: var(--accent-soft);
-}
-
-.step-nav-item:disabled {
-  color: var(--text-muted);
-  background: transparent;
-}
-
-.step-index {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-sm);
-  color: var(--text-soft);
-  background: var(--surface);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.step-nav-item.is-active .step-index {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--button-primary-text);
-}
-
-.step-nav-item.is-complete:not(.is-active) .step-index {
-  color: var(--text-main);
-  border-color: var(--line-strong);
-}
-
-.step-nav-item span:last-child {
-  min-width: 0;
-}
-
-.step-nav-item strong {
-  display: block;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.step-nav-item small {
-  display: block;
-  margin-top: 3px;
-  color: var(--text-muted);
-  font-size: 11px;
-  line-height: 1.25;
+.step-nav cds-progress-step:not([disabled]) {
+  cursor: pointer;
 }
 
 .workbench-step-panel {

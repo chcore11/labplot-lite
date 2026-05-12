@@ -80,14 +80,14 @@ function renderSampleGuide() {
   actions.replaceChildren();
 
   (guide.calcActions || []).forEach((action, index) => {
-    actions.appendChild(createButton(action.label, "btn btn-secondary", {
+    actions.appendChild(createButton(action.label, "carbon-tertiary", {
       sampleAction: "calc",
       sampleActionIndex: index,
     }));
   });
 
   (guide.plotActions || []).forEach((action, index) => {
-    actions.appendChild(createButton(action.label, index === 0 ? "btn btn-primary" : "btn btn-secondary", {
+    actions.appendChild(createButton(action.label, index === 0 ? "carbon-primary" : "carbon-tertiary", {
       sampleAction: "plot",
       sampleActionIndex: index,
     }));

@@ -74,6 +74,27 @@
   --info-bg: oklch(96% 0.03 255);
   --info-border: var(--accent-border);
   --info-text: oklch(34% 0.095 255);
+
+  --cds-background: var(--surface);
+  --cds-layer: var(--surface-soft);
+  --cds-layer-hover: var(--surface-hover);
+  --cds-layer-active: var(--surface-active);
+  --cds-field: var(--input-bg);
+  --cds-border-subtle: var(--line-soft);
+  --cds-border-strong: var(--line-strong);
+  --cds-focus: var(--accent);
+  --cds-interactive: var(--accent);
+  --cds-link-primary: var(--accent);
+  --cds-button-primary: var(--accent);
+  --cds-button-primary-hover: var(--accent-strong);
+  --cds-button-primary-active: var(--accent-strong);
+  --cds-button-tertiary: var(--accent);
+  --cds-button-tertiary-hover: var(--accent-soft);
+  --cds-button-danger-secondary: var(--danger-text);
+  --cds-text-primary: var(--text-main);
+  --cds-text-secondary: var(--text-soft);
+  --cds-text-helper: var(--text-muted);
+  --cds-text-on-color: var(--button-primary-text);
 }
 
 *,
@@ -109,7 +130,8 @@ body,
 .panel,
 .form-card,
 .workbench,
-.step-nav-item,
+cds-button,
+cds-progress-step,
 .sample-list button,
 .sample-list a,
 .download-panel a,
@@ -127,7 +149,8 @@ a {
 
 button,
 input,
-select {
+select,
+cds-button {
   font: inherit;
 }
 

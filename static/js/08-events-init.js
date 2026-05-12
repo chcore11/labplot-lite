@@ -49,7 +49,7 @@ function checkRequiredDependencies() {
 
   if (missingKeys.has("chart")) {
     qsa(
-      "#pasteForm button[type='submit'], #uploadForm button[type='submit'], .sample-load-button, #plotSubmitButton",
+      "#pasteForm [type='submit'], #uploadForm [type='submit'], .sample-load-button, #plotSubmitButton",
     ).forEach(disableControl);
   }
 
@@ -150,6 +150,15 @@ function setupTheme() {
 }
 
 function setupEvents() {
+  qsa("form cds-button[type='submit']").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (!button.disabled) {
+        button.closest("form")?.requestSubmit();
+      }
+    });
+  });
+
   qs("#pasteForm").addEventListener("submit", (event) => {
     event.preventDefault();
     clearMessage();
@@ -264,6 +273,15 @@ function setupEvents() {
       }
     });
   });
+
+  if (window.matchMedia) {
+    const mobileWorkflow = window.matchMedia("(max-width: 640px)");
+    if (mobileWorkflow.addEventListener) {
+      mobileWorkflow.addEventListener("change", updateWorkflowNav);
+    } else if (mobileWorkflow.addListener) {
+      mobileWorkflow.addListener(updateWorkflowNav);
+    }
+  }
 
   const resetButton = qs("#resetWorkflowButton");
   if (resetButton) {

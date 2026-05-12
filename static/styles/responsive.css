@@ -31,21 +31,10 @@
   }
 
   .step-nav {
-    grid-template-columns: repeat(4, minmax(150px, 1fr));
     grid-row: auto;
     overflow-x: auto;
     border-right: 0;
     border-bottom: 1px solid var(--line-soft);
-  }
-
-  .step-nav-item {
-    min-height: 52px;
-    border-right: 1px solid var(--line-soft);
-    border-bottom: 0;
-  }
-
-  .step-nav-item:last-child {
-    border-right: 0;
   }
 
   .plot-config-layout,
@@ -168,7 +157,7 @@
   }
 
   .hero-actions,
-  .hero-actions .btn {
+  .hero-actions cds-button {
     width: 100%;
   }
 
@@ -243,38 +232,8 @@
   }
 
   .step-nav {
-    display: flex;
-    overflow: visible;
-  }
-
-  .step-nav-item {
-    flex: 1 1 0;
-    grid-template-columns: 1fr;
-    justify-items: center;
-    gap: 5px;
-    min-width: 0;
-    min-height: 58px;
-    padding: 8px 3px;
-    border-right: 1px solid var(--line-soft);
-  }
-
-  .step-nav-item span:last-child {
-    display: grid;
-    justify-items: center;
-    width: 100%;
-  }
-
-  .step-nav-item strong {
-    max-width: 100%;
-    overflow: hidden;
-    font-size: 12px;
-    line-height: 1.2;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .step-nav-item small {
-    display: none;
+    overflow-x: auto;
+    padding: 14px 16px 10px;
   }
 
   .step-head {
@@ -310,7 +269,7 @@
   }
 
   .plot-generate-row,
-  .sample-guide-actions .btn,
+  .sample-guide-actions cds-button,
   #plotSubmitButton {
     width: 100%;
   }

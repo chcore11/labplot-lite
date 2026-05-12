@@ -6,6 +6,8 @@
   <link rel="icon" href="./static/logo_dark.png" type="image/png">
   <title>LabPlot Lite 工作台</title>
   <script src="./static/theme.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/button.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/progress-indicator.min.js"></script>
   <link rel="stylesheet" href="./static/style.css">
   <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script defer src="https://cdn.plot.ly/plotly-3.4.0.min.js"></script>
@@ -49,28 +51,16 @@
               <span>当前步骤</span>
               <strong id="workflowStatusText">等待导入数据</strong>
             </div>
-            <button type="button" class="btn btn-ghost workflow-reset-button is-hidden" id="resetWorkflowButton" disabled>重新开始</button>
+            <cds-button type="button" kind="ghost" size="sm" class="workflow-reset-button is-hidden" id="resetWorkflowButton" disabled>重新开始</cds-button>
           </div>
         </div>
 
-        <nav class="step-nav" aria-label="工作台步骤">
-          <button type="button" class="step-nav-item is-active" data-step-target="upload" aria-controls="step-upload" aria-current="step">
-            <span class="step-index">1</span>
-            <span><strong>Upload Data</strong><small>粘贴、上传或示例</small></span>
-          </button>
-          <button type="button" class="step-nav-item" data-step-target="range" aria-controls="previewSection" disabled>
-            <span class="step-index">2</span>
-            <span><strong>Check & Describe</strong><small>表头、数据行、可选加工</small></span>
-          </button>
-          <button type="button" class="step-nav-item" data-step-target="plot" aria-controls="plotSection" disabled>
-            <span class="step-index">3</span>
-            <span><strong>Visualize</strong><small>坐标轴、曲线、拟合</small></span>
-          </button>
-          <button type="button" class="step-nav-item" data-step-target="result" aria-controls="resultSection" disabled>
-            <span class="step-index">4</span>
-            <span><strong>Export</strong><small>检查并下载素材</small></span>
-          </button>
-        </nav>
+        <cds-progress-indicator class="step-nav" aria-label="工作台步骤">
+          <cds-progress-step label-text="Upload Data" secondary-label-text="粘贴、上传或示例" data-step-target="upload" aria-controls="step-upload" state="current"></cds-progress-step>
+          <cds-progress-step label-text="Check & Describe" secondary-label-text="表头、数据行、可选加工" data-step-target="range" aria-controls="previewSection" state="incomplete" disabled></cds-progress-step>
+          <cds-progress-step label-text="Visualize" secondary-label-text="坐标轴、曲线、拟合" data-step-target="plot" aria-controls="plotSection" state="incomplete" disabled></cds-progress-step>
+          <cds-progress-step label-text="Export" secondary-label-text="检查并下载素材" data-step-target="result" aria-controls="resultSection" state="incomplete" disabled></cds-progress-step>
+        </cds-progress-indicator>
 
         <section id="statusMessage" class="message is-hidden" role="status" aria-live="polite"></section>
 
@@ -103,7 +93,7 @@
                 placeholder="从 Excel、Numbers 或表格网页复制数据，粘贴到这里..."
               ></textarea>
               <p class="hint">支持制表符分隔和 CSV。第一行通常作为列名。</p>
-              <button type="submit" class="btn btn-primary form-button">使用粘贴数据</button>
+              <cds-button type="submit" kind="primary" class="form-button">使用粘贴数据</cds-button>
             </form>
 
             <form id="uploadForm" class="form-card upload-card">
@@ -114,7 +104,7 @@
                 文件前几行有实验名称、姓名、日期也没关系。下一步可以指定真正的表头行。
               </p>
 
-              <button type="submit" class="btn btn-primary form-button">上传并预览</button>
+              <cds-button type="submit" kind="primary" class="form-button">上传并预览</cds-button>
             </form>
 
             <div class="sample-card inline-samples">
@@ -201,7 +191,7 @@
               例如第 5 行是 <code>voltage,current</code>，第 6 行开始是数字数据，就填写 5 和 6。
             </p>
 
-            <button type="submit" class="btn btn-primary form-button">确认数据范围</button>
+            <cds-button type="submit" kind="primary" class="form-button">确认数据范围</cds-button>
           </form>
 
           <div id="calcSection" class="advanced-box calc-card is-hidden">
@@ -253,8 +243,8 @@
               </p>
 
               <div class="form-actions">
-                <button type="submit" class="btn btn-primary form-button">生成新计算列</button>
-                <button type="button" class="btn btn-secondary" data-step-target="plot">跳到配置图像</button>
+                <cds-button type="submit" kind="primary" class="form-button">生成新计算列</cds-button>
+                <cds-button type="button" kind="tertiary" data-step-target="plot">跳到配置图像</cds-button>
               </div>
             </form>
           </div>
@@ -296,7 +286,7 @@
                 <div class="section-label">曲线配置</div>
 
                 <div class="curve-config-box" id="curveConfigBox"></div>
-                <button type="button" class="btn btn-secondary curve-add-button" id="addCurveButton">添加一条曲线</button>
+                <cds-button type="button" kind="tertiary" class="curve-add-button" id="addCurveButton">添加一条曲线</cds-button>
               </div>
 
               <div id="plotReadinessBox" class="plot-readiness" aria-live="polite">
@@ -392,7 +382,7 @@
             </details>
 
             <div class="plot-generate-row">
-              <button type="submit" class="btn btn-primary form-button" id="plotSubmitButton">生成图像与拟合结果</button>
+              <cds-button type="submit" kind="primary" class="form-button" id="plotSubmitButton">生成图像与拟合结果</cds-button>
               <div id="plotProgress" class="plot-progress is-hidden" role="status" aria-live="polite">
                 <span class="plot-progress-dot"></span>
                 <span id="plotProgressText">准备生成</span>

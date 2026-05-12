@@ -80,12 +80,28 @@ function createElement(tag, options = {}) {
 }
 
 function createButton(label, className, dataset = {}, attributes = {}) {
-  return createElement("button", {
-    attributes: { type: "button", ...attributes },
+  return createElement("cds-button", {
+    attributes: {
+      kind: getCarbonButtonKind(className),
+      size: getCarbonButtonSize(className),
+      type: "button",
+      ...attributes,
+    },
     className,
     dataset,
     textContent: label,
   });
+}
+
+function getCarbonButtonKind(className = "") {
+  if (className.includes("carbon-primary")) return "primary";
+  if (className.includes("carbon-tertiary")) return "tertiary";
+  if (className.includes("curve-remove-button")) return "danger-tertiary";
+  return "ghost";
+}
+
+function getCarbonButtonSize(className = "") {
+  return className.includes("curve-remove-button") ? "md" : "sm";
 }
 
 function createLabeledControl(labelText, control) {
@@ -140,6 +156,8 @@ function updateWorkflowNav() {
     return;
   }
 
+  syncWorkflowNavLayout();
+
   if (!isWorkflowStepAvailable(state.activeStep)) {
     state.activeStep = getLastAvailableWorkflowStep();
   }
@@ -154,20 +172,21 @@ function updateWorkflowNav() {
 
   const activeIndex = WORKFLOW_STEPS.indexOf(state.activeStep);
   const activeNavStep = state.activeStep === "calc" ? "range" : state.activeStep;
-  qsa(".step-nav-item[data-step-target]").forEach((button) => {
-    const step = button.dataset.stepTarget;
+  qsa(".step-nav [data-step-target]").forEach((navItem) => {
+    const step = navItem.dataset.stepTarget;
     const stepIndex = WORKFLOW_STEPS.indexOf(step);
     const available = isWorkflowStepAvailable(step);
     const isActive = step === activeNavStep;
 
-    button.disabled = !available;
-    button.classList.toggle("is-active", isActive);
-    button.classList.toggle("is-complete", !isActive && available && stepIndex >= 0 && stepIndex < activeIndex);
+    navItem.disabled = !available;
+    navItem.classList.toggle("is-active", isActive);
+    navItem.classList.toggle("is-complete", !isActive && available && stepIndex >= 0 && stepIndex < activeIndex);
+    navItem.setAttribute("state", isActive ? "current" : (available && stepIndex >= 0 && stepIndex < activeIndex ? "complete" : "incomplete"));
 
     if (isActive) {
-      button.setAttribute("aria-current", "step");
+      navItem.setAttribute("aria-current", "step");
     } else {
-      button.removeAttribute("aria-current");
+      navItem.removeAttribute("aria-current");
     }
   });
 
@@ -177,6 +196,21 @@ function updateWorkflowNav() {
   }
 
   updateWorkflowActions();
+}
+
+function syncWorkflowNavLayout() {
+  const nav = qs(".step-nav");
+  if (!nav || !window.matchMedia) {
+    return;
+  }
+
+  const vertical = window.matchMedia("(max-width: 640px)").matches;
+  nav.vertical = vertical;
+  nav.toggleAttribute("vertical", vertical);
+  qsa(".step-nav cds-progress-step").forEach((step) => {
+    step.vertical = vertical;
+    step.toggleAttribute("vertical", vertical);
+  });
 }
 
 function updateWorkflowActions() {
