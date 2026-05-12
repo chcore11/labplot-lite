@@ -216,28 +216,8 @@ function loadSimpleRows(rows, fileName) {
   return guess;
 }
 
-async function handleSimpleFile(file) {
-  clearSimpleMessage();
-
-  if (!file) {
-    throw new Error("请先选择 CSV / Excel 文件。");
-  }
-  if (file.size > 5 * 1024 * 1024) {
-    throw new Error("建议单个文件不超过 5MB。");
-  }
-
-  setSimpleMessage("info", "正在准备文件解析和绘图环境...");
-  const parserReady = fileNeedsSpreadsheetLibrary(file.name)
-    ? ensureExternalLibrary("xlsx")
-    : Promise.resolve();
-  const plotReady = ensureExternalLibrary("plotly");
-  await nextFrame();
-  await parserReady;
-
-  setSimpleMessage("info", "正在读取文件并识别绘图列...");
-  const rows = await parseFile(file);
-  loadSimpleRows(rows, file.name);
-  const { xCol, yCol } = chooseSimpleXYColumns();
+async function renderSimplePlotFromColumns(xCol, yCol, successMessage = "", options = {}) {
+  const plotReady = options.plotReady || ensureExternalLibrary("plotly");
 
   setSelectIfExists("#xCol", xCol);
   setSelectIfExists("#chartType", "line_marker");
@@ -273,7 +253,51 @@ async function handleSimpleFile(file) {
   setText("#simpleYCol", yCol);
   setText("#simplePointCount", `${payload.stats.points} 点`);
   show(qs("#simpleResult"));
-  setSimpleMessage("success", `已自动生成基础图：${file.name}`);
+
+  if (successMessage) {
+    setSimpleMessage("success", successMessage);
+  }
+}
+
+async function handleSimpleFile(file) {
+  clearSimpleMessage();
+
+  if (!file) {
+    throw new Error("请先选择 CSV / Excel 文件。");
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error("建议单个文件不超过 5MB。");
+  }
+
+  setSimpleMessage("info", "正在准备文件解析和绘图环境...");
+  const parserReady = fileNeedsSpreadsheetLibrary(file.name)
+    ? ensureExternalLibrary("xlsx")
+    : Promise.resolve();
+  const plotReady = ensureExternalLibrary("plotly");
+  await nextFrame();
+  await parserReady;
+
+  setSimpleMessage("info", "正在读取文件并识别绘图列...");
+  const rows = await parseFile(file);
+  loadSimpleRows(rows, file.name);
+  const { xCol, yCol } = chooseSimpleXYColumns();
+
+  await renderSimplePlotFromColumns(xCol, yCol, `已自动生成基础图：${file.name}`, { plotReady });
+}
+
+async function swapSimpleAxes() {
+  const payload = state.simplePlotPayload;
+  if (!payload?.stats?.x_col || !payload?.stats?.y_col) {
+    throw new Error("请先在简易模式生成基础图，再交换 X/Y 轴。");
+  }
+
+  const nextXCol = payload.stats.y_col;
+  const nextYCol = payload.stats.x_col;
+  if (!state.numericColumns.includes(nextXCol) || !state.numericColumns.includes(nextYCol)) {
+    throw new Error("当前数据列无法交换，请进入功能模式手动调整。");
+  }
+
+  await renderSimplePlotFromColumns(nextXCol, nextYCol, "已交换 X/Y 轴，并更新 PNG 下载。");
 }
 
 function setupModeEvents() {
@@ -297,6 +321,14 @@ function setupModeEvents() {
 
   simpleFileButton?.addEventListener("cds-file-uploader-button-changed", handleSimpleFileChange);
   simpleFileButton?.addEventListener("change", handleSimpleFileChange);
+
+  qs("#simpleSwapAxes")?.addEventListener("click", async () => {
+    try {
+      await swapSimpleAxes();
+    } catch (error) {
+      setSimpleMessage("error", error.message);
+    }
+  });
 }
 
 function setupTheme() {
