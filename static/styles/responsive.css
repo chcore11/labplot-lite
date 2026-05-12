@@ -85,7 +85,10 @@
   }
 
   .upload-layout,
+  .mode-landing,
+  .mode-choice-grid,
   .sample-guide,
+  .simple-result-meta,
   .result-side,
   .stats,
   .form-grid,
@@ -202,6 +205,40 @@
   .workbench {
     width: calc(100% - 24px);
     margin-top: 16px;
+  }
+
+  .mode-landing,
+  .simple-mode {
+    width: calc(100% - 24px);
+    margin-top: 16px;
+    margin-bottom: 58px;
+  }
+
+  .mode-landing-copy,
+  .simple-mode {
+    padding: 18px;
+  }
+
+  .mode-landing h1,
+  .simple-mode h1 {
+    font-size: 28px;
+  }
+
+  .mode-choice-card {
+    min-height: 170px;
+  }
+
+  .simple-mode-head,
+  .simple-upload-dropzone {
+    display: grid;
+  }
+
+  .simple-upload-dropzone {
+    grid-template-columns: 1fr;
+  }
+
+  .simple-meta-grid {
+    grid-template-columns: 1fr;
   }
 
   .workbench-head,

@@ -290,6 +290,12 @@ async function renderDownloads(payload) {
   setDownloadLink("#downloadZip", zipBlob, payload.filenames.zip);
 }
 
+async function renderSimpleDownloads(payload) {
+  revokeDownloadUrls();
+  const pngBlob = await renderedPlotToPngBlob("#simplePlotCanvas", payload);
+  setDownloadLink("#simpleDownloadPng", pngBlob, payload.filenames.png);
+}
+
 function addSummaryRow(container, label, value, large = false) {
   container.appendChild(createValueItem(label, value, large ? "summary-row large" : "summary-row"));
 }

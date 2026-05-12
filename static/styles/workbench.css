@@ -1,3 +1,232 @@
+#advancedMode {
+  width: 100%;
+}
+
+.mode-landing,
+.simple-mode {
+  width: min(1180px, calc(100% - 40px));
+  margin: 28px auto 82px;
+}
+
+.mode-landing.is-hidden,
+.simple-mode.is-hidden,
+.simple-result.is-hidden,
+#advancedMode.is-hidden {
+  display: none;
+}
+
+.mode-landing {
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(420px, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.mode-landing-copy,
+.simple-mode {
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-md);
+}
+
+.mode-landing-copy {
+  display: grid;
+  align-content: center;
+  gap: 14px;
+  padding: 30px;
+}
+
+.mode-landing h1,
+.simple-mode h1 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 32px;
+  line-height: 1.16;
+  font-weight: 700;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.mode-landing p,
+.simple-mode p {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 15px;
+  line-height: 1.62;
+}
+
+.mode-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.mode-choice-card {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 12px;
+  width: 100%;
+  min-height: 230px;
+  padding: 24px;
+  text-align: left;
+}
+
+.mode-choice-card span {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.mode-choice-card strong {
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.mode-choice-card small {
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.simple-mode {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+}
+
+.simple-mode > .message {
+  margin: 0;
+}
+
+.simple-mode-head {
+  display: flex;
+  gap: 18px;
+  align-items: start;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.simple-upload-dropzone {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  min-height: 174px;
+  padding: 24px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
+}
+
+.simple-upload-dropzone,
+.simple-upload-copy,
+.simple-upload-copy strong,
+.simple-upload-copy span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.simple-upload-dropzone.is-dragging {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.simple-upload-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.simple-upload-copy strong {
+  color: var(--text-main);
+  font-size: 21px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.simple-upload-copy span {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.simple-result {
+  display: grid;
+  gap: 16px;
+  padding-top: 4px;
+}
+
+.simple-result-meta {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(360px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.simple-result-meta h2 {
+  margin: 4px 0 0;
+  color: var(--text-main);
+  font-size: 20px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.simple-result-meta span,
+.simple-meta-grid span {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.simple-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  background: var(--line-soft);
+}
+
+.simple-meta-grid div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 12px;
+  background: var(--surface);
+}
+
+.simple-meta-grid strong {
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.simple-plot-wrap {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+}
+
+.simple-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
 .workbench {
   overflow: hidden;
   width: min(1180px, calc(100% - 40px));

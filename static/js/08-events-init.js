@@ -103,6 +103,12 @@ function getInitialSampleUrl() {
   return `./samples/${fileName}`;
 }
 
+function getInitialMode() {
+  const params = new URLSearchParams(window.location.search);
+  const mode = params.get("mode");
+  return mode === "simple" || mode === "advanced" ? mode : "";
+}
+
 async function loadInitialSampleFromUrl() {
   const sampleUrl = getInitialSampleUrl();
   if (!sampleUrl) {
@@ -111,6 +117,7 @@ async function loadInitialSampleFromUrl() {
 
   clearMessage();
   try {
+    showMode("advanced", { skipScroll: true });
     await loadSample(sampleUrl);
     window.history.replaceState(null, "", window.location.pathname);
   } catch (error) {
@@ -143,14 +150,14 @@ function getFileFromUploaderButton(uploaderButton) {
   return getFirstFileFromFileList(input?.files);
 }
 
-function getFileFromUploadEvent(event) {
+function getFileFromUploadEvent(event, uploaderButton = qs("#dataFile")) {
   const detail = event?.detail || {};
   return (
     getFirstFileFromFileList(detail.addedFiles) ||
     getFirstFileFromFileList(detail.files) ||
     getFirstFileFromFileList(detail.selectedFiles) ||
     getFirstFileFromFileList(event?.target?.files) ||
-    getFileFromUploaderButton(qs("#dataFile"))
+    getFileFromUploaderButton(uploaderButton)
   );
 }
 
@@ -159,9 +166,206 @@ function syncPendingUploadFile(file) {
   setText("#selectedFileHint", file ? `已选择：${file.name}` : "尚未选择文件。");
 }
 
+function showMode(mode, options = {}) {
+  const sections = {
+    landing: qs("#modeLanding"),
+    simple: qs("#simpleMode"),
+    advanced: qs("#advancedMode"),
+  };
+  const target = sections[mode] || sections.landing;
+
+  Object.values(sections).forEach((section) => {
+    if (section) {
+      section.classList.toggle("is-hidden", section !== target);
+    }
+  });
+
+  if (mode === "advanced") {
+    updateWorkflowNav();
+  }
+
+  if (!options.skipScroll) {
+    scrollToElement(target);
+  }
+}
+
+function loadInitialModeFromUrl() {
+  const mode = getInitialMode();
+  if (!mode) {
+    return;
+  }
+
+  showMode(mode, { skipScroll: true });
+  window.history.replaceState(null, "", window.location.pathname);
+}
+
+function setSimpleMessage(type, text) {
+  renderNotification(qs("#simpleMessage"), type, text, "简易模式");
+}
+
+function clearSimpleMessage() {
+  clearNotification(qs("#simpleMessage"));
+}
+
+function isLikelyXColumn(column) {
+  const text = cellText(column).toLowerCase();
+  const compact = text.replace(/[\s_-]+/g, "");
+  return (
+    text.includes("time") ||
+    text.includes("时间") ||
+    compact === "t" ||
+    compact === "x" ||
+    compact.startsWith("t") ||
+    compact.startsWith("x")
+  );
+}
+
+function chooseSimpleXYColumns() {
+  if (state.numericColumns.length < 2) {
+    throw new Error("无法自动识别 X/Y，请进入功能模式手动选择。");
+  }
+
+  const xCol = state.numericColumns.find(isLikelyXColumn) || state.numericColumns[0];
+  const yCol = state.numericColumns.find((column) => column !== xCol);
+  if (!yCol) {
+    throw new Error("无法自动识别 X/Y，请进入功能模式手动选择。");
+  }
+
+  return { xCol, yCol };
+}
+
+function loadSimpleRows(rows, fileName) {
+  state.fileName = fileName;
+  state.sampleGuide = null;
+  state.rawRows = rows.map((row) => Array.isArray(row) ? row.map(cellText) : []);
+
+  if (!state.rawRows.length) {
+    throw new Error("文件中没有可读取的数据。");
+  }
+
+  const guess = guessHeaderAndDataRows(state.rawRows);
+  qs("#currentFileName").textContent = fileName;
+  qs("#headerGuessMessage").textContent = guess.message;
+  setControlValue("#headerRow", String(guess.headerRow));
+  setControlValue("#dataStartRow", String(guess.dataStartRow));
+  setControlValue("#dataEndRow", "");
+
+  renderPreview();
+  show(qs("#previewSection"));
+  reloadDataFromRange(false);
+  state.activeStep = "range";
+  updateWorkflowNav();
+
+  return guess;
+}
+
+async function handleSimpleFile(file) {
+  clearSimpleMessage();
+
+  if (!file) {
+    throw new Error("请先选择 CSV / Excel 文件。");
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error("建议单个文件不超过 5MB。");
+  }
+
+  setSimpleMessage("info", "正在读取文件并识别绘图列...");
+  const rows = await parseFile(file);
+  const headerGuess = loadSimpleRows(rows, file.name);
+  const { xCol, yCol } = chooseSimpleXYColumns();
+
+  setSelectIfExists("#xCol", xCol);
+  setSelectIfExists("#chartType", "line_marker");
+  setSelectIfExists("#fitType", "none");
+  renderCurveRows([{
+    yCol,
+    color: DEFAULT_CURVE_COLORS[0],
+    lineWidth: 1.8,
+    lineStyle: "solid",
+  }]);
+  updatePlotReadiness();
+
+  const payload = buildSimplePlotPayload({ xCol, yCol, headerGuess });
+  state.simplePlotPayload = payload;
+  state.lastPlotPayload = payload;
+  await renderChart(payload, "#simplePlotCanvas");
+  await renderSimpleDownloads(payload);
+
+  setText("#simpleXCol", xCol);
+  setText("#simpleYCol", yCol);
+  setText("#simplePointCount", `${payload.stats.points} 点`);
+  show(qs("#simpleResult"));
+  setSimpleMessage("success", `已自动生成基础图：${file.name}`);
+}
+
+function setupModeEvents() {
+  qs("#enterSimpleMode")?.addEventListener("click", () => {
+    showMode("simple");
+  });
+
+  qs("#enterAdvancedMode")?.addEventListener("click", () => {
+    showMode("advanced");
+  });
+
+  qsa("#simpleToAdvanced, #simpleToAdvancedTop").forEach((button) => {
+    button.addEventListener("click", () => {
+      showMode("advanced");
+      if (state.rawRows.length) {
+        showMessage("success", "已进入功能模式。可继续手动确认数据范围和绘图配置。");
+      }
+    });
+  });
+
+  const simpleFileButton = qs("#simpleFileInput");
+  const dropzone = qs("#simpleDropzone");
+  const handleSimpleFileChange = async (event) => {
+    try {
+      await handleSimpleFile(getFileFromUploadEvent(event, simpleFileButton));
+    } catch (error) {
+      setSimpleMessage("error", error.message);
+    }
+  };
+
+  simpleFileButton?.addEventListener("cds-file-uploader-button-changed", handleSimpleFileChange);
+  simpleFileButton?.addEventListener("change", handleSimpleFileChange);
+
+  ["dragenter", "dragover"].forEach((eventName) => {
+    dropzone?.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      dropzone.classList.add("is-dragging");
+    });
+  });
+
+  ["dragleave", "drop"].forEach((eventName) => {
+    dropzone?.addEventListener(eventName, (event) => {
+      event.preventDefault();
+      dropzone.classList.remove("is-dragging");
+    });
+  });
+
+  dropzone?.addEventListener("drop", async (event) => {
+    try {
+      await handleSimpleFile(event.dataTransfer?.files?.[0] || null);
+    } catch (error) {
+      setSimpleMessage("error", error.message);
+    }
+  });
+}
+
 function setupTheme() {
   async function refreshRenderedResult() {
     try {
+      if (
+        state.simplePlotPayload &&
+        qs("#simpleMode") &&
+        !qs("#simpleMode").classList.contains("is-hidden") &&
+        !qs("#simpleResult").classList.contains("is-hidden")
+      ) {
+        await renderChart(state.simplePlotPayload, "#simplePlotCanvas");
+        await renderSimpleDownloads(state.simplePlotPayload);
+        return;
+      }
+
       if (!state.lastPlotPayload || qs("#resultSection").classList.contains("is-hidden")) {
         return;
       }
@@ -208,7 +412,7 @@ function setupEvents() {
   const uploadForm = qs("#uploadForm");
   const dataFileButton = qs("#dataFile");
   const handleUploadFileChange = (event) => {
-    syncPendingUploadFile(getFileFromUploadEvent(event));
+    syncPendingUploadFile(getFileFromUploadEvent(event, dataFileButton));
   };
   dataFileButton?.addEventListener("cds-file-uploader-button-changed", handleUploadFileChange);
   dataFileButton?.addEventListener("change", handleUploadFileChange);
@@ -361,10 +565,14 @@ function setupEvents() {
 document.addEventListener("DOMContentLoaded", async () => {
   renderStaticOptions();
   setupTheme();
+  setupModeEvents();
   setupEvents();
   const dependencyStatus = checkRequiredDependencies();
   updateWorkflowNav();
   if (!dependencyStatus.blocksSampleLoad) {
     await loadInitialSampleFromUrl();
+  }
+  if (!getInitialSampleUrl()) {
+    loadInitialModeFromUrl();
   }
 });

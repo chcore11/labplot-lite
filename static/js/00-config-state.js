@@ -196,6 +196,7 @@ const state = {
   data: [],
   numericColumns: [],
   lastPlotPayload: null,
+  simplePlotPayload: null,
   isPlotGenerating: false,
   activeStep: "upload",
   objectUrls: [],

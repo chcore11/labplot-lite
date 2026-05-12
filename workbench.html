@@ -49,6 +49,77 @@
 
     <cds-actionable-notification id="dependencyMessage" class="message is-hidden" kind="error" title="依赖未加载" hide-close-button low-contrast inline role="alert"></cds-actionable-notification>
 
+    <section class="mode-landing" id="modeLanding" aria-labelledby="modeLandingTitle">
+      <div class="mode-landing-copy">
+        <span class="section-kicker">LabPlot Lite 工作台</span>
+        <h1 id="modeLandingTitle">先走最短路径，需要时再展开功能</h1>
+        <p>简易模式只需要拖入文件并下载 PNG；功能模式保留表头范围、计算列、多曲线、拟合和素材包导出。</p>
+      </div>
+
+      <div class="mode-choice-grid" aria-label="工作模式">
+        <cds-button type="button" kind="tertiary" class="mode-choice-card" id="enterSimpleMode">
+          <span>简易模式</span>
+          <strong>拖入文件，直接生图</strong>
+          <small>自动识别表头和 X/Y 数值列，默认散点连线，适合快速得到一张报告图。</small>
+        </cds-button>
+
+        <cds-button type="button" kind="tertiary" class="mode-choice-card" id="enterAdvancedMode">
+          <span>功能模式</span>
+          <strong>进入完整工作台</strong>
+          <small>手动确认数据范围，配置多曲线、计算列、拟合指标和报告素材。</small>
+        </cds-button>
+      </div>
+    </section>
+
+    <section class="simple-mode is-hidden" id="simpleMode" aria-labelledby="simpleModeTitle">
+      <div class="simple-mode-head">
+        <div>
+          <span class="section-kicker">简易模式</span>
+          <h1 id="simpleModeTitle">把 Excel / CSV 拖到这里，生成基础图</h1>
+          <p>系统自动选择一组 X/Y，默认散点连线，不做自动拟合。</p>
+        </div>
+        <cds-button type="button" kind="tertiary" size="sm" id="simpleToAdvancedTop">进入功能模式</cds-button>
+      </div>
+
+      <div class="simple-upload-dropzone" id="simpleDropzone">
+        <div class="simple-upload-copy">
+          <strong>拖拽 CSV / XLSX / XLS 文件到这里</strong>
+          <span>也可以点击选择文件。页面只在浏览器本地读取数据，不上传到服务器。</span>
+        </div>
+        <cds-file-uploader-button
+          id="simpleFileInput"
+          accept=".csv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          button-kind="primary"
+        >选择文件</cds-file-uploader-button>
+      </div>
+
+      <cds-actionable-notification id="simpleMessage" class="message is-hidden" kind="info" title="简易模式" hide-close-button low-contrast inline role="status" aria-live="polite"></cds-actionable-notification>
+
+      <section class="simple-result is-hidden" id="simpleResult" aria-labelledby="simpleResultTitle">
+        <div class="simple-result-meta">
+          <div>
+            <span>识别结果</span>
+            <h2 id="simpleResultTitle">基础图已生成</h2>
+          </div>
+          <div class="simple-meta-grid">
+            <div><span>X 列</span><strong id="simpleXCol">待识别</strong></div>
+            <div><span>Y 列</span><strong id="simpleYCol">待识别</strong></div>
+            <div><span>有效点数</span><strong id="simplePointCount">待生成</strong></div>
+          </div>
+        </div>
+
+        <div class="simple-plot-wrap">
+          <div id="simplePlotCanvas" class="plot plot-viewport" role="img" aria-label="简易模式 X-Y 图"></div>
+        </div>
+
+        <div class="simple-result-actions">
+          <cds-button id="simpleDownloadPng" href="#" kind="primary">下载 PNG</cds-button>
+          <cds-button type="button" kind="tertiary" id="simpleToAdvanced">进入功能模式手动调整</cds-button>
+        </div>
+      </section>
+    </section>
+
+    <div id="advancedMode" class="is-hidden">
     <section class="workbench" id="upload-section">
       <div class="workbench-main">
         <div class="workbench-head">
@@ -418,6 +489,7 @@
         </section>
       </div>
     </section>
+    </div>
   </main>
 </body>
 </html>

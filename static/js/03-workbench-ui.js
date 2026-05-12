@@ -318,6 +318,7 @@ function resetWorkflow() {
   state.numericColumns = [];
   state.pendingUploadFile = null;
   state.lastPlotPayload = null;
+  state.simplePlotPayload = null;
   state.isPlotGenerating = false;
   state.activeStep = "upload";
   state.sampleGuide = null;
@@ -345,6 +346,12 @@ function resetWorkflow() {
   qs("#summaryRows").replaceChildren();
   qs("#statsGrid").replaceChildren();
   resetResultFigure();
+  hide(qs("#simpleResult"));
+  clearNotification(qs("#simpleMessage"));
+  setText("#simpleXCol", "待识别");
+  setText("#simpleYCol", "待识别");
+  setText("#simplePointCount", "待生成");
+  clearDownloadLink("#simpleDownloadPng");
 
   qsa(".download-panel [href]").forEach((link) => {
     link.removeAttribute("download");
