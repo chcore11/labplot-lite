@@ -4,6 +4,8 @@ const CHART_TYPES = {
   line: "折线图",
   scatter: "散点图",
   line_marker: "散点 + 连线",
+  area: "面积图",
+  bar: "柱状图",
 };
 
 const CALC_TEMPLATES = {

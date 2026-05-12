@@ -124,6 +124,17 @@ function getRenderedPlotlyGraph(target) {
   return target._labPlotGraphDiv || target.querySelector(".js-plotly-plot");
 }
 
+function getRenderedPlotlySize(target, payload) {
+  const outputSize = getPlotPixelSize(payload);
+  const renderWidth = Number(target?.dataset.renderWidth) || outputSize.width;
+  const renderHeight = Number(target?.dataset.renderHeight) || outputSize.height;
+  return {
+    outputSize,
+    renderHeight,
+    renderWidth,
+  };
+}
+
 async function dataUrlToBlob(dataUrl) {
   const response = await fetch(dataUrl);
   if (!response.ok) {
@@ -180,12 +191,12 @@ async function renderedPlotToPngBlob(selector, payload) {
   const target = qs(selector);
   const plotlyGraph = getRenderedPlotlyGraph(target);
   if (plotlyGraph && window.Plotly) {
-    const { width, height } = getPlotPixelSize(payload);
+    const { outputSize, renderHeight, renderWidth } = getRenderedPlotlySize(target, payload);
     const dataUrl = await Plotly.toImage(plotlyGraph, {
       format: "png",
-      height,
-      scale: 1,
-      width,
+      height: renderHeight,
+      scale: outputSize.width / renderWidth,
+      width: renderWidth,
     });
     return dataUrlToBlob(dataUrl);
   }
@@ -210,12 +221,12 @@ async function renderedPlotToSvgBlob(selector, payload) {
   const target = qs(selector);
   const plotlyGraph = getRenderedPlotlyGraph(target);
   if (plotlyGraph && window.Plotly) {
-    const { width, height } = getPlotPixelSize(payload);
+    const { renderHeight, renderWidth } = getRenderedPlotlySize(target, payload);
     const dataUrl = await Plotly.toImage(plotlyGraph, {
       format: "svg",
-      height,
+      height: renderHeight,
       scale: 1,
-      width,
+      width: renderWidth,
     });
     return dataUrlToBlob(dataUrl);
   }

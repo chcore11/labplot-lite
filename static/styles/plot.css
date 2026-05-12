@@ -339,11 +339,22 @@
 }
 
 .plotly-export-surface {
-  will-change: transform;
+  position: relative;
 }
 
 .plotly-export-surface .main-svg {
   display: block;
+}
+
+.plotly-export-surface .modebar {
+  top: 8px !important;
+  right: 8px !important;
+}
+
+.plotly-export-surface .modebar-group {
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  background: oklch(99.2% 0.004 255 / 0.94) !important;
 }
 
 .result-side {

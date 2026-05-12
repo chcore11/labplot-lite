@@ -232,14 +232,17 @@ function buildPlotPayload() {
 function makeChartDataset(label, pairs, config, chartType) {
   const isScatter = chartType === "scatter";
   const isLineOnly = chartType === "line";
+  const isArea = chartType === "area";
+  const isBar = chartType === "bar";
 
   return {
     label,
+    chartType,
     data: pairs,
-    showLine: !isScatter,
-    pointRadius: isLineOnly ? 0 : 3.6,
-    pointHoverRadius: isLineOnly ? 0 : 4.8,
-    pointBorderWidth: isLineOnly ? 0 : 1,
+    showLine: !isScatter && !isBar,
+    pointRadius: isLineOnly || isArea || isBar ? 0 : 3.6,
+    pointHoverRadius: isLineOnly || isArea || isBar ? 0 : 4.8,
+    pointBorderWidth: isLineOnly || isArea || isBar ? 0 : 1,
     pointBorderColor: "rgb(252, 252, 249)",
     borderColor: config.color,
     backgroundColor: config.color,
@@ -249,10 +252,6 @@ function makeChartDataset(label, pairs, config, chartType) {
     tension: 0,
     spanGaps: true,
   };
-}
-
-function chartRenderScale(payload) {
-  return Math.max(payload.figDpi / 96, 1);
 }
 
 function shouldAxisStartAtZero(minValue, maxValue) {
@@ -311,6 +310,25 @@ function getPlotPixelSize(payload) {
   return {
     width: Math.round(payload.figWidth * payload.figDpi),
     height: Math.round(payload.figHeight * payload.figDpi),
+  };
+}
+
+function getPlotAvailableWidth(target) {
+  const parent = target.parentElement;
+  const parentRect = parent?.getBoundingClientRect();
+  const parentStyles = parent ? window.getComputedStyle(parent) : null;
+  const horizontalPadding = parentStyles
+    ? (parseFloat(parentStyles.paddingLeft) || 0) + (parseFloat(parentStyles.paddingRight) || 0)
+    : 0;
+  const measuredWidth = (parentRect?.width || parent?.clientWidth || 980) - horizontalPadding;
+  return Math.max(Math.min(measuredWidth > 0 ? measuredWidth : 980, 980), 280);
+}
+
+function getPlotPreviewSize(target, payload) {
+  const width = getPlotAvailableWidth(target);
+  return {
+    width,
+    height: Math.round(width * (payload.figHeight / payload.figWidth)),
   };
 }
 
@@ -429,6 +447,19 @@ function plotlyDashStyle(dataset) {
   return "solid";
 }
 
+function plotlyFillColor(color) {
+  if (/^#[0-9a-f]{6}$/i.test(color)) {
+    const r = parseInt(color.slice(1, 3), 16);
+    const g = parseInt(color.slice(3, 5), 16);
+    const b = parseInt(color.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, 0.16)`;
+  }
+  if (color.startsWith("rgb(")) {
+    return color.replace("rgb(", "rgba(").replace(")", ", 0.16)");
+  }
+  return color;
+}
+
 function getTraceMode(dataset) {
   const hasLine = dataset.showLine !== false;
   const hasPoint = (dataset.pointRadius || 0) > 0;
@@ -442,7 +473,23 @@ function makePlotlyTraces(payload, scale, colors) {
     const stroke = dataset.borderColor || colors.axis;
     const fill = dataset.backgroundColor || stroke;
 
+    if (dataset.chartType === "bar") {
+      return {
+        hovertemplate: `${payload.xLabel}: %{x}<br>${dataset.label}: %{y}<extra></extra>`,
+        marker: {
+          color: fill,
+          line: { color: stroke, width: Math.max((dataset.borderWidth || 1) * 0.4, 0.5) },
+        },
+        name: dataset.label || "Series",
+        type: "bar",
+        x: dataset.data.map((point) => point.x),
+        y: dataset.data.map((point) => point.y),
+      };
+    }
+
     return {
+      fill: dataset.chartType === "area" ? "tozeroy" : undefined,
+      fillcolor: dataset.chartType === "area" ? plotlyFillColor(fill) : undefined,
       hovertemplate: `${payload.xLabel}: %{x}<br>${dataset.label}: %{y}<extra></extra>`,
       line: {
         color: stroke,
@@ -467,30 +514,16 @@ function makePlotlyTraces(payload, scale, colors) {
   });
 }
 
-function setScaledPlotPreview(target, graphDiv, width, height) {
-  const parent = target.parentElement;
-  const parentRect = parent?.getBoundingClientRect();
-  const parentStyles = parent ? window.getComputedStyle(parent) : null;
-  const horizontalPadding = parentStyles
-    ? (parseFloat(parentStyles.paddingLeft) || 0) + (parseFloat(parentStyles.paddingRight) || 0)
-    : 0;
-  const availableWidth = Math.max(
-    Math.min((parentRect?.width || 980) - horizontalPadding, 980),
-    280,
-  );
-  const previewWidth = Math.min(width, availableWidth);
-  const previewHeight = Math.round((previewWidth / width) * height);
-  const scale = previewWidth / width;
+function setPlotPreviewSize(target, graphDiv, previewSize, outputSize) {
+  target.style.width = `${previewSize.width}px`;
+  target.style.height = `${previewSize.height}px`;
+  target.style.setProperty("--plot-output-width", `${outputSize.width}px`);
+  target.style.setProperty("--plot-output-height", `${outputSize.height}px`);
+  target.dataset.renderWidth = String(previewSize.width);
+  target.dataset.renderHeight = String(previewSize.height);
 
-  target.style.width = `${previewWidth}px`;
-  target.style.height = `${previewHeight}px`;
-  target.style.setProperty("--plot-output-width", `${width}px`);
-  target.style.setProperty("--plot-output-height", `${height}px`);
-
-  graphDiv.style.width = `${width}px`;
-  graphDiv.style.height = `${height}px`;
-  graphDiv.style.transform = `scale(${scale})`;
-  graphDiv.style.transformOrigin = "top left";
+  graphDiv.style.width = `${previewSize.width}px`;
+  graphDiv.style.height = `${previewSize.height}px`;
 }
 
 async function renderPlotlyChart(payload, selector) {
@@ -501,10 +534,11 @@ async function renderPlotlyChart(payload, selector) {
   const target = getPlotTarget(selector);
   clearRenderedPlot(target);
 
-  const { width, height } = getPlotPixelSize(payload);
+  const outputSize = getPlotPixelSize(payload);
+  const previewSize = getPlotPreviewSize(target, payload);
   const colors = getThemeColors();
-  const scale = chartRenderScale(payload);
-  const margin = getPlotlyMargins(payload, width, scale);
+  const scale = 1;
+  const margin = getPlotlyMargins(payload, previewSize.width, scale);
   const yAxisMax = shouldAxisStartAtZero(payload.yMin, payload.yMax) ? nicePositiveAxisMax(payload.yMax) : undefined;
 
   const graphDiv = document.createElement("div");
@@ -513,6 +547,7 @@ async function renderPlotlyChart(payload, selector) {
   graphDiv.setAttribute("role", "img");
   target.appendChild(graphDiv);
   target._labPlotGraphDiv = graphDiv;
+  setPlotPreviewSize(target, graphDiv, previewSize, outputSize);
 
   const layout = {
     annotations: getFitAnnotation(payload, scale, colors),
@@ -522,7 +557,8 @@ async function renderPlotlyChart(payload, selector) {
       family: "-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Arial, sans-serif",
       size: Math.max((payload.labelFontsize - 2) * scale, 8 * scale),
     },
-    height,
+    dragmode: "zoom",
+    height: previewSize.height,
     hovermode: "closest",
     legend: {
       bgcolor: "rgba(0,0,0,0)",
@@ -540,8 +576,9 @@ async function renderPlotlyChart(payload, selector) {
     paper_bgcolor: colors.surface,
     plot_bgcolor: colors.surface,
     showlegend: payload.datasets.length > 1,
-    width,
+    width: previewSize.width,
     xaxis: {
+      automargin: true,
       gridcolor: colors.line,
       linecolor: colors.axis,
       linewidth: 1.05 * scale,
@@ -552,6 +589,7 @@ async function renderPlotlyChart(payload, selector) {
       ticks: "outside",
       tickfont: { size: Math.max((payload.labelFontsize - 3) * scale, 7 * scale) },
       title: {
+        automargin: true,
         font: { color: colors.text, size: payload.labelFontsize * scale },
         standoff: 12 * scale,
         text: payload.xLabel,
@@ -559,6 +597,7 @@ async function renderPlotlyChart(payload, selector) {
       zeroline: false,
     },
     yaxis: {
+      automargin: true,
       gridcolor: colors.line,
       linecolor: colors.axis,
       linewidth: 1.05 * scale,
@@ -569,6 +608,7 @@ async function renderPlotlyChart(payload, selector) {
       ticks: "outside",
       tickfont: { size: Math.max((payload.labelFontsize - 3) * scale, 7 * scale) },
       title: {
+        automargin: true,
         font: { color: colors.text, size: payload.labelFontsize * scale },
         standoff: 12 * scale,
         text: payload.yLabel,
@@ -578,17 +618,26 @@ async function renderPlotlyChart(payload, selector) {
   };
 
   const config = {
-    displayModeBar: false,
+    displayModeBar: true,
+    displaylogo: false,
+    doubleClick: "reset+autosize",
     responsive: false,
+    scrollZoom: true,
     staticPlot: false,
+    toImageButtonOptions: {
+      filename: payload.filenames.png.replace(/\.png$/i, ""),
+      format: "png",
+      height: previewSize.height,
+      scale: outputSize.width / previewSize.width,
+      width: previewSize.width,
+    },
   };
 
   await Plotly.newPlot(graphDiv, makePlotlyTraces(payload, scale, colors), layout, config);
-  setScaledPlotPreview(target, graphDiv, width, height);
 
   target.dataset.renderer = "plotly";
-  target.dataset.outputWidth = String(width);
-  target.dataset.outputHeight = String(height);
+  target.dataset.outputWidth = String(outputSize.width);
+  target.dataset.outputHeight = String(outputSize.height);
 }
 
 async function renderChart(payload, canvasSelector = "#plotCanvas") {

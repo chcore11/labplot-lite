@@ -70,6 +70,8 @@ async function handlePlotSubmit() {
   const payload = buildPlotPayload();
   state.lastPlotPayload = payload;
   setPlotProgress("正在绘制图像...");
+  show(qs("#resultSection"));
+  setActiveStep("result");
   await renderChart(payload);
   setPlotProgress("正在生成下载文件...");
   await renderDownloads(payload);
