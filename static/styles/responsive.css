@@ -45,6 +45,15 @@
     align-items: start;
   }
 
+  .visualize-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .visualize-side {
+    border-top: 1px solid var(--line-soft);
+    border-left: 0;
+  }
+
 }
 
 @media (max-width: 900px) {
@@ -94,15 +103,6 @@
 
   .sample-chart-grid {
     grid-template-columns: 1fr;
-  }
-
-  .visualize-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .visualize-side {
-    border-top: 1px solid var(--line-soft);
-    border-left: 0;
   }
 
 }

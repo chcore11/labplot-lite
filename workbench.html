@@ -200,7 +200,7 @@
             当前文件：<strong id="currentFileName"></strong>
           </div>
 
-          <cds-actionable-notification
+          <cds-inline-notification
             id="headerGuessBox"
             class="context-note"
             kind="info"
@@ -210,7 +210,7 @@
             inline
             role="status"
             aria-live="polite"
-          ></cds-actionable-notification>
+          ></cds-inline-notification>
 
           <p class="table-scroll-hint" id="previewTableHint">窄屏可左右滑动查看完整表格。</p>
           <div class="table-wrap" tabindex="0" aria-describedby="previewTableHint">
@@ -404,7 +404,7 @@
                       <div id="metricBox" class="checkbox-grid"></div>
                     </cds-tile>
 
-                    <cds-actionable-notification
+                    <cds-inline-notification
                       class="context-note"
                       kind="warning"
                       title="拟合提醒"
@@ -413,7 +413,7 @@
                       low-contrast
                       inline
                       open
-                    ></cds-actionable-notification>
+                    ></cds-inline-notification>
                   </cds-accordion-item>
                 </cds-accordion>
               </div>
@@ -425,7 +425,7 @@
                 </div>
 
                 <cds-tile id="plotReadinessBox" class="plot-readiness" aria-live="polite">
-                  <cds-actionable-notification
+                  <cds-inline-notification
                     id="plotReadinessMessage"
                     class="plot-readiness-message"
                     kind="info"
@@ -435,23 +435,23 @@
                     low-contrast
                     inline
                     open
-                  ></cds-actionable-notification>
-                  <cds-table size="sm" class="plot-readiness-table">
-                    <cds-table-body>
-                      <cds-table-row>
-                        <cds-table-cell>有效点数</cds-table-cell>
-                        <cds-table-cell><strong id="plotReadyPoints">待选择</strong></cds-table-cell>
-                      </cds-table-row>
-                      <cds-table-row>
-                        <cds-table-cell>拟合状态</cds-table-cell>
-                        <cds-table-cell><strong id="plotReadyFit">待选择</strong></cds-table-cell>
-                      </cds-table-row>
-                      <cds-table-row>
-                        <cds-table-cell>导出尺寸</cds-table-cell>
-                        <cds-table-cell><strong id="plotReadyExport">待生成</strong></cds-table-cell>
-                      </cds-table-row>
-                    </cds-table-body>
-                  </cds-table>
+                  ></cds-inline-notification>
+                  <cds-structured-list class="plot-readiness-list" condensed>
+                    <cds-structured-list-body>
+                      <cds-structured-list-row>
+                        <cds-structured-list-cell>有效点数</cds-structured-list-cell>
+                        <cds-structured-list-cell><strong id="plotReadyPoints">待选择</strong></cds-structured-list-cell>
+                      </cds-structured-list-row>
+                      <cds-structured-list-row>
+                        <cds-structured-list-cell>拟合状态</cds-structured-list-cell>
+                        <cds-structured-list-cell><strong id="plotReadyFit">待选择</strong></cds-structured-list-cell>
+                      </cds-structured-list-row>
+                      <cds-structured-list-row>
+                        <cds-structured-list-cell>导出尺寸</cds-structured-list-cell>
+                        <cds-structured-list-cell><strong id="plotReadyExport">待生成</strong></cds-structured-list-cell>
+                      </cds-structured-list-row>
+                    </cds-structured-list-body>
+                  </cds-structured-list>
                 </cds-tile>
 
                 <div class="plot-generate-row">

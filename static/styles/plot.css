@@ -53,6 +53,14 @@
   border-radius: var(--radius-md);
 }
 
+.visualize-side cds-inline-notification,
+.visualize-side cds-structured-list {
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  box-sizing: border-box;
+}
+
 .visualize-accordion,
 .annotate-grid {
   display: grid;
@@ -130,18 +138,18 @@
 }
 
 .plot-readiness-message,
-.plot-readiness-table {
+.plot-readiness-list {
   width: 100%;
+  min-width: 0;
 }
 
-.plot-readiness-table {
-  display: block;
+.plot-readiness-list {
   overflow: hidden;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-sm);
 }
 
-.plot-readiness-table strong {
+.plot-readiness-list strong {
   color: var(--text-main);
   font-size: 13px;
   font-weight: 700;
