@@ -323,9 +323,11 @@ function reloadDataFromRange(showSuccess = false) {
   }
   hide(qs("#resultSection"));
   if (showSuccess) {
-    showMessage("success", "已按新的表头和数据范围重新读取。");
     if (state.numericColumns.length >= 2) {
+      clearMessage();
       setActiveStep("plot", { scroll: true });
+    } else {
+      showMessage("success", "已按新的表头和数据范围重新读取。");
     }
   }
 

@@ -291,7 +291,7 @@
                 <div id="plotColumnsBox" class="columns-box"></div>
 
                 <cds-accordion class="visualize-accordion">
-                  <cds-accordion-item title="图表类型" open>
+                  <cds-accordion-item title="基础设置" open>
                     <div class="form-grid">
                       <div>
                         <cds-select id="xCol" name="xCol" label-text="X 轴数据列" required></cds-select>
@@ -307,12 +307,12 @@
                     </div>
                   </cds-accordion-item>
 
-                  <cds-accordion-item title="曲线配置" open>
+                  <cds-accordion-item title="曲线" open>
                     <div class="curve-config-box" id="curveConfigBox"></div>
                     <cds-button type="button" kind="tertiary" class="curve-add-button" id="addCurveButton">添加一条曲线</cds-button>
                   </cds-accordion-item>
 
-                  <cds-accordion-item title="标题与坐标轴">
+                  <cds-accordion-item title="标题和坐标轴">
                     <div class="annotate-grid">
                       <cds-text-input id="plotTitle" name="plotTitle" label="图表标题" value="X-Y Curve" placeholder="不填则自动生成，例如 power vs voltage"></cds-text-input>
 
@@ -328,7 +328,7 @@
                     </div>
                   </cds-accordion-item>
 
-                  <cds-accordion-item title="导出与指标">
+                  <cds-accordion-item title="导出设置">
                     <div class="section-label">图像输出设置</div>
 
                     <div class="form-grid compact-grid">
@@ -390,17 +390,14 @@
                     </div>
                   </cds-accordion-item>
                 </cds-accordion>
-
-                <div class="plot-generate-row">
-                  <cds-button type="submit" kind="primary" class="form-button" id="plotSubmitButton">生成图表</cds-button>
-                  <div id="plotProgress" class="plot-progress is-hidden" role="status" aria-live="polite">
-                    <span class="plot-progress-dot"></span>
-                    <span id="plotProgressText">准备生成</span>
-                  </div>
-                </div>
               </div>
 
               <aside class="visualize-side" aria-label="生成前检查">
+                <div class="visualize-side-head">
+                  <h3>生成前检查</h3>
+                  <p>配置会实时检查，不通过时生成按钮不可用。</p>
+                </div>
+
                 <div id="plotReadinessBox" class="plot-readiness" aria-live="polite">
                   <div class="plot-readiness-main">
                     <span id="plotReadyStatus">等待选择绘图列</span>
@@ -410,6 +407,14 @@
                     <div><span>有效点数</span><strong id="plotReadyPoints">待选择</strong></div>
                     <div><span>拟合状态</span><strong id="plotReadyFit">待选择</strong></div>
                     <div><span>导出尺寸</span><strong id="plotReadyExport">待生成</strong></div>
+                  </div>
+                </div>
+
+                <div class="plot-generate-row">
+                  <cds-button type="submit" kind="primary" class="form-button" id="plotSubmitButton">生成图表</cds-button>
+                  <div id="plotProgress" class="plot-progress is-hidden" role="status" aria-live="polite">
+                    <span class="plot-progress-dot"></span>
+                    <span id="plotProgressText">准备生成</span>
                   </div>
                 </div>
               </aside>

@@ -345,6 +345,13 @@ function setActiveStep(step, options = {}) {
   }
 
   state.activeStep = step;
+  if (step === "plot") {
+    const messageBox = qs("#statusMessage");
+    const keepMessage = messageBox && (messageBox.classList.contains("error") || messageBox.classList.contains("warning"));
+    if (messageBox && !keepMessage) {
+      clearNotification(messageBox);
+    }
+  }
   updateWorkflowNav();
 
   if (options.scroll) {
