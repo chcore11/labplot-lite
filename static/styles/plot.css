@@ -53,12 +53,11 @@
 .curve-row {
   display: grid;
   grid-template-columns:
-    minmax(220px, 1.5fr)
-    minmax(136px, 0.8fr)
-    minmax(122px, 0.65fr)
-    minmax(136px, 0.75fr)
-    minmax(84px, 0.35fr);
-  gap: 14px;
+    minmax(200px, 1.45fr)
+    minmax(132px, 0.8fr)
+    minmax(116px, 0.62fr)
+    minmax(132px, 0.75fr);
+  gap: 12px 14px;
   align-items: end;
   padding: 12px;
   border-bottom: 1px solid var(--line-soft);
@@ -78,9 +77,10 @@
 }
 
 .curve-remove-button {
-  justify-self: stretch;
-  width: 100%;
-  min-width: 84px;
+  grid-column: 1 / -1;
+  justify-self: start;
+  width: auto;
+  min-width: 96px;
 }
 
 .plot-readiness {
