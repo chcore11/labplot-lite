@@ -76,14 +76,23 @@
   --cds-layout-size-height-lg: 73px;
   padding-block: 4px;
   transition:
-    letter-spacing 0.5s var(--ease-out),
-    transform 0.5s var(--ease-out),
-    box-shadow 0.5s var(--ease-out);
+    transform var(--duration-med) var(--ease-out),
+    box-shadow var(--duration-med) var(--ease-out);
 }
 
-.hero-actions cds-button:hover {
-  letter-spacing: 0.04em;
-  transform: scale(1.04);
+.hero-actions cds-button:active {
+  transform: translateY(0) scale(0.99);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hero-actions cds-button:hover {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+}
+
+.hero-actions cds-button:focus-visible {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 

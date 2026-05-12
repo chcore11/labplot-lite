@@ -199,7 +199,9 @@ html.motion-ready .workflow-list[data-reveal].is-visible li:nth-child(4) {
     transition-duration: 0.01ms !important;
   }
 
-  .sample-chart-card:hover {
+  .sample-chart-card:hover,
+  .hero-actions cds-button:hover,
+  .hero-actions cds-button:active {
     transform: none;
   }
 
