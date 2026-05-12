@@ -12,16 +12,7 @@ const REQUIRED_DEPENDENCIES = [
 ];
 
 function disableControl(control) {
-  if (!control) {
-    return;
-  }
-
-  if ("disabled" in control) {
-    control.disabled = true;
-  } else {
-    control.setAttribute("tabindex", "-1");
-  }
-  control.setAttribute("aria-disabled", "true");
+  setControlDisabled(control, true);
 }
 
 function showDependencyMessage(missingDependencies) {
@@ -32,9 +23,12 @@ function showDependencyMessage(missingDependencies) {
 
   const missingLabels = missingDependencies.map((dependency) => dependency.label).join("、");
   const affectedAreas = missingDependencies.map((dependency) => dependency.affects).join("、");
-  box.textContent = `部分功能依赖未加载：${missingLabels}。请检查网络后刷新页面。受影响：${affectedAreas}。`;
-  box.className = "message error";
-  show(box);
+  renderNotification(
+    box,
+    "error",
+    `部分功能依赖未加载：${missingLabels}。请检查网络后刷新页面。受影响：${affectedAreas}。`,
+    "依赖未加载",
+  );
 }
 
 function checkRequiredDependencies() {
@@ -164,7 +158,7 @@ function setupEvents() {
     clearMessage();
 
     try {
-      const rows = parsePastedTable(qs("#pasteData").value);
+      const rows = parsePastedTable(getControlValue("#pasteData"));
       setDataset(rows, "pasted-data.csv");
       showMessage("success", "已读取粘贴数据。请检查表头和数据范围。");
     } catch (error) {
@@ -172,12 +166,18 @@ function setupEvents() {
     }
   });
 
+  qs("#dataFile")?.addEventListener("cds-file-uploader-button-changed", (event) => {
+    const file = event.detail?.addedFiles?.[0] || null;
+    state.pendingUploadFile = file;
+    setText("#selectedFileHint", file ? `已选择：${file.name}` : "尚未选择文件。");
+  });
+
   qs("#uploadForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     clearMessage();
 
     try {
-      const file = qs("#dataFile").files[0];
+      const file = state.pendingUploadFile;
       if (!file) {
         throw new Error("请先上传 CSV / Excel 文件。");
       }

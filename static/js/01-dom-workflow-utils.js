@@ -62,9 +62,11 @@ function createElement(tag, options = {}) {
       return;
     }
 
+    const shouldReflectAttribute = element.tagName.includes("-");
     if (name in element) {
       element[name] = value;
-    } else {
+    }
+    if (!(name in element) || shouldReflectAttribute) {
       element.setAttribute(name, value === true ? "" : String(value));
     }
   });
@@ -105,6 +107,15 @@ function getCarbonButtonSize(className = "") {
 }
 
 function createLabeledControl(labelText, control) {
+  if (control?.tagName?.includes("-")) {
+    if (control.tagName.toLowerCase() === "cds-select") {
+      control.setAttribute("label-text", labelText);
+    } else if (!control.hasAttribute("label")) {
+      control.setAttribute("label", labelText);
+    }
+    return control;
+  }
+
   return createElement("div", {
     children: [
       createElement("label", {
@@ -114,6 +125,71 @@ function createLabeledControl(labelText, control) {
       control,
     ],
   });
+}
+
+function getControl(target) {
+  return typeof target === "string" ? qs(target) : target;
+}
+
+function getControlValue(target) {
+  const control = getControl(target);
+  if (!control) {
+    return "";
+  }
+  return "value" in control ? control.value : (control.getAttribute("value") || "");
+}
+
+function setControlValue(target, value) {
+  const control = getControl(target);
+  if (!control) {
+    return;
+  }
+
+  const stringValue = value === null || value === undefined ? "" : String(value);
+  if ("value" in control) {
+    control.value = stringValue;
+  }
+  control.setAttribute("value", stringValue);
+}
+
+function getControlChecked(target) {
+  const control = getControl(target);
+  return Boolean(control && ("checked" in control ? control.checked : control.hasAttribute("checked")));
+}
+
+function setControlChecked(target, checked) {
+  const control = getControl(target);
+  if (!control) {
+    return;
+  }
+
+  if ("checked" in control) {
+    control.checked = Boolean(checked);
+  }
+  control.toggleAttribute("checked", Boolean(checked));
+}
+
+function setControlDisabled(target, disabled) {
+  const control = getControl(target);
+  if (!control) {
+    return;
+  }
+
+  if ("disabled" in control) {
+    control.disabled = Boolean(disabled);
+  } else {
+    if (disabled) {
+      control.setAttribute("tabindex", "-1");
+    } else {
+      control.removeAttribute("tabindex");
+    }
+  }
+  control.toggleAttribute("disabled", Boolean(disabled));
+  control.setAttribute("aria-disabled", String(Boolean(disabled)));
+}
+
+function getControlOptions(control) {
+  return Array.from(control?.querySelectorAll("option, cds-select-item") || []);
 }
 
 function createValueItem(label, value, className = "") {
@@ -245,14 +321,39 @@ function setActiveStep(step, options = {}) {
 
 function showMessage(type, text) {
   const box = qs("#statusMessage");
-  box.textContent = text;
-  box.className = `message ${type}`;
-  show(box);
+  renderNotification(box, type, text);
 }
 
 function clearMessage() {
   const box = qs("#statusMessage");
-  box.textContent = "";
+  clearNotification(box);
+}
+
+function renderNotification(box, type, text, title = "状态") {
+  if (!box) {
+    return;
+  }
+
+  const kind = type === "error" ? "error" : type === "warning" ? "warning" : type === "success" ? "success" : "info";
+  box.kind = kind;
+  box.title = title;
+  box.subtitle = text;
+  box.setAttribute("kind", kind);
+  box.setAttribute("title", title);
+  box.setAttribute("subtitle", text);
+  box.setAttribute("open", "");
+  box.className = `message ${type}`;
+  show(box);
+}
+
+function clearNotification(box) {
+  if (!box) {
+    return;
+  }
+
+  box.subtitle = "";
+  box.removeAttribute("subtitle");
+  box.removeAttribute("open");
   box.className = "message is-hidden";
 }
 
@@ -354,15 +455,22 @@ function randomId() {
 function setOptions(select, entries, selectedValue = null) {
   select.replaceChildren();
 
+  const effectiveSelectedValue = selectedValue ?? entries[0]?.value ?? "";
   entries.forEach((entry) => {
-    select.appendChild(createElement("option", {
+    const isCarbonSelect = select.tagName.toLowerCase() === "cds-select";
+    select.appendChild(createElement(isCarbonSelect ? "cds-select-item" : "option", {
       attributes: {
-        selected: entry.value === selectedValue,
+        label: isCarbonSelect ? entry.label : undefined,
+        selected: entry.value === effectiveSelectedValue,
         value: entry.value,
       },
       textContent: entry.label,
     }));
   });
+
+  if (effectiveSelectedValue) {
+    setControlValue(select, effectiveSelectedValue);
+  }
 }
 
 function objectEntriesToOptions(object) {

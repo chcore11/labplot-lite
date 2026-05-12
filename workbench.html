@@ -6,8 +6,18 @@
   <link rel="icon" href="./static/logo_dark.png" type="image/png">
   <title>LabPlot Lite 工作台</title>
   <script src="./static/theme.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/accordion.min.js"></script>
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/button.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/checkbox.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/data-table.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/file-uploader.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/notification.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/number-input.min.js"></script>
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/progress-indicator.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/select.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/tag.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/text-input.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/textarea.min.js"></script>
   <link rel="stylesheet" href="./static/style.css">
   <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script defer src="https://cdn.plot.ly/plotly-3.4.0.min.js"></script>
@@ -37,7 +47,7 @@
       </nav>
     </header>
 
-    <div id="dependencyMessage" class="message error is-hidden" role="alert"></div>
+    <cds-actionable-notification id="dependencyMessage" class="message is-hidden" kind="error" title="依赖未加载" hide-close-button low-contrast inline role="alert"></cds-actionable-notification>
 
     <section class="workbench" id="upload-section">
       <div class="workbench-main">
@@ -62,7 +72,7 @@
           <cds-progress-step label-text="Export" secondary-label-text="检查并下载素材" data-step-target="result" aria-controls="resultSection" state="incomplete" disabled></cds-progress-step>
         </cds-progress-indicator>
 
-        <section id="statusMessage" class="message is-hidden" role="status" aria-live="polite"></section>
+        <cds-actionable-notification id="statusMessage" class="message is-hidden" kind="info" title="状态" hide-close-button low-contrast inline role="status" aria-live="polite"></cds-actionable-notification>
 
         <div id="sampleGuideBox" class="sample-guide is-hidden" aria-live="polite">
           <div class="sample-guide-main">
@@ -85,23 +95,33 @@
 
           <div class="upload-layout">
             <form id="pasteForm" class="form-card paste-card">
-              <label for="pasteData">复制粘贴表格</label>
-              <textarea
+              <cds-textarea
                 id="pasteData"
                 name="pasteData"
+                label="复制粘贴表格"
                 rows="12"
                 placeholder="从 Excel、Numbers 或表格网页复制数据，粘贴到这里..."
-              ></textarea>
+              ></cds-textarea>
               <p class="hint">支持制表符分隔和 CSV。第一行通常作为列名。</p>
               <cds-button type="submit" kind="primary" class="form-button">使用粘贴数据</cds-button>
             </form>
 
             <form id="uploadForm" class="form-card upload-card">
-              <label for="dataFile">选择 CSV / Excel 文件</label>
-              <input id="dataFile" name="dataFile" type="file" accept=".csv,.xls,.xlsx" required>
+              <cds-file-uploader
+                label-title="选择 CSV / Excel 文件"
+                label-description="文件前几行有实验名称、姓名、日期也没关系。下一步可以指定真正的表头行。"
+              >
+                <cds-file-uploader-button
+                  id="dataFile"
+                  name="dataFile"
+                  accept=".csv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                  button-kind="tertiary"
+                >选择文件</cds-file-uploader-button>
+              </cds-file-uploader>
+              <p class="hint" id="selectedFileHint">尚未选择文件。</p>
 
               <p class="hint">
-                文件前几行有实验名称、姓名、日期也没关系。下一步可以指定真正的表头行。
+                选择文件后点击上传并预览，当前页面不会把数据发送到服务器。
               </p>
 
               <cds-button type="submit" kind="primary" class="form-button">上传并预览</cds-button>
@@ -111,34 +131,10 @@
               <h3>使用示例数据</h3>
               <p>四个示例分别覆盖光谱、多曲线动力学、标准曲线拟合和谱峰对比。</p>
               <div class="sample-list">
-                <button type="button" class="sample-load-button" data-sample="./samples/sample_01_temp_c_to_k.xlsx">
-                  <span>1</span>
-                  <span class="sample-copy">
-                    <strong>荧光发射光谱</strong>
-                    <small>多峰光谱，三组曲线对比</small>
-                  </span>
-                </button>
-                <button type="button" class="sample-load-button" data-sample="./samples/sample_02_voltage_scale.xlsx">
-                  <span>2</span>
-                  <span class="sample-copy">
-                    <strong>反应动力学</strong>
-                    <small>多组衰减曲线，期刊线图</small>
-                  </span>
-                </button>
-                <button type="button" class="sample-load-button" data-sample="./samples/sample_03_abs_error.xlsx">
-                  <span>3</span>
-                  <span class="sample-copy">
-                    <strong>标准曲线拟合</strong>
-                    <small>线性校准，残差检查</small>
-                  </span>
-                </button>
-                <button type="button" class="sample-load-button" data-sample="./samples/sample_04_invalid_log.xlsx">
-                  <span>4</span>
-                  <span class="sample-copy">
-                    <strong>拉曼谱峰对比</strong>
-                    <small>D/G 峰，多样品叠图</small>
-                  </span>
-                </button>
+                <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/sample_01_temp_c_to_k.xlsx">1 荧光发射光谱</cds-button>
+                <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/sample_02_voltage_scale.xlsx">2 反应动力学</cds-button>
+                <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/sample_03_abs_error.xlsx">3 标准曲线拟合</cds-button>
+                <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/sample_04_invalid_log.xlsx">4 拉曼谱峰对比</cds-button>
               </div>
             </div>
           </div>
@@ -164,26 +160,28 @@
 
           <p class="table-scroll-hint" id="previewTableHint">窄屏可左右滑动查看完整表格。</p>
           <div class="table-wrap" tabindex="0" aria-describedby="previewTableHint">
-            <table class="preview-table">
-              <tbody id="previewBody"></tbody>
-            </table>
+            <cds-table size="sm" class="preview-table">
+              <cds-table-head>
+                <cds-table-header-row id="previewHeaderRow">
+                  <cds-table-header-cell>行</cds-table-header-cell>
+                </cds-table-header-row>
+              </cds-table-head>
+              <cds-table-body id="previewBody"></cds-table-body>
+            </cds-table>
           </div>
 
           <form id="rangeForm" class="form-card range-card">
             <div class="form-grid">
               <div>
-                <label for="headerRow">表头在第几行</label>
-                <input id="headerRow" name="headerRow" type="number" min="1" value="1" required>
+                <cds-number-input id="headerRow" name="headerRow" label="表头在第几行" min="1" value="1" required></cds-number-input>
               </div>
 
               <div>
-                <label for="dataStartRow">数据从第几行开始</label>
-                <input id="dataStartRow" name="dataStartRow" type="number" min="1" value="2" required>
+                <cds-number-input id="dataStartRow" name="dataStartRow" label="数据从第几行开始" min="1" value="2" required></cds-number-input>
               </div>
 
               <div>
-                <label for="dataEndRow">数据到第几行结束</label>
-                <input id="dataEndRow" name="dataEndRow" type="number" min="1" placeholder="不填则读取到文件末尾">
+                <cds-number-input id="dataEndRow" name="dataEndRow" label="数据到第几行结束" min="1" placeholder="不填则读取到文件末尾" allow-empty></cds-number-input>
               </div>
             </div>
 
@@ -206,35 +204,31 @@
             <form id="calcForm" class="calc-form">
               <div class="form-grid">
                 <div>
-                  <label for="calcTemplate">计算类型</label>
-                  <select id="calcTemplate" name="calcTemplate" required></select>
+                  <cds-select id="calcTemplate" name="calcTemplate" label-text="计算类型" required></cds-select>
                 </div>
 
                 <div>
-                  <label for="newColName">新列名</label>
-                  <input
+                  <cds-text-input
                     id="newColName"
                     name="newColName"
+                    label="新列名"
                     placeholder="例如 power、temp_k、abs_error"
                     required
-                  >
+                  ></cds-text-input>
                 </div>
               </div>
 
               <div class="formula-grid">
                 <div>
-                  <label for="firstCol">第一列 A</label>
-                  <select id="firstCol" name="firstCol" required></select>
+                  <cds-select id="firstCol" name="firstCol" label-text="第一列 A" required></cds-select>
                 </div>
 
                 <div>
-                  <label for="secondCol">第二列 B</label>
-                  <select id="secondCol" name="secondCol"></select>
+                  <cds-select id="secondCol" name="secondCol" label-text="第二列 B"></cds-select>
                 </div>
 
                 <div>
-                  <label for="constantK">常数 k</label>
-                  <input id="constantK" name="constantK" placeholder="例如 273.15、1000、0.01">
+                  <cds-text-input id="constantK" name="constantK" label="常数 k" placeholder="例如 273.15、1000、0.01"></cds-text-input>
                 </div>
               </div>
 
@@ -268,18 +262,15 @@
 
                 <div class="form-grid">
                   <div>
-                    <label for="xCol">X 轴数据列</label>
-                    <select id="xCol" name="xCol" required></select>
+                    <cds-select id="xCol" name="xCol" label-text="X 轴数据列" required></cds-select>
                   </div>
 
                   <div>
-                    <label for="chartType">图表类型</label>
-                    <select id="chartType" name="chartType" required></select>
+                    <cds-select id="chartType" name="chartType" label-text="图表类型" required></cds-select>
                   </div>
 
                   <div>
-                    <label for="fitType">拟合方式</label>
-                    <select id="fitType" name="fitType" required></select>
+                    <cds-select id="fitType" name="fitType" label-text="拟合方式" required></cds-select>
                   </div>
                 </div>
 
@@ -302,67 +293,53 @@
               </div>
             </div>
 
-            <details class="advanced-box">
-              <summary>高级选项：标题、坐标轴、导出尺寸、拟合指标</summary>
+            <cds-accordion class="advanced-box">
+              <cds-accordion-item title="高级选项：标题、坐标轴、导出尺寸、拟合指标">
+                <cds-text-input id="plotTitle" name="plotTitle" label="图表标题" value="X-Y Curve" placeholder="不填则自动生成，例如 power vs voltage"></cds-text-input>
 
-              <label for="plotTitle">图表标题</label>
-              <input id="plotTitle" name="plotTitle" value="X-Y Curve" placeholder="不填则自动生成，例如 power vs voltage">
+                <div class="form-grid">
+                  <div>
+                    <cds-text-input id="xLabel" name="xLabel" label="X 轴显示名称" placeholder="例如：时间 / s、Voltage / V"></cds-text-input>
+                  </div>
 
-              <div class="form-grid">
-                <div>
-                  <label for="xLabel">X 轴显示名称</label>
-                  <input id="xLabel" name="xLabel" placeholder="例如：时间 / s、Voltage / V">
+                  <div>
+                    <cds-text-input id="yLabel" name="yLabel" label="Y 轴显示名称" placeholder="例如：温度 / C、Power / W"></cds-text-input>
+                  </div>
                 </div>
 
-                <div>
-                  <label for="yLabel">Y 轴显示名称</label>
-                  <input id="yLabel" name="yLabel" placeholder="例如：温度 / C、Power / W">
-                </div>
-              </div>
-
-              <div class="section-label">图像输出设置</div>
+                <div class="section-label">图像输出设置</div>
 
               <div class="form-grid compact-grid">
                 <div>
-                  <label for="figWidth">图片宽度</label>
-                  <input id="figWidth" name="figWidth" type="number" min="3" max="20" step="0.1" value="7" required>
+                  <cds-number-input id="figWidth" name="figWidth" label="图片宽度" min="3" max="20" step="0.1" value="7" required></cds-number-input>
                 </div>
 
                 <div>
-                  <label for="figHeight">图片高度</label>
-                  <input id="figHeight" name="figHeight" type="number" min="2" max="16" step="0.1" value="4.6" required>
+                  <cds-number-input id="figHeight" name="figHeight" label="图片高度" min="2" max="16" step="0.1" value="4.6" required></cds-number-input>
                 </div>
 
                 <div>
-                  <label for="figDpi">图片 DPI</label>
-                  <input id="figDpi" name="figDpi" type="number" min="72" max="600" step="1" value="300" required>
+                  <cds-number-input id="figDpi" name="figDpi" label="图片 DPI" min="72" max="600" step="1" value="300" required></cds-number-input>
                 </div>
               </div>
 
               <div class="form-grid compact-grid">
                 <div>
-                  <label for="titleFontsize">标题字体大小</label>
-                  <input id="titleFontsize" name="titleFontsize" type="number" min="8" max="40" step="1" value="15" required>
+                  <cds-number-input id="titleFontsize" name="titleFontsize" label="标题字体大小" min="8" max="40" step="1" value="15" required></cds-number-input>
                 </div>
 
                 <div>
-                  <label for="labelFontsize">坐标轴字体大小</label>
-                  <input id="labelFontsize" name="labelFontsize" type="number" min="8" max="32" step="1" value="13" required>
+                  <cds-number-input id="labelFontsize" name="labelFontsize" label="坐标轴字体大小" min="8" max="32" step="1" value="13" required></cds-number-input>
                 </div>
 
                 <div>
-                  <label for="legendFontsize">图例字体大小</label>
-                  <input id="legendFontsize" name="legendFontsize" type="number" min="6" max="24" step="1" value="11" required>
+                  <cds-number-input id="legendFontsize" name="legendFontsize" label="图例字体大小" min="6" max="24" step="1" value="11" required></cds-number-input>
                 </div>
               </div>
 
-              <label class="checkbox-row single-checkbox">
-                <input id="showGrid" type="checkbox" name="showGrid">
-                显示辅助网格线
-              </label>
+              <cds-checkbox id="showGrid" name="showGrid" label-text="显示辅助网格线"></cds-checkbox>
 
-              <label for="metricMode">拟合指标输出模式</label>
-              <select id="metricMode" name="metricMode" required></select>
+              <cds-select id="metricMode" name="metricMode" label-text="拟合指标输出模式" required></cds-select>
 
               <div class="metric-box">
                 <strong>基础指标包含</strong>
@@ -379,7 +356,8 @@
                 <p>一次拟合适合近似 <code>y = ax + b</code> 的数据；二次拟合适合近似 <code>y = ax² + bx + c</code> 的数据。</p>
                 <p>不要只看 R²，必须结合实验原理判断模型是否合理。</p>
               </div>
-            </details>
+              </cds-accordion-item>
+            </cds-accordion>
 
             <div class="plot-generate-row">
               <cds-button type="submit" kind="primary" class="form-button" id="plotSubmitButton">生成图像与拟合结果</cds-button>
@@ -408,8 +386,8 @@
                   <strong id="resultFigureTitle">等待生成图像</strong>
                 </div>
                 <div class="figure-meta">
-                  <span id="resultFigureMeta">待生成</span>
-                  <span id="resultFigureCurves">待生成</span>
+                  <cds-tag id="resultFigureMeta" type="gray">待生成</cds-tag>
+                  <cds-tag id="resultFigureCurves" type="blue">待生成</cds-tag>
                 </div>
               </div>
 
@@ -426,12 +404,12 @@
 
               <div class="download-panel">
                 <h3>下载文件</h3>
-                <a id="downloadZip" href="#">下载报告素材包 ZIP</a>
-                <a id="downloadPng" href="#">下载 PNG 图片</a>
-                <a id="downloadSvg" href="#">下载 SVG 矢量图</a>
-                <a id="downloadFitReport" href="#">下载拟合报告 TXT</a>
-                <a id="downloadOriginCsv" href="#">下载绘图数据 CSV</a>
-                <a id="downloadFullCsv" href="#">下载完整数据 CSV</a>
+                <cds-button id="downloadZip" href="#" kind="primary">下载报告素材包 ZIP</cds-button>
+                <cds-button id="downloadPng" href="#" kind="tertiary">下载 PNG 图片</cds-button>
+                <cds-button id="downloadSvg" href="#" kind="tertiary">下载 SVG 矢量图</cds-button>
+                <cds-button id="downloadFitReport" href="#" kind="tertiary">下载拟合报告 TXT</cds-button>
+                <cds-button id="downloadOriginCsv" href="#" kind="tertiary">下载绘图数据 CSV</cds-button>
+                <cds-button id="downloadFullCsv" href="#" kind="tertiary">下载完整数据 CSV</cds-button>
               </div>
             </div>
           </div>

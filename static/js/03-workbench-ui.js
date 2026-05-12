@@ -5,21 +5,29 @@ function syncRawRowsFromData() {
     state.columns.slice(),
     ...state.data.map((row) => state.columns.map((column) => row[column] ?? "")),
   ];
-  qs("#headerRow").value = "1";
-  qs("#dataStartRow").value = "2";
-  qs("#dataEndRow").value = "";
+  setControlValue("#headerRow", "1");
+  setControlValue("#dataStartRow", "2");
+  setControlValue("#dataEndRow", "");
 }
 
 function renderPreview() {
+  const header = qs("#previewHeaderRow");
   const body = qs("#previewBody");
+  header.replaceChildren();
   body.replaceChildren();
 
   const previewRows = state.rawRows.slice(0, 15);
+  const maxColumns = Math.max(0, ...previewRows.map((row) => row.length));
+  header.append(
+    createElement("cds-table-header-cell", { textContent: "行" }),
+    ...Array.from({ length: maxColumns }, (_, index) => createElement("cds-table-header-cell", { textContent: `列 ${index + 1}` })),
+  );
+
   previewRows.forEach((row, index) => {
-    body.appendChild(createElement("tr", {
+    body.appendChild(createElement("cds-table-row", {
       children: [
-        createElement("th", { textContent: `第 ${index + 1} 行` }),
-        ...row.map((value) => createElement("td", { textContent: cellText(value) })),
+        createElement("cds-table-cell", { textContent: `第 ${index + 1} 行` }),
+        ...row.map((value) => createElement("cds-table-cell", { textContent: cellText(value) })),
       ],
     }));
   });
@@ -29,7 +37,10 @@ function renderColumnsBox(target, label) {
   target.replaceChildren();
   target.append(
     createElement("span", { textContent: label }),
-    ...state.numericColumns.map((column) => createElement("code", { textContent: column })),
+    ...state.numericColumns.map((column) => createElement("cds-tag", {
+      attributes: { size: "sm", type: "gray" },
+      textContent: column,
+    })),
   );
 }
 
@@ -47,12 +58,12 @@ function setSelectIfExists(selector, value) {
     return false;
   }
 
-  const exists = Array.from(select.options).some((option) => option.value === value);
+  const exists = getControlOptions(select).some((option) => option.value === value);
   if (!exists) {
     return false;
   }
 
-  select.value = value;
+  setControlValue(select, value);
   return true;
 }
 
@@ -116,8 +127,8 @@ function applySampleCalcAction(index) {
       return;
     }
   }
-  qs("#constantK").value = action.constantK || "";
-  qs("#newColName").value = action.newColName || "";
+  setControlValue("#constantK", action.constantK || "");
+  setControlValue("#newColName", action.newColName || "");
 
   clearMessage();
   setActiveStep("calc", { scroll: true });
@@ -138,11 +149,11 @@ function applySamplePlotAction(index = 0) {
   setSelectIfExists("#xCol", action.xCol);
   setSelectIfExists("#chartType", action.chartType);
   setSelectIfExists("#fitType", action.fitType);
-  qs("#plotTitle").value = action.title || "";
-  qs("#xLabel").value = action.xLabel || "";
-  qs("#yLabel").value = action.yLabel || "";
+  setControlValue("#plotTitle", action.title || "");
+  setControlValue("#xLabel", action.xLabel || "");
+  setControlValue("#yLabel", action.yLabel || "");
   if (typeof action.showGrid === "boolean") {
-    qs("#showGrid").checked = action.showGrid;
+    setControlChecked("#showGrid", action.showGrid);
   }
 
   renderCurveRows(yCols.map((yCol, yIndex) => ({
@@ -165,25 +176,21 @@ function renderStaticOptions() {
   const metricBox = qs("#metricBox");
   metricBox.replaceChildren();
   Object.entries(AVAILABLE_METRICS).forEach(([value, label]) => {
-    const input = createElement("input", {
+    const input = createElement("cds-checkbox", {
       attributes: {
         checked: BASIC_METRICS.includes(value),
+        "label-text": label,
         name: "selectedMetrics",
-        type: "checkbox",
         value,
       },
     });
-    const wrapper = createElement("label", {
-      className: "checkbox-row",
-      children: [input, label],
-    });
-    metricBox.appendChild(wrapper);
+    metricBox.appendChild(input);
   });
 }
 
 function createSelectField(labelText, name, options, selectedValue) {
   const id = `${name}-${randomId()}`;
-  const select = createElement("select", {
+  const select = createElement("cds-select", {
     attributes: { id, name, required: true },
   });
   setOptions(select, options, selectedValue);
@@ -192,18 +199,18 @@ function createSelectField(labelText, name, options, selectedValue) {
 
 function createInputField(labelText, name, value) {
   const id = `${name}-${randomId()}`;
-  const input = createElement("input", {
+  const input = createElement("cds-number-input", {
     attributes: {
       id,
+      label: labelText,
       min: "0.1",
       name,
       required: true,
       step: "0.1",
-      type: "number",
       value,
     },
   });
-  return createLabeledControl(labelText, input);
+  return input;
 }
 
 function createCurveRow(config, index) {
@@ -257,15 +264,15 @@ function updateRemoveButtons() {
 function getCurveConfigsFromForm() {
   const rows = qsa("#curveConfigBox .curve-row");
   const configs = rows.map((row, index) => {
-    const yCol = row.querySelector('select[name="curveYCols"]').value;
-    const color = row.querySelector('select[name="curveColors"]').value || DEFAULT_CURVE_COLORS[index % DEFAULT_CURVE_COLORS.length];
+    const yCol = getControlValue(row.querySelector('[name="curveYCols"]'));
+    const color = getControlValue(row.querySelector('[name="curveColors"]')) || DEFAULT_CURVE_COLORS[index % DEFAULT_CURVE_COLORS.length];
     const lineWidth = parsePositiveFloat(
-      row.querySelector('input[name="curveWidths"]').value,
+      getControlValue(row.querySelector('[name="curveWidths"]')),
       1.8,
       "线条粗细",
       0.1,
     );
-    const lineStyle = row.querySelector('select[name="curveStyles"]').value || "solid";
+    const lineStyle = getControlValue(row.querySelector('[name="curveStyles"]')) || "solid";
 
     return { yCol, color, lineWidth, lineStyle };
   }).filter((config) => config.yCol);
@@ -309,6 +316,7 @@ function resetWorkflow() {
   state.columns = [];
   state.data = [];
   state.numericColumns = [];
+  state.pendingUploadFile = null;
   state.lastPlotPayload = null;
   state.isPlotGenerating = false;
   state.activeStep = "upload";
@@ -322,8 +330,14 @@ function resetWorkflow() {
   qs("#rangeForm").reset();
   qs("#calcForm").reset();
   qs("#plotForm").reset();
+  setControlValue("#pasteData", "");
+  setControlValue("#headerRow", "1");
+  setControlValue("#dataStartRow", "2");
+  setControlValue("#dataEndRow", "");
+  setText("#selectedFileHint", "尚未选择文件。");
   qs("#currentFileName").textContent = "";
   qs("#headerGuessMessage").textContent = "";
+  qs("#previewHeaderRow").replaceChildren(createElement("cds-table-header-cell", { textContent: "行" }));
   qs("#previewBody").replaceChildren();
   qs("#numericColumnsBox").replaceChildren();
   qs("#plotColumnsBox").replaceChildren();
@@ -332,9 +346,10 @@ function resetWorkflow() {
   qs("#statsGrid").replaceChildren();
   resetResultFigure();
 
-  qsa(".download-panel a").forEach((link) => {
+  qsa(".download-panel [href]").forEach((link) => {
     link.removeAttribute("download");
     link.href = "#";
+    link.setAttribute("href", "#");
   });
 
   renderStaticOptions();
@@ -345,9 +360,9 @@ function resetWorkflow() {
 }
 
 function reloadDataFromRange(showSuccess = false) {
-  const headerRow = parsePositiveInt(qs("#headerRow").value, 1);
-  const dataStartRow = parsePositiveInt(qs("#dataStartRow").value, headerRow + 1);
-  const dataEndRow = parsePositiveInt(qs("#dataEndRow").value, null);
+  const headerRow = parsePositiveInt(getControlValue("#headerRow"), 1);
+  const dataStartRow = parsePositiveInt(getControlValue("#dataStartRow"), headerRow + 1);
+  const dataEndRow = parsePositiveInt(getControlValue("#dataEndRow"), null);
 
   const loaded = loadDataFromRawRows(headerRow, dataStartRow, dataEndRow);
   state.columns = loaded.columns;
@@ -378,9 +393,9 @@ function setDataset(rows, fileName) {
   const guess = guessHeaderAndDataRows(state.rawRows);
   qs("#currentFileName").textContent = fileName;
   qs("#headerGuessMessage").textContent = guess.message;
-  qs("#headerRow").value = String(guess.headerRow);
-  qs("#dataStartRow").value = String(guess.dataStartRow);
-  qs("#dataEndRow").value = "";
+  setControlValue("#headerRow", String(guess.headerRow));
+  setControlValue("#dataStartRow", String(guess.dataStartRow));
+  setControlValue("#dataEndRow", "");
 
   renderPreview();
   show(qs("#previewSection"));
@@ -404,11 +419,11 @@ function getNumericSeries(column, label) {
 }
 
 function calculateColumn() {
-  const newColName = cellText(qs("#newColName").value);
-  const calcTemplate = qs("#calcTemplate").value;
-  const firstCol = qs("#firstCol").value;
-  const secondCol = qs("#secondCol").value;
-  const constantKText = qs("#constantK").value;
+  const newColName = cellText(getControlValue("#newColName"));
+  const calcTemplate = getControlValue("#calcTemplate");
+  const firstCol = getControlValue("#firstCol");
+  const secondCol = getControlValue("#secondCol");
+  const constantKText = getControlValue("#constantK");
 
   if (!newColName) {
     throw new Error("请输入新列名。");
@@ -482,7 +497,7 @@ function calculateColumn() {
   renderPreview();
   renderDataControls();
 
-  qs("#newColName").value = "";
+  setControlValue("#newColName", "");
   showMessage("success", `已生成新列：${newColName}`);
   setActiveStep("plot", { scroll: true });
 }

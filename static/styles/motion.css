@@ -194,8 +194,7 @@ html.motion-ready .workflow-list[data-reveal].is-visible li:nth-child(4) {
     transition-duration: 0.01ms !important;
   }
 
-  .sample-chart-card:hover,
-  .download-panel a:hover {
+  .sample-chart-card:hover {
     transform: none;
   }
 

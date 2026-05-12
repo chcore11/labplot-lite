@@ -1,12 +1,14 @@
 "use strict";
 
 function normalizeSelectedMetrics() {
-  const mode = qs("#metricMode").value;
+  const mode = getControlValue("#metricMode");
   if (mode === "basic") {
     return BASIC_METRICS.slice();
   }
 
-  const selected = qsa('input[name="selectedMetrics"]:checked').map((input) => input.value);
+  const selected = qsa('[name="selectedMetrics"]')
+    .filter(getControlChecked)
+    .map((input) => getControlValue(input));
   return selected.length ? selected : BASIC_METRICS.slice();
 }
 
@@ -31,16 +33,15 @@ function sortPairsByX(pairs) {
 function getSelectedCurveSummary() {
   return qsa("#curveConfigBox .curve-row")
     .map((row) => {
-      const ySelect = row.querySelector('select[name="curveYCols"]');
-      return ySelect ? ySelect.value : "";
+      return getControlValue(row.querySelector('[name="curveYCols"]'));
     })
     .filter(Boolean);
 }
 
 function readOutputSize() {
-  const figWidth = parsePositiveFloat(qs("#figWidth").value, 7, "图片宽度", 3, 20);
-  const figHeight = parsePositiveFloat(qs("#figHeight").value, 4.6, "图片高度", 2, 16);
-  const figDpi = Math.round(parsePositiveFloat(qs("#figDpi").value, 300, "图片 DPI", 72, 600));
+  const figWidth = parsePositiveFloat(getControlValue("#figWidth"), 7, "图片宽度", 3, 20);
+  const figHeight = parsePositiveFloat(getControlValue("#figHeight"), 4.6, "图片高度", 2, 16);
+  const figDpi = Math.round(parsePositiveFloat(getControlValue("#figDpi"), 300, "图片 DPI", 72, 600));
   return {
     width: Math.round(figWidth * figDpi),
     height: Math.round(figHeight * figDpi),
@@ -63,9 +64,9 @@ function inspectPlotReadiness() {
     return getPendingReadiness("等待数据", "上传或载入示例数据后再生成图像。");
   }
 
-  const xCol = qs("#xCol").value;
+  const xCol = getControlValue("#xCol");
   const yCols = getSelectedCurveSummary();
-  const fitType = qs("#fitType").value;
+  const fitType = getControlValue("#fitType");
 
   if (!xCol || !yCols.length) {
     return getPendingReadiness("等待选择绘图列", "选择 X 轴和至少一条 Y 轴曲线。");
@@ -161,9 +162,9 @@ function syncFitAvailability() {
   }
 
   const isMultiCurve = getSelectedCurveSummary().length > 1;
-  fitSelect.disabled = isMultiCurve;
+  setControlDisabled(fitSelect, isMultiCurve);
   if (isMultiCurve) {
-    fitSelect.value = "none";
+    setControlValue(fitSelect, "none");
   }
 }
 
@@ -174,7 +175,7 @@ function syncMetricBoxVisibility() {
     return;
   }
 
-  const isCustom = metricMode.value === "custom";
+  const isCustom = getControlValue(metricMode) === "custom";
   metricBox.classList.toggle("is-hidden", !isCustom);
   metricBox.setAttribute("aria-hidden", String(!isCustom));
 }
@@ -225,4 +226,3 @@ function setPlotGenerating(isGenerating, text = "正在生成") {
   setPlotProgress(text, isGenerating);
   updatePlotReadiness();
 }
-

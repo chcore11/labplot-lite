@@ -247,7 +247,7 @@
 
   .sample-card,
   .form-card,
-  .sample-list button,
+  .sample-list cds-button,
   .hint,
   .sample-card p {
     min-width: 0;

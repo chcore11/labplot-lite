@@ -132,9 +132,8 @@ body,
 .workbench,
 cds-button,
 cds-progress-step,
-.sample-list button,
+.sample-list cds-button,
 .sample-list a,
-.download-panel a,
 .sample-chart-card {
   transition:
     background-color var(--duration-med) var(--ease-out),
@@ -147,20 +146,15 @@ a {
   text-decoration: none;
 }
 
-button,
-input,
-select,
+cds-checkbox,
 cds-button {
   font: inherit;
 }
 
-button {
-  cursor: pointer;
-}
-
-button:disabled,
-select:disabled,
-input:disabled {
+cds-button[disabled],
+cds-select[disabled],
+cds-text-input[disabled],
+cds-number-input[disabled] {
   cursor: not-allowed;
   opacity: 0.55;
 }

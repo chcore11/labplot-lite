@@ -88,7 +88,10 @@ function setDownloadLink(selector, blob, filename) {
   state.objectUrls.push(url);
   link.href = url;
   link.download = filename;
+  link.setAttribute("href", url);
+  link.setAttribute("download", filename);
   link.removeAttribute("aria-disabled");
+  link.removeAttribute("disabled");
 }
 
 function canvasToBlob(canvas) {
@@ -241,6 +244,7 @@ function clearDownloadLink(selector) {
   }
   link.href = "#";
   link.removeAttribute("download");
+  link.setAttribute("href", "#");
   link.setAttribute("aria-disabled", "true");
 }
 

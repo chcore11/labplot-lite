@@ -191,6 +191,7 @@ const HEADER_KEYWORDS = [
 const state = {
   fileName: "",
   rawRows: [],
+  pendingUploadFile: null,
   columns: [],
   data: [],
   numericColumns: [],

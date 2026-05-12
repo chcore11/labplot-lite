@@ -1,13 +1,13 @@
 "use strict";
 
 function buildPlotPayload() {
-  const xCol = qs("#xCol").value;
+  const xCol = getControlValue("#xCol");
   const curveConfigs = getCurveConfigsFromForm();
   const yCols = curveConfigs.map((config) => config.yCol);
   const uniqueYCols = Array.from(new Set(yCols));
-  const chartType = qs("#chartType").value;
-  let fitType = qs("#fitType").value;
-  const metricMode = qs("#metricMode").value;
+  const chartType = getControlValue("#chartType");
+  let fitType = getControlValue("#fitType");
+  const metricMode = getControlValue("#metricMode");
   const selectedMetrics = normalizeSelectedMetrics();
 
   if (!xCol || !yCols.length) {
@@ -23,20 +23,20 @@ function buildPlotPayload() {
     throw new Error("请选择正确的拟合方式。");
   }
 
-  const figWidth = parsePositiveFloat(qs("#figWidth").value, 7, "图片宽度", 3, 20);
-  const figHeight = parsePositiveFloat(qs("#figHeight").value, 4.6, "图片高度", 2, 16);
-  const figDpi = Math.round(parsePositiveFloat(qs("#figDpi").value, 300, "图片 DPI", 72, 600));
-  const titleFontsize = parsePositiveFloat(qs("#titleFontsize").value, 15, "标题字体大小", 8, 40);
-  const labelFontsize = parsePositiveFloat(qs("#labelFontsize").value, 13, "坐标轴字体大小", 8, 32);
-  const legendFontsize = parsePositiveFloat(qs("#legendFontsize").value, 11, "图例字体大小", 6, 24);
-  const showGrid = qs("#showGrid").checked;
+  const figWidth = parsePositiveFloat(getControlValue("#figWidth"), 7, "图片宽度", 3, 20);
+  const figHeight = parsePositiveFloat(getControlValue("#figHeight"), 4.6, "图片高度", 2, 16);
+  const figDpi = Math.round(parsePositiveFloat(getControlValue("#figDpi"), 300, "图片 DPI", 72, 600));
+  const titleFontsize = parsePositiveFloat(getControlValue("#titleFontsize"), 15, "标题字体大小", 8, 40);
+  const labelFontsize = parsePositiveFloat(getControlValue("#labelFontsize"), 13, "坐标轴字体大小", 8, 32);
+  const legendFontsize = parsePositiveFloat(getControlValue("#legendFontsize"), 11, "图例字体大小", 6, 24);
+  const showGrid = getControlChecked("#showGrid");
 
-  const xLabel = cellText(qs("#xLabel").value) || xCol;
-  const yLabel = cellText(qs("#yLabel").value) || (curveConfigs.length > 1 ? uniqueYCols.join(" / ") : yCols[0]);
-  const plotTitle = autoTitle(qs("#plotTitle").value, xLabel, yLabel);
-  const headerRow = parsePositiveInt(qs("#headerRow").value, 1);
-  const dataStartRow = parsePositiveInt(qs("#dataStartRow").value, headerRow + 1);
-  const dataEndRow = parsePositiveInt(qs("#dataEndRow").value, null);
+  const xLabel = cellText(getControlValue("#xLabel")) || xCol;
+  const yLabel = cellText(getControlValue("#yLabel")) || (curveConfigs.length > 1 ? uniqueYCols.join(" / ") : yCols[0]);
+  const plotTitle = autoTitle(getControlValue("#plotTitle"), xLabel, yLabel);
+  const headerRow = parsePositiveInt(getControlValue("#headerRow"), 1);
+  const dataStartRow = parsePositiveInt(getControlValue("#dataStartRow"), headerRow + 1);
+  const dataEndRow = parsePositiveInt(getControlValue("#dataEndRow"), null);
 
   const datasets = [];
   const allPairs = [];
