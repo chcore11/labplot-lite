@@ -15,6 +15,73 @@ Use the Carbon + Plotly architecture for all frontend work:
 
 If Carbon or Plotly already covers the behavior, do not hand-write it.
 
+## Collaboration Norms
+
+The user expects concrete completion, not only proposals. When the request is actionable, make the change, verify it, commit it when appropriate, and push when the task asks for completion on `main` or continues an already-pushing workflow.
+
+Default collaboration behavior:
+
+- Prefer doing the work over explaining possible work.
+- Keep updates concise and factual, especially during long edits or verification.
+- Use Chinese for user-facing summaries unless the user asks otherwise.
+- Preserve the product direction already established in `PRODUCT.md`, `DESIGN.md`, `.impeccable/design.json`, and this file.
+- Treat screenshots from the user as concrete bug reports. If the issue is visual, verify visually instead of relying only on code inspection.
+- If the user points out a UI problem such as overlap, blockage, duplicated entry points, or confusing flow, fix the visible issue directly and then run the relevant workflow test.
+- If the user asks for cleanup, actually delete obsolete code, duplicated styles, old branches of logic, and unused files. Do not leave deprecated UI paths hidden in the repo.
+- If a change starts increasing code volume, stop and check whether Carbon, Plotly, or an existing helper already owns the behavior.
+- Do not revert collaborator or user changes unless explicitly asked. Work with the current tree.
+
+## Standard Work Loop
+
+For non-trivial repo work, follow this loop:
+
+1. Inspect: run `git status --short --branch`, read the relevant docs, and inspect existing code before deciding.
+2. Align: identify whether the change affects product, design, UI components, plotting, parsing, fitting, export, deployment, or docs.
+3. Reuse: look for existing helpers, Carbon components, Plotly options, and established module boundaries before adding code.
+4. Edit: keep the patch scoped. Prefer replacing or deleting old code over layering new code on top.
+5. Verify: run static checks and the smallest real user flow that proves the change works.
+6. Review: inspect `git diff --stat` and key diffs. Confirm the change did not add redundant UI or duplicate chart logic.
+7. Publish: if the task requires completion on the remote, commit with a clear message and push to `origin main`.
+
+## UI And Design Workflow
+
+For UI, design, layout, interaction, motion, accessibility, or visual cleanup work:
+
+- Use the project-local impeccable context before editing:
+
+  ```bash
+  node .agents/skills/impeccable/scripts/load-context.mjs
+  ```
+
+- Treat `PRODUCT.md`, `DESIGN.md`, and `.impeccable/design.json` as source files, not optional commentary.
+- If those files are stale relative to a major design direction, refresh or update the contract first.
+- Keep the workbench's Datawrapper-like linear path visible: upload, describe/check, visualize, export.
+- Keep the product feel: student lab report tool, lightweight Origin alternative, report paper plus instrument panel.
+- Do not drift into generic SaaS, AI-tool, glassmorphism, dark-gradient, or marketing-page styling.
+- Use browser verification for visible UI changes. Check desktop and a narrow mobile width when layout could be affected.
+
+## Refactor And Cleanup Workflow
+
+The user's repeated preference is less redundancy and less hand-rolled UI.
+
+When refactoring:
+
+- Delete replaced native controls, old CSS selectors, duplicate helper logic, and unused paths in the same change.
+- Keep glue code centralized. Carbon control read/write logic belongs in `static/js/01-dom-workflow-utils.js`.
+- Keep chart assembly centralized. Plotly traces and layouts belong in `static/js/06-plot-build-render.js`.
+- Keep event wiring in `static/js/08-events-init.js`; do not hide workflow state changes inside rendering helpers.
+- Keep docs honest. If architecture or dependencies change, update `README.md`, `PRODUCT.md`, `DESIGN.md`, `.impeccable/design.json`, or this file as needed.
+- Favor net code reduction when replacing custom UI with Carbon or custom plotting with Plotly.
+
+## Git And Publishing Workflow
+
+- Work on the current branch unless the user asks for a separate branch.
+- Before push, check `git status --short --branch`.
+- If `main` diverged from `origin/main`, use `git pull --rebase origin main` before pushing.
+- Do not force-push unless the user explicitly asks for history rewrite.
+- Keep commits focused and named after the product-level change.
+- After pushing, confirm the commit hash and that `main...origin/main` is clean.
+
 ## Read Before Editing
 
 Read these files before non-trivial changes:
