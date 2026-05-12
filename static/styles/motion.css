@@ -14,6 +14,48 @@
   }
 }
 
+@keyframes measuredScaleIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes tableRowIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawChartLine {
+  from {
+    stroke-dashoffset: 560;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes pointPlotIn {
+  from {
+    opacity: 0;
+    transform: scale(0.72);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .nav {
   animation: revealDown 0.45s var(--ease-out) both;
 }
@@ -23,7 +65,123 @@
 }
 
 .landing-hero .hero-product {
-  animation: riseFadeIn 0.65s var(--ease-out) 0.16s both;
+  animation: measuredScaleIn 0.64s var(--ease-out) 0.16s both;
+}
+
+.landing-hero .mini-table > div:not(.mini-table-head),
+.landing-hero .hero-inspector div {
+  animation: tableRowIn 0.34s var(--ease-out) both;
+}
+
+.landing-hero .mini-table > div:nth-child(2) {
+  animation-delay: 0.34s;
+}
+
+.landing-hero .mini-table > div:nth-child(3) {
+  animation-delay: 0.39s;
+}
+
+.landing-hero .mini-table > div:nth-child(4) {
+  animation-delay: 0.44s;
+}
+
+.landing-hero .mini-table > div:nth-child(5) {
+  animation-delay: 0.49s;
+}
+
+.landing-hero .mini-table > div:nth-child(6) {
+  animation-delay: 0.54s;
+}
+
+.landing-hero .hero-inspector div:nth-child(1) {
+  animation-delay: 0.42s;
+}
+
+.landing-hero .hero-inspector div:nth-child(2) {
+  animation-delay: 0.47s;
+}
+
+.landing-hero .hero-inspector div:nth-child(3) {
+  animation-delay: 0.52s;
+}
+
+.landing-hero .hero-inspector div:nth-child(4) {
+  animation-delay: 0.57s;
+}
+
+.landing-hero .report-chart .chart-fit-line {
+  stroke-dasharray: 560;
+  stroke-dashoffset: 560;
+  animation: drawChartLine 0.82s var(--ease-out) 0.54s both;
+}
+
+.landing-hero .report-chart .chart-points circle {
+  opacity: 0;
+  animation: pointPlotIn 0.28s var(--ease-out) both;
+}
+
+.landing-hero .report-chart .chart-points circle:nth-child(1) {
+  animation-delay: 0.62s;
+}
+
+.landing-hero .report-chart .chart-points circle:nth-child(2) {
+  animation-delay: 0.68s;
+}
+
+.landing-hero .report-chart .chart-points circle:nth-child(3) {
+  animation-delay: 0.74s;
+}
+
+.landing-hero .report-chart .chart-points circle:nth-child(4) {
+  animation-delay: 0.8s;
+}
+
+.landing-hero .report-chart .chart-points circle:nth-child(5) {
+  animation-delay: 0.86s;
+}
+
+.landing-hero .report-chart .chart-points circle:nth-child(6) {
+  animation-delay: 0.92s;
+}
+
+html.motion-ready [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+html.motion-ready [data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.46s var(--ease-out),
+    transform 0.46s var(--ease-out);
+}
+
+html.motion-ready .workflow-list[data-reveal] li {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.38s var(--ease-out),
+    transform 0.38s var(--ease-out);
+}
+
+html.motion-ready .workflow-list[data-reveal].is-visible li {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+html.motion-ready .workflow-list[data-reveal].is-visible li:nth-child(2),
+html.motion-ready .sample-chart-card[data-reveal].is-visible:nth-child(2) {
+  transition-delay: 0.06s;
+}
+
+html.motion-ready .workflow-list[data-reveal].is-visible li:nth-child(3),
+html.motion-ready .sample-chart-card[data-reveal].is-visible:nth-child(3) {
+  transition-delay: 0.12s;
+}
+
+html.motion-ready .workflow-list[data-reveal].is-visible li:nth-child(4) {
+  transition-delay: 0.18s;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -37,7 +195,14 @@
   }
 
   .btn-primary:hover,
+  .sample-chart-card:hover,
   .download-panel a:hover {
+    transform: none;
+  }
+
+  html.motion-ready [data-reveal],
+  html.motion-ready .workflow-list[data-reveal] li {
+    opacity: 1;
     transform: none;
   }
 }

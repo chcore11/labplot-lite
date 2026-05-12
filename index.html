@@ -7,6 +7,7 @@
   <title>LabPlot Lite - 实验数据，快速成图</title>
   <script src="./static/theme.js"></script>
   <link rel="stylesheet" href="./static/style.css">
+  <script defer src="./static/js/landing-motion.js"></script>
 </head>
 
 <body>
@@ -88,12 +89,12 @@
     </section>
 
     <section class="workflow-section" id="workflow" aria-labelledby="workflowTitle">
-      <div class="section-heading">
+      <div class="section-heading" data-reveal>
         <span>线性流程</span>
         <h2 id="workflowTitle">先跑通默认路径，再展开高级参数</h2>
       </div>
 
-      <ol class="workflow-list" aria-label="LabPlot Lite 使用流程">
+      <ol class="workflow-list" aria-label="LabPlot Lite 使用流程" data-reveal>
         <li>
           <span>01</span>
           <strong>导入数据</strong>
@@ -118,13 +119,13 @@
     </section>
 
     <section class="sample-gallery" id="samples" aria-labelledby="samplesTitle">
-      <div class="section-heading">
+      <div class="section-heading" data-reveal>
         <span>示例图件</span>
         <h2 id="samplesTitle">用接近实验报告的图件进入工作台</h2>
       </div>
 
       <div class="sample-chart-grid">
-        <a class="sample-chart-card sample-chart-wide" href="./workbench.html?sample=sample_03_abs_error.xlsx">
+        <a class="sample-chart-card sample-chart-wide" href="./workbench.html?sample=sample_03_abs_error.xlsx" data-reveal>
           <div>
             <span>标准曲线拟合</span>
             <strong>线性校准，残差检查</strong>
@@ -143,7 +144,7 @@
           </svg>
         </a>
 
-        <a class="sample-chart-card" href="./workbench.html?sample=sample_01_temp_c_to_k.xlsx">
+        <a class="sample-chart-card" href="./workbench.html?sample=sample_01_temp_c_to_k.xlsx" data-reveal>
           <div>
             <span>荧光发射光谱</span>
             <strong>多峰光谱，三组曲线对比</strong>
@@ -156,7 +157,7 @@
           </svg>
         </a>
 
-        <a class="sample-chart-card" href="./workbench.html?sample=sample_02_voltage_scale.xlsx">
+        <a class="sample-chart-card" href="./workbench.html?sample=sample_02_voltage_scale.xlsx" data-reveal>
           <div>
             <span>反应动力学</span>
             <strong>衰减曲线，时间序列检查</strong>
