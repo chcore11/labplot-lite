@@ -4,8 +4,8 @@
 
 .mode-landing,
 .simple-mode {
-  width: min(1180px, calc(100% - 40px));
-  margin: 34px auto 82px;
+  width: min(1120px, calc(100% - 40px));
+  margin: 44px auto 82px;
 }
 
 .mode-landing.is-hidden,
@@ -23,24 +23,46 @@
 .simple-mode {
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
-  background: var(--surface-raised);
+  background:
+    linear-gradient(180deg, oklch(100% 0.004 255), var(--surface-raised));
   box-shadow: var(--shadow-md);
 }
 
 .mode-landing-copy {
+  position: relative;
   display: grid;
   align-content: center;
-  gap: 18px;
-  padding: 34px;
+  gap: 20px;
+  min-height: 360px;
+  padding: clamp(28px, 4vw, 46px);
+  overflow: hidden;
+}
+
+.mode-landing-copy::after {
+  content: "";
+  position: absolute;
+  right: 28px;
+  bottom: 24px;
+  width: min(42%, 220px);
+  height: 88px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(90deg, var(--chart-grid) 1px, transparent 1px),
+    linear-gradient(var(--chart-grid) 1px, transparent 1px),
+    var(--paper);
+  background-size: 24px 24px;
+  opacity: 0.72;
+  pointer-events: none;
 }
 
 .mode-landing h1,
 .simple-mode h1 {
   margin: 0;
   color: var(--text-main);
-  font-size: 32px;
-  line-height: 1.16;
-  font-weight: 700;
+  font-size: clamp(34px, 4.4vw, 54px);
+  line-height: 1.08;
+  font-weight: 720;
   letter-spacing: 0;
   overflow-wrap: anywhere;
 }
@@ -78,14 +100,18 @@
 .mode-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
+}
+
+.mode-actions cds-button {
+  min-height: 48px;
 }
 
 .simple-mode {
   display: grid;
   gap: 18px;
-  padding: 24px;
+  padding: clamp(20px, 3vw, 30px);
 }
 
 .simple-mode > .message {
@@ -103,7 +129,7 @@
 
 .simple-upload-panel {
   min-width: 0;
-  padding: 18px;
+  padding: clamp(22px, 3vw, 34px);
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
   background: var(--surface-soft);
@@ -111,6 +137,10 @@
 
 .simple-upload-panel cds-file-uploader {
   width: 100%;
+}
+
+#simpleFileInput {
+  min-height: 48px;
 }
 
 .simple-result {
@@ -183,6 +213,17 @@
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
+}
+
+.simple-result-actions cds-button,
+.download-panel cds-button,
+.form-button,
+#plotSubmitButton {
+  min-height: 46px;
+}
+
+.sample-list cds-button {
+  min-height: 50px;
 }
 
 .workbench {

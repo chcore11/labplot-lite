@@ -220,7 +220,7 @@
 
   .mode-landing h1,
   .simple-mode h1 {
-    font-size: 28px;
+    font-size: 32px;
   }
 
   .mode-flow {
@@ -231,6 +231,14 @@
     display: grid;
   }
 
+  #simpleFileInput,
+  .simple-result-actions cds-button,
+  .download-panel cds-button,
+  .mode-actions cds-button,
+  .form-button,
+  #plotSubmitButton {
+    width: 100%;
+  }
   .simple-meta-grid {
     grid-template-columns: 1fr;
   }
