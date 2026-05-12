@@ -299,12 +299,11 @@ async function handleSimpleFile(file) {
 }
 
 function setupModeEvents() {
-  qs("#enterSimpleMode")?.addEventListener("click", () => {
-    showMode("simple");
-  });
-
-  qs("#enterAdvancedMode")?.addEventListener("click", () => {
-    showMode("advanced");
+  qsa("[data-mode-choice]").forEach((entry) => {
+    entry.addEventListener("click", (event) => {
+      event.preventDefault();
+      showMode(entry.dataset.modeChoice);
+    });
   });
 
   qsa("#simpleToAdvanced, #simpleToAdvancedTop").forEach((button) => {

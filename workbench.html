@@ -53,21 +53,29 @@
       <div class="mode-landing-copy">
         <span class="section-kicker">LabPlot Lite 工作台</span>
         <h1 id="modeLandingTitle">先走最短路径，需要时再展开功能</h1>
-        <p>简易模式只需要拖入文件并下载 PNG；功能模式保留表头范围、计算列、多曲线、拟合和素材包导出。</p>
+        <p>简易模式只需要拖入文件并下载 PNG。功能模式保留表头范围、计算列、多曲线、拟合和素材包导出。</p>
+        <div class="mode-flow" aria-label="默认流程">
+          <span>上传</span>
+          <span>识别</span>
+          <span>成图</span>
+          <span>导出</span>
+        </div>
       </div>
 
       <div class="mode-choice-grid" aria-label="工作模式">
-        <cds-button type="button" kind="tertiary" class="mode-choice-card" id="enterSimpleMode">
+        <a class="mode-choice-card mode-choice-primary" id="enterSimpleMode" href="./workbench.html?mode=simple" data-mode-choice="simple">
           <span>简易模式</span>
           <strong>拖入文件，直接生图</strong>
           <small>自动识别表头和 X/Y 数值列，默认散点连线，适合快速得到一张报告图。</small>
-        </cds-button>
+          <em>2 步完成</em>
+        </a>
 
-        <cds-button type="button" kind="tertiary" class="mode-choice-card" id="enterAdvancedMode">
+        <a class="mode-choice-card" id="enterAdvancedMode" href="./workbench.html?mode=advanced" data-mode-choice="advanced">
           <span>功能模式</span>
           <strong>进入完整工作台</strong>
           <small>手动确认数据范围，配置多曲线、计算列、拟合指标和报告素材。</small>
-        </cds-button>
+          <em>完整控制</em>
+        </a>
       </div>
     </section>
 
