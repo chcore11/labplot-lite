@@ -322,6 +322,17 @@
   box-shadow: 0 18px 42px oklch(21% 0.014 255 / 0.13);
 }
 
+.plot-viewport {
+  overflow: hidden;
+}
+
+.plot-viewport > svg,
+.plot-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .result-side {
   display: grid;
   gap: 12px;

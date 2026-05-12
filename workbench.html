@@ -8,6 +8,8 @@
   <script src="./static/theme.js"></script>
   <link rel="stylesheet" href="./static/style.css">
   <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6.17/dist/plot.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script defer src="./static/js/00-config-state.js"></script>
@@ -97,11 +99,12 @@
         </div>
 
         <div class="simple-plot-wrap">
-          <canvas id="simplePlotCanvas" class="plot" aria-label="简易模式 X-Y 图"></canvas>
+          <div id="simplePlotCanvas" class="plot plot-viewport" role="img" aria-label="简易模式 X-Y 图"></div>
         </div>
 
         <div class="simple-result-actions">
           <a id="simpleDownloadPng" class="btn btn-secondary" href="#">下载 PNG</a>
+          <a id="simpleDownloadSvg" class="btn btn-secondary" href="#">下载 SVG</a>
           <a id="simpleDownloadCsv" class="btn btn-secondary" href="#">下载 CSV</a>
           <a id="simpleDownloadTxt" class="btn btn-secondary" href="#">下载 TXT 报告</a>
           <button type="button" class="btn btn-primary" id="simpleToAdvanced">进入功能模式手动调整</button>
@@ -494,7 +497,7 @@
               </div>
 
               <div class="plot-wrap">
-                <canvas id="plotCanvas" class="plot" aria-label="X-Y 图"></canvas>
+                <div id="plotCanvas" class="plot plot-viewport" role="img" aria-label="X-Y 图"></div>
               </div>
             </div>
 
@@ -508,6 +511,7 @@
                 <h3>下载文件</h3>
                 <a id="downloadZip" href="#">下载报告素材包 ZIP</a>
                 <a id="downloadPng" href="#">下载 PNG 图片</a>
+                <a id="downloadSvg" href="#">下载 SVG 矢量图</a>
                 <a id="downloadFitReport" href="#">下载拟合报告 TXT</a>
                 <a id="downloadOriginCsv" href="#">下载绘图数据 CSV</a>
                 <a id="downloadFullCsv" href="#">下载完整数据 CSV</a>

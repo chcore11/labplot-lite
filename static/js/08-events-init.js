@@ -2,7 +2,12 @@
 
 const REQUIRED_DEPENDENCIES = [
   { key: "xlsx", label: "Excel 解析库", affects: "XLS / XLSX 文件和示例数据", isLoaded: () => Boolean(window.XLSX) },
-  { key: "chart", label: "图表绘制库", affects: "图像生成", isLoaded: () => Boolean(window.Chart) },
+  {
+    key: "chart",
+    label: "图表绘制库",
+    affects: "图像生成和 SVG 导出",
+    isLoaded: () => Boolean(window.Plot || window.Chart),
+  },
   { key: "zip", label: "ZIP 打包库", affects: "报告素材包导出", isLoaded: () => Boolean(window.JSZip) },
 ];
 

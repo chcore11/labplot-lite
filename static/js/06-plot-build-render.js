@@ -220,6 +220,7 @@ function buildPlotPayload() {
     fullColumns: state.columns,
     filenames: {
       png: `${prefix}_${jobId}.png`,
+      svg: `${prefix}_${jobId}.svg`,
       originCsv: `${prefix}_origin_${jobId}.csv`,
       fullCsv: `${prefix}_full_data_${jobId}.csv`,
       fitReport: `${prefix}_fit_report_${jobId}.txt`,
@@ -323,6 +324,7 @@ function buildSimplePlotPayload(options) {
     fullColumns: state.columns,
     filenames: {
       png: `${prefix}_${jobId}.png`,
+      svg: `${prefix}_${jobId}.svg`,
       originCsv: `${prefix}_origin_${jobId}.csv`,
       fullCsv: `${prefix}_full_data_${jobId}.csv`,
       fitReport: `${prefix}_report_${jobId}.txt`,
@@ -428,6 +430,304 @@ function getThemeColors() {
   };
 }
 
+function getPlotPixelSize(payload) {
+  return {
+    width: Math.round(payload.figWidth * payload.figDpi),
+    height: Math.round(payload.figHeight * payload.figDpi),
+  };
+}
+
+function getPlotTarget(selector) {
+  const target = qs(selector);
+  if (!target) {
+    throw new Error("图像预览容器不存在。");
+  }
+  return target;
+}
+
+function clearRenderedPlot(target) {
+  if (state.chart) {
+    state.chart.destroy();
+    state.chart = null;
+  }
+  if (target instanceof HTMLCanvasElement) {
+    const context = target.getContext("2d");
+    if (context) {
+      context.clearRect(0, 0, target.width, target.height);
+    }
+    return;
+  }
+  target.replaceChildren();
+}
+
+function prepareCanvasTarget(selector) {
+  const target = getPlotTarget(selector);
+  clearRenderedPlot(target);
+  if (target instanceof HTMLCanvasElement) {
+    return target;
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.className = "plot-canvas";
+  canvas.setAttribute("aria-label", target.getAttribute("aria-label") || "X-Y 图");
+  target.dataset.renderer = "chartjs";
+  target.appendChild(canvas);
+  return canvas;
+}
+
+function dashArrayToString(dashArray, scale) {
+  if (!Array.isArray(dashArray) || !dashArray.length) {
+    return null;
+  }
+  return dashArray.map((value) => Math.max(value * scale, 1).toFixed(2)).join(" ");
+}
+
+function estimateLegendRows(datasets, width, margins, scale, fontSize) {
+  if (datasets.length <= 1) {
+    return 0;
+  }
+
+  const availableWidth = Math.max(width - margins.left - margins.right, 320 * scale);
+  let rows = 1;
+  let usedWidth = 0;
+
+  datasets.forEach((dataset) => {
+    const labelWidth = String(dataset.label || "").length * fontSize * 0.58;
+    const itemWidth = Math.min(Math.max(labelWidth + (58 * scale), 150 * scale), 360 * scale);
+    if (usedWidth > 0 && usedWidth + itemWidth > availableWidth) {
+      rows += 1;
+      usedWidth = 0;
+    }
+    usedWidth += itemWidth;
+  });
+
+  return rows;
+}
+
+function getObservablePlotLayout(payload, width, scale) {
+  const margins = {
+    top: 34 * scale,
+    right: 36 * scale,
+    bottom: 64 * scale,
+    left: 78 * scale,
+  };
+  const legendRows = estimateLegendRows(payload.datasets, width, margins, scale, payload.legendFontsize * scale);
+  if (legendRows) {
+    margins.top += (legendRows * 25 * scale) + (10 * scale);
+  }
+  return margins;
+}
+
+function makePlotDomain(minValue, maxValue, axisMaxValue) {
+  if (!Number.isFinite(minValue) || !Number.isFinite(maxValue)) {
+    return undefined;
+  }
+  if (shouldAxisStartAtZero(minValue, maxValue)) {
+    return [0, axisMaxValue || maxValue];
+  }
+  return undefined;
+}
+
+function appendObservableLegend(svg, payload, layout, scale, colors) {
+  if (payload.datasets.length <= 1) {
+    return;
+  }
+
+  const fontSize = payload.legendFontsize * scale;
+  const lineLength = 20 * scale;
+  const itemGap = 16 * scale;
+  const rowGap = 24 * scale;
+  const startX = layout.left;
+  const maxX = Number(svg.getAttribute("width")) - layout.right;
+  let x = startX;
+  let y = 26 * scale;
+
+  const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  group.setAttribute("aria-hidden", "true");
+  svg.appendChild(group);
+
+  payload.datasets.forEach((dataset) => {
+    const label = String(dataset.label || "Series");
+    const color = dataset.borderColor || dataset.backgroundColor || colors.axis;
+    const labelWidth = label.length * fontSize * 0.58;
+    const itemWidth = Math.min(Math.max(labelWidth + (58 * scale), 150 * scale), 360 * scale);
+
+    if (x > startX && x + itemWidth > maxX) {
+      x = startX;
+      y += rowGap;
+    }
+
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", String(x));
+    line.setAttribute("x2", String(x + lineLength));
+    line.setAttribute("y1", String(y));
+    line.setAttribute("y2", String(y));
+    line.setAttribute("stroke", color);
+    line.setAttribute("stroke-width", String(Math.max((dataset.borderWidth || 1.7) * scale, 1)));
+    const dash = dashArrayToString(dataset.borderDash, scale);
+    if (dash) {
+      line.setAttribute("stroke-dasharray", dash);
+    }
+    group.appendChild(line);
+
+    if (dataset.pointRadius) {
+      const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      dot.setAttribute("cx", String(x + (lineLength / 2)));
+      dot.setAttribute("cy", String(y));
+      dot.setAttribute("r", String(Math.max(dataset.pointRadius * scale, 2 * scale)));
+      dot.setAttribute("fill", dataset.backgroundColor || color);
+      dot.setAttribute("stroke", dataset.pointBorderColor || "rgb(252, 252, 249)");
+      dot.setAttribute("stroke-width", String(Math.max((dataset.pointBorderWidth || 0) * scale, 0.8)));
+      group.appendChild(dot);
+    }
+
+    const labelNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    labelNode.textContent = label;
+    labelNode.setAttribute("x", String(x + lineLength + (8 * scale)));
+    labelNode.setAttribute("y", String(y + (fontSize * 0.35)));
+    labelNode.setAttribute("fill", colors.text);
+    labelNode.setAttribute("font-size", String(fontSize));
+    labelNode.setAttribute("font-weight", "560");
+    group.appendChild(labelNode);
+
+    x += itemWidth + itemGap;
+  });
+}
+
+function appendObservableFitLabel(svg, payload, layout, scale, colors) {
+  if (!payload.fitText) {
+    return;
+  }
+
+  const lines = payload.fitText.split("\n");
+  const fontSize = 11 * scale;
+  const lineHeight = 16 * scale;
+  const padding = 8 * scale;
+  const x = layout.left + (14 * scale);
+  const y = layout.top + (12 * scale);
+  const textWidth = Math.max(...lines.map((line) => line.length * fontSize * 0.62));
+  const boxWidth = textWidth + (padding * 2);
+  const boxHeight = (lines.length * lineHeight) + (padding * 2);
+
+  const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  group.setAttribute("aria-hidden", "true");
+  svg.appendChild(group);
+
+  const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  rect.setAttribute("x", String(x));
+  rect.setAttribute("y", String(y));
+  rect.setAttribute("width", String(boxWidth));
+  rect.setAttribute("height", String(boxHeight));
+  rect.setAttribute("rx", String(5 * scale));
+  rect.setAttribute("fill", colors.fitLabelBg);
+  rect.setAttribute("stroke", colors.fitLabelBorder);
+  rect.setAttribute("stroke-width", String(0.8 * scale));
+  group.appendChild(rect);
+
+  lines.forEach((line, index) => {
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.textContent = line;
+    text.setAttribute("x", String(x + padding));
+    text.setAttribute("y", String(y + padding + fontSize + (index * lineHeight)));
+    text.setAttribute("fill", colors.fitLabelText);
+    text.setAttribute("font-size", String(fontSize));
+    text.setAttribute("font-weight", "560");
+    group.appendChild(text);
+  });
+}
+
+function makeObservableMarks(payload, scale, colors) {
+  const marks = [];
+  payload.datasets.forEach((dataset) => {
+    const stroke = dataset.borderColor || colors.axis;
+    const fill = dataset.backgroundColor || stroke;
+    const dash = dashArrayToString(dataset.borderDash, scale);
+
+    if (dataset.showLine !== false) {
+      marks.push(Plot.line(dataset.data, {
+        x: "x",
+        y: "y",
+        stroke,
+        strokeWidth: Math.max((dataset.borderWidth || 1.7) * scale, 1),
+        strokeDasharray: dash,
+        curve: "linear",
+      }));
+    }
+
+    if ((dataset.pointRadius || 0) > 0) {
+      marks.push(Plot.dot(dataset.data, {
+        x: "x",
+        y: "y",
+        r: Math.max(dataset.pointRadius * scale, 1.8 * scale),
+        fill,
+        stroke: dataset.pointBorderColor || "rgb(252, 252, 249)",
+        strokeWidth: Math.max((dataset.pointBorderWidth || 0) * scale, 0.6),
+      }));
+    }
+  });
+
+  marks.push(Plot.frame({
+    stroke: colors.axis,
+    strokeWidth: 1.05 * scale,
+  }));
+  return marks;
+}
+
+function renderObservablePlot(payload, selector) {
+  if (!window.Plot) {
+    throw new Error("Observable Plot 绘图库未加载，请检查网络后刷新页面。");
+  }
+
+  const target = getPlotTarget(selector);
+  clearRenderedPlot(target);
+
+  const { width, height } = getPlotPixelSize(payload);
+  const colors = getThemeColors();
+  const scale = chartRenderScale(payload);
+  const layout = getObservablePlotLayout(payload, width, scale);
+  const yAxisMax = shouldAxisStartAtZero(payload.yMin, payload.yMax) ? nicePositiveAxisMax(payload.yMax) : undefined;
+  const plot = Plot.plot({
+    width,
+    height,
+    marginTop: layout.top,
+    marginRight: layout.right,
+    marginBottom: layout.bottom,
+    marginLeft: layout.left,
+    style: {
+      background: colors.surface,
+      color: colors.text,
+      fontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC, Arial, sans-serif",
+      fontSize: `${Math.max((payload.labelFontsize - 2) * scale, 8 * scale)}px`,
+    },
+    x: {
+      label: payload.xLabel,
+      grid: payload.showGrid,
+      domain: makePlotDomain(payload.xMin, payload.xMax),
+      nice: true,
+      tickFormat: formatShortNumber,
+    },
+    y: {
+      label: payload.yLabel,
+      grid: payload.showGrid,
+      domain: makePlotDomain(payload.yMin, payload.yMax, yAxisMax),
+      nice: true,
+      tickFormat: formatShortNumber,
+    },
+    marks: makeObservableMarks(payload, scale, colors),
+  });
+
+  plot.setAttribute("role", "img");
+  plot.setAttribute("aria-label", `${payload.plotTitle || "X-Y 图"}，${payload.xLabel} 对 ${payload.yLabel}`);
+  plot.classList.add("plot-svg");
+  appendObservableLegend(plot, payload, layout, scale, colors);
+  appendObservableFitLabel(plot, payload, layout, scale, colors);
+
+  target.dataset.renderer = "observable-plot";
+  target.style.setProperty("--plot-output-width", `${width}px`);
+  target.style.setProperty("--plot-output-height", `${height}px`);
+  target.appendChild(plot);
+}
+
 function ensureChartPlugin() {
   if (!window.Chart || window.__labplotFitLabelPluginRegistered) {
     return;
@@ -504,16 +804,15 @@ function ensureChartPlugin() {
   window.__labplotFitLabelPluginRegistered = true;
 }
 
-function renderChart(payload, canvasSelector = "#plotCanvas") {
+function renderChartWithChartJs(payload, canvasSelector = "#plotCanvas") {
   if (!window.Chart) {
     throw new Error("图表库未加载，请检查网络后刷新页面。");
   }
 
   ensureChartPlugin();
 
-  const canvas = qs(canvasSelector);
-  const width = Math.round(payload.figWidth * payload.figDpi);
-  const height = Math.round(payload.figHeight * payload.figDpi);
+  const canvas = prepareCanvasTarget(canvasSelector);
+  const { width, height } = getPlotPixelSize(payload);
   canvas.width = width;
   canvas.height = height;
 
@@ -694,3 +993,10 @@ function renderChart(payload, canvasSelector = "#plotCanvas") {
   canvas.style.height = "auto";
 }
 
+function renderChart(payload, canvasSelector = "#plotCanvas") {
+  if (window.Plot) {
+    renderObservablePlot(payload, canvasSelector);
+    return;
+  }
+  renderChartWithChartJs(payload, canvasSelector);
+}

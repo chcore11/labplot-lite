@@ -88,6 +88,7 @@ function setDownloadLink(selector, blob, filename) {
   state.objectUrls.push(url);
   link.href = url;
   link.download = filename;
+  link.removeAttribute("aria-disabled");
 }
 
 function canvasToBlob(canvas) {
@@ -102,6 +103,96 @@ function canvasToBlob(canvas) {
   });
 }
 
+function getRenderedCanvas(target) {
+  if (target instanceof HTMLCanvasElement) {
+    return target;
+  }
+  return target ? target.querySelector("canvas") : null;
+}
+
+function getRenderedSvg(target) {
+  if (target instanceof SVGSVGElement) {
+    return target;
+  }
+  return target ? target.querySelector("svg") : null;
+}
+
+function svgToBlob(svg) {
+  if (!svg) {
+    return null;
+  }
+
+  const clone = svg.cloneNode(true);
+  clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  if (!clone.getAttribute("width") && svg.viewBox && svg.viewBox.baseVal.width) {
+    clone.setAttribute("width", String(svg.viewBox.baseVal.width));
+  }
+  if (!clone.getAttribute("height") && svg.viewBox && svg.viewBox.baseVal.height) {
+    clone.setAttribute("height", String(svg.viewBox.baseVal.height));
+  }
+
+  const source = new XMLSerializer().serializeToString(clone);
+  return new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+}
+
+function loadImage(url) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("SVG 图像转换失败。"));
+    image.src = url;
+  });
+}
+
+async function svgBlobToPngBlob(svgBlob, width, height) {
+  const url = URL.createObjectURL(svgBlob);
+  try {
+    const image = await loadImage(url);
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+    context.fillStyle = getThemeColors().surface;
+    context.fillRect(0, 0, width, height);
+    context.drawImage(image, 0, 0, width, height);
+    return canvasToBlob(canvas);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+async function renderedPlotToPngBlob(selector, payload) {
+  const target = qs(selector);
+  const canvas = getRenderedCanvas(target);
+  if (canvas) {
+    return canvasToBlob(canvas);
+  }
+
+  const svg = getRenderedSvg(target);
+  const svgBlob = svgToBlob(svg);
+  if (!svg || !svgBlob) {
+    throw new Error("没有找到可导出的图像。");
+  }
+
+  const width = Math.round(Number(svg.getAttribute("width")) || payload.figWidth * payload.figDpi);
+  const height = Math.round(Number(svg.getAttribute("height")) || payload.figHeight * payload.figDpi);
+  return svgBlobToPngBlob(svgBlob, width, height);
+}
+
+function renderedPlotToSvgBlob(selector) {
+  return svgToBlob(getRenderedSvg(qs(selector)));
+}
+
+function clearDownloadLink(selector) {
+  const link = qs(selector);
+  if (!link) {
+    return;
+  }
+  link.href = "#";
+  link.removeAttribute("download");
+  link.setAttribute("aria-disabled", "true");
+}
+
 async function renderDownloads(payload) {
   if (!window.JSZip) {
     throw new Error("ZIP 打包库未加载，请检查网络后刷新页面。");
@@ -109,7 +200,8 @@ async function renderDownloads(payload) {
 
   revokeDownloadUrls();
 
-  const pngBlob = await canvasToBlob(qs("#plotCanvas"));
+  const pngBlob = await renderedPlotToPngBlob("#plotCanvas", payload);
+  const svgBlob = renderedPlotToSvgBlob("#plotCanvas");
   const originCsvBlob = new Blob(
     ["\uFEFF", rowsToCsv(payload.originRows, payload.originColumns)],
     { type: "text/csv;charset=utf-8" },
@@ -123,12 +215,20 @@ async function renderDownloads(payload) {
 
   const zip = new JSZip();
   zip.file(payload.filenames.png, pngBlob);
+  if (svgBlob && payload.filenames.svg) {
+    zip.file(payload.filenames.svg, svgBlob);
+  }
   zip.file(payload.filenames.originCsv, originCsvBlob);
   zip.file(payload.filenames.fullCsv, fullCsvBlob);
   zip.file(payload.filenames.fitReport, fitReportBlob);
   const zipBlob = await zip.generateAsync({ type: "blob" });
 
   setDownloadLink("#downloadPng", pngBlob, payload.filenames.png);
+  if (svgBlob && payload.filenames.svg) {
+    setDownloadLink("#downloadSvg", svgBlob, payload.filenames.svg);
+  } else {
+    clearDownloadLink("#downloadSvg");
+  }
   setDownloadLink("#downloadOriginCsv", originCsvBlob, payload.filenames.originCsv);
   setDownloadLink("#downloadFullCsv", fullCsvBlob, payload.filenames.fullCsv);
   setDownloadLink("#downloadFitReport", fitReportBlob, payload.filenames.fitReport);
@@ -138,7 +238,8 @@ async function renderDownloads(payload) {
 async function renderSimpleDownloads(payload) {
   revokeDownloadUrls();
 
-  const pngBlob = await canvasToBlob(qs("#simplePlotCanvas"));
+  const pngBlob = await renderedPlotToPngBlob("#simplePlotCanvas", payload);
+  const svgBlob = renderedPlotToSvgBlob("#simplePlotCanvas");
   const originCsvBlob = new Blob(
     ["\uFEFF", rowsToCsv(payload.originRows, payload.originColumns)],
     { type: "text/csv;charset=utf-8" },
@@ -147,6 +248,11 @@ async function renderSimpleDownloads(payload) {
   const reportBlob = new Blob([reportText], { type: "text/plain;charset=utf-8" });
 
   setDownloadLink("#simpleDownloadPng", pngBlob, payload.filenames.png);
+  if (svgBlob && payload.filenames.svg) {
+    setDownloadLink("#simpleDownloadSvg", svgBlob, payload.filenames.svg);
+  } else {
+    clearDownloadLink("#simpleDownloadSvg");
+  }
   setDownloadLink("#simpleDownloadCsv", originCsvBlob, payload.filenames.originCsv);
   setDownloadLink("#simpleDownloadTxt", reportBlob, payload.filenames.fitReport);
 }
@@ -204,4 +310,3 @@ function renderResult(payload) {
 
   show(qs("#resultSection"));
 }
-
