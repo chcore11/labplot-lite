@@ -1,5 +1,6 @@
 ﻿.DS_Store
 .venv/
+.tmp-edge-check-*/
 uploads/
 output/
 __pycache__/

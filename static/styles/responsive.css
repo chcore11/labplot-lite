@@ -86,7 +86,6 @@
 
   .upload-layout,
   .mode-landing,
-  .mode-choice-grid,
   .sample-guide,
   .simple-result-meta,
   .result-side,
@@ -224,29 +223,16 @@
     font-size: 28px;
   }
 
-  .mode-choice-card {
-    min-height: 140px;
-  }
-
   .mode-flow {
     max-width: none;
   }
 
-  .simple-mode-head,
-  .simple-upload-dropzone {
+  .simple-mode-head {
     display: grid;
-  }
-
-  .simple-upload-dropzone {
-    grid-template-columns: 1fr;
   }
 
   .simple-meta-grid {
     grid-template-columns: 1fr;
-  }
-
-  .mode-flow {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .workbench-head,

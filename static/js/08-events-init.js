@@ -42,7 +42,7 @@ function checkRequiredDependencies() {
   }
 
   if (missingKeys.has("chart")) {
-    qsa("#plotSubmitButton").forEach(disableControl);
+    qsa("#plotSubmitButton, #simpleFileInput, #enterSimpleMode").forEach(disableControl);
   }
 
   if (missingKeys.has("zip")) {
@@ -262,6 +262,9 @@ function loadSimpleRows(rows, fileName) {
 async function handleSimpleFile(file) {
   clearSimpleMessage();
 
+  if (!window.Plotly) {
+    throw new Error("图表绘制库未加载，暂时不能生成简易模式图像。请检查网络后刷新页面。");
+  }
   if (!file) {
     throw new Error("请先选择 CSV / Excel 文件。");
   }
@@ -271,12 +274,23 @@ async function handleSimpleFile(file) {
 
   setSimpleMessage("info", "正在读取文件并识别绘图列...");
   const rows = await parseFile(file);
-  const headerGuess = loadSimpleRows(rows, file.name);
+  loadSimpleRows(rows, file.name);
   const { xCol, yCol } = chooseSimpleXYColumns();
 
   setSelectIfExists("#xCol", xCol);
   setSelectIfExists("#chartType", "line_marker");
   setSelectIfExists("#fitType", "none");
+  setSelectIfExists("#metricMode", "basic");
+  setControlValue("#plotTitle", "");
+  setControlValue("#xLabel", xCol);
+  setControlValue("#yLabel", yCol);
+  setControlValue("#figWidth", "7");
+  setControlValue("#figHeight", "4.6");
+  setControlValue("#figDpi", "300");
+  setControlValue("#titleFontsize", "15");
+  setControlValue("#labelFontsize", "13");
+  setControlValue("#legendFontsize", "11");
+  setControlChecked("#showGrid", false);
   renderCurveRows([{
     yCol,
     color: DEFAULT_CURVE_COLORS[0],
@@ -285,7 +299,7 @@ async function handleSimpleFile(file) {
   }]);
   updatePlotReadiness();
 
-  const payload = buildSimplePlotPayload({ xCol, yCol, headerGuess });
+  const payload = buildPlotPayload();
   state.simplePlotPayload = payload;
   state.lastPlotPayload = payload;
   await renderChart(payload, "#simplePlotCanvas");
@@ -302,6 +316,9 @@ function setupModeEvents() {
   qsa("[data-mode-choice]").forEach((entry) => {
     entry.addEventListener("click", (event) => {
       event.preventDefault();
+      if (entry.disabled || entry.getAttribute("aria-disabled") === "true") {
+        return;
+      }
       showMode(entry.dataset.modeChoice);
     });
   });
@@ -316,7 +333,6 @@ function setupModeEvents() {
   });
 
   const simpleFileButton = qs("#simpleFileInput");
-  const dropzone = qs("#simpleDropzone");
   const handleSimpleFileChange = async (event) => {
     try {
       await handleSimpleFile(getFileFromUploadEvent(event, simpleFileButton));
@@ -327,28 +343,6 @@ function setupModeEvents() {
 
   simpleFileButton?.addEventListener("cds-file-uploader-button-changed", handleSimpleFileChange);
   simpleFileButton?.addEventListener("change", handleSimpleFileChange);
-
-  ["dragenter", "dragover"].forEach((eventName) => {
-    dropzone?.addEventListener(eventName, (event) => {
-      event.preventDefault();
-      dropzone.classList.add("is-dragging");
-    });
-  });
-
-  ["dragleave", "drop"].forEach((eventName) => {
-    dropzone?.addEventListener(eventName, (event) => {
-      event.preventDefault();
-      dropzone.classList.remove("is-dragging");
-    });
-  });
-
-  dropzone?.addEventListener("drop", async (event) => {
-    try {
-      await handleSimpleFile(event.dataTransfer?.files?.[0] || null);
-    } catch (error) {
-      setSimpleMessage("error", error.message);
-    }
-  });
 }
 
 function setupTheme() {

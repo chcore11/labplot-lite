@@ -53,29 +53,17 @@
       <div class="mode-landing-copy">
         <span class="section-kicker">LabPlot Lite 工作台</span>
         <h1 id="modeLandingTitle">先走最短路径，需要时再展开功能</h1>
-        <p>简易模式只需要拖入文件并下载 PNG。功能模式保留表头范围、计算列、多曲线、拟合和素材包导出。</p>
-        <div class="mode-flow" aria-label="默认流程">
-          <span>上传</span>
-          <span>识别</span>
-          <span>成图</span>
-          <span>导出</span>
+        <p>简易模式只需要选择文件并下载 PNG。功能模式保留表头范围、计算列、多曲线、拟合和素材包导出。</p>
+        <ol class="mode-flow" aria-label="默认流程">
+          <li>上传</li>
+          <li>识别</li>
+          <li>成图</li>
+          <li>导出</li>
+        </ol>
+        <div class="mode-actions" aria-label="工作模式">
+          <cds-button id="enterSimpleMode" href="./workbench.html?mode=simple" data-mode-choice="simple" kind="primary" size="lg">打开简易模式</cds-button>
+          <cds-button id="enterAdvancedMode" href="./workbench.html?mode=advanced" data-mode-choice="advanced" kind="tertiary" size="lg">打开功能模式</cds-button>
         </div>
-      </div>
-
-      <div class="mode-choice-grid" aria-label="工作模式">
-        <a class="mode-choice-card mode-choice-primary" id="enterSimpleMode" href="./workbench.html?mode=simple" data-mode-choice="simple">
-          <span>简易模式</span>
-          <strong>拖入文件，直接生图</strong>
-          <small>自动识别表头和 X/Y 数值列，默认散点连线，适合快速得到一张报告图。</small>
-          <em>2 步完成</em>
-        </a>
-
-        <a class="mode-choice-card" id="enterAdvancedMode" href="./workbench.html?mode=advanced" data-mode-choice="advanced">
-          <span>功能模式</span>
-          <strong>进入完整工作台</strong>
-          <small>手动确认数据范围，配置多曲线、计算列、拟合指标和报告素材。</small>
-          <em>完整控制</em>
-        </a>
       </div>
     </section>
 
@@ -83,22 +71,23 @@
       <div class="simple-mode-head">
         <div>
           <span class="section-kicker">简易模式</span>
-          <h1 id="simpleModeTitle">把 Excel / CSV 拖到这里，生成基础图</h1>
+          <h1 id="simpleModeTitle">选择 Excel / CSV，生成基础图</h1>
           <p>系统自动选择一组 X/Y，默认散点连线，不做自动拟合。</p>
         </div>
         <cds-button type="button" kind="tertiary" size="sm" id="simpleToAdvancedTop">进入功能模式</cds-button>
       </div>
 
-      <div class="simple-upload-dropzone" id="simpleDropzone">
-        <div class="simple-upload-copy">
-          <strong>拖拽 CSV / XLSX / XLS 文件到这里</strong>
-          <span>也可以点击选择文件。页面只在浏览器本地读取数据，不上传到服务器。</span>
-        </div>
+      <div class="simple-upload-panel">
+        <cds-file-uploader
+          label-title="选择 CSV / XLSX / XLS 文件"
+          label-description="页面只在浏览器本地读取数据，不上传到服务器。"
+        >
         <cds-file-uploader-button
           id="simpleFileInput"
           accept=".csv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           button-kind="primary"
         >选择文件</cds-file-uploader-button>
+        </cds-file-uploader>
       </div>
 
       <cds-actionable-notification id="simpleMessage" class="message is-hidden" kind="info" title="简易模式" hide-close-button low-contrast inline role="status" aria-live="polite"></cds-actionable-notification>

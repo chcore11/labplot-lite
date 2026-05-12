@@ -16,10 +16,7 @@
 }
 
 .mode-landing {
-  display: grid;
-  grid-template-columns: minmax(300px, 0.72fr) minmax(460px, 1fr);
-  gap: 18px;
-  align-items: stretch;
+  display: block;
 }
 
 .mode-landing-copy,
@@ -57,124 +54,32 @@
   line-height: 1.62;
 }
 
-.mode-choice-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  padding: 12px;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-md);
-  background:
-    linear-gradient(180deg, var(--surface), var(--surface-soft));
-  box-shadow: var(--shadow-md);
-}
-
-.mode-choice-card {
-  display: grid;
-  align-content: start;
-  justify-items: start;
-  gap: 10px;
-  position: relative;
-  width: 100%;
-  min-height: 150px;
-  padding: 22px 24px 22px 28px;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-sm);
-  color: var(--text-main);
-  background: var(--surface-raised);
-  text-align: left;
-  text-decoration: none;
-  transition:
-    border-color var(--duration-fast) var(--ease-out),
-    background var(--duration-fast) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
-}
-
-.mode-choice-card::before {
-  content: "";
-  position: absolute;
-  top: 18px;
-  bottom: 18px;
-  left: 12px;
-  width: 3px;
-  border-radius: 999px;
-  background: var(--line-strong);
-}
-
-.mode-choice-card:hover,
-.mode-choice-card:focus-visible {
-  border-color: var(--accent-border);
-  background: var(--surface);
-  transform: translateY(-1px);
-}
-
-.mode-choice-card:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.mode-choice-primary {
-  border-color: var(--accent-border);
-  background: var(--accent-soft);
-}
-
-.mode-choice-primary::before {
-  background: var(--accent);
-}
-
-.mode-choice-card span {
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 650;
-}
-
-.mode-choice-card strong {
-  font-size: 22px;
-  line-height: 1.25;
-  font-weight: 700;
-}
-
-.mode-choice-card small {
-  max-width: 58ch;
-  color: var(--text-soft);
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.mode-choice-card em {
-  display: inline-flex;
-  align-items: center;
-  min-height: 26px;
-  margin-top: 4px;
-  padding: 0 9px;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
-  background: var(--surface);
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 650;
-}
-
 .mode-flow {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   max-width: 460px;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-sm);
-  background: var(--line-soft);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.mode-flow span {
-  display: grid;
-  place-items: center;
-  min-height: 38px;
-  color: var(--text-soft);
+.mode-flow li {
+  min-height: 26px;
+  padding: 4px 10px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
   background: var(--surface-soft);
   font-size: 12px;
   font-weight: 650;
+}
+
+.mode-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
 }
 
 .simple-mode {
@@ -196,50 +101,16 @@
   border-bottom: 1px solid var(--line-soft);
 }
 
-.simple-upload-dropzone {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
-  align-items: center;
-  min-height: 174px;
-  padding: 24px;
-  border: 1px dashed var(--line-strong);
+.simple-upload-panel {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
   background: var(--surface-soft);
-  transition:
-    border-color var(--duration-fast) var(--ease-out),
-    background var(--duration-fast) var(--ease-out);
 }
 
-.simple-upload-dropzone,
-.simple-upload-copy,
-.simple-upload-copy strong,
-.simple-upload-copy span {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.simple-upload-dropzone.is-dragging {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-
-.simple-upload-copy {
-  display: grid;
-  gap: 8px;
-}
-
-.simple-upload-copy strong {
-  color: var(--text-main);
-  font-size: 21px;
-  line-height: 1.25;
-  font-weight: 700;
-}
-
-.simple-upload-copy span {
-  color: var(--text-muted);
-  font-size: 14px;
-  line-height: 1.55;
+.simple-upload-panel cds-file-uploader {
+  width: 100%;
 }
 
 .simple-result {
