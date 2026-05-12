@@ -182,14 +182,6 @@ const WORKFLOW_PANELS = {
   result: "resultSection",
 };
 
-const WORKFLOW_STATUS = {
-  upload: "Upload Data",
-  range: "Check & Describe",
-  calc: "Check & Describe",
-  plot: "Visualize",
-  result: "Publish & Embed",
-};
-
 const EMPTY_RESULT_STATE = {
   title: "等待生成图像",
   meta: "待生成",

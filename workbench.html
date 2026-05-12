@@ -105,28 +105,23 @@
             <h1>创建报告图</h1>
           </div>
           <div class="workflow-head-tools">
-            <div class="workflow-status" aria-live="polite">
-              <span>当前步骤</span>
-              <strong id="workflowStatusText">等待导入数据</strong>
-            </div>
             <cds-button type="button" kind="ghost" size="sm" class="workflow-reset-button is-hidden" id="resetWorkflowButton" disabled>重新开始</cds-button>
           </div>
         </div>
 
         <cds-progress-indicator class="step-nav" aria-label="工作台步骤" space-equally>
-          <cds-progress-step label-text="Upload Data" secondary-label-text="Upload Data" data-step-target="upload" aria-controls="step-upload" state="current"></cds-progress-step>
-          <cds-progress-step label-text="Check & Describe" secondary-label-text="Check & Describe" data-step-target="range" aria-controls="previewSection" state="incomplete" disabled></cds-progress-step>
-          <cds-progress-step label-text="Visualize" secondary-label-text="Visualize" data-step-target="plot" aria-controls="plotSection" state="incomplete" disabled></cds-progress-step>
-          <cds-progress-step label-text="Publish & Embed" secondary-label-text="Publish & Embed" data-step-target="result" aria-controls="resultSection" state="incomplete" disabled></cds-progress-step>
+          <cds-progress-step label-text="Step 1" secondary-label-text="Upload Data" data-step-target="upload" aria-controls="step-upload" state="current"></cds-progress-step>
+          <cds-progress-step label-text="Step 2" secondary-label-text="Check & Describe" data-step-target="range" aria-controls="previewSection" state="incomplete" disabled></cds-progress-step>
+          <cds-progress-step label-text="Step 3" secondary-label-text="Visualize" data-step-target="plot" aria-controls="plotSection" state="incomplete" disabled></cds-progress-step>
+          <cds-progress-step label-text="Step 4" secondary-label-text="Publish & Embed" data-step-target="result" aria-controls="resultSection" state="incomplete" disabled></cds-progress-step>
         </cds-progress-indicator>
 
         <cds-actionable-notification id="statusMessage" class="message is-hidden" kind="info" title="状态" hide-close-button low-contrast inline role="status" aria-live="polite"></cds-actionable-notification>
 
         <section id="step-upload" class="panel workbench-step-panel is-active" data-step="upload">
           <div class="step-head">
-            <span>1</span>
             <div>
-              <h2>Upload Data</h2>
+              <h2>导入数据</h2>
               <p>粘贴表格、上传 CSV / Excel，或载入示例数据。</p>
             </div>
           </div>
@@ -180,9 +175,8 @@
 
         <section id="previewSection" class="panel workbench-step-panel is-hidden" data-step="range">
           <div class="step-head">
-            <span>2</span>
             <div>
-              <h2>Check & Describe</h2>
+              <h2>检查数据</h2>
               <p>确认数据是否被正确理解，设置表头、数据范围和必要的计算列。</p>
             </div>
           </div>
@@ -227,14 +221,14 @@
               例如第 5 行是 <code>voltage,current</code>，第 6 行开始是数字数据，就填写 5 和 6。
             </p>
 
-            <cds-button type="submit" kind="primary" class="form-button">确认并继续 Visualize</cds-button>
+            <cds-button type="submit" kind="primary" class="form-button">确认数据</cds-button>
           </form>
 
           <div id="calcSection" class="advanced-box calc-card is-hidden">
             <div class="section-label">可选数据加工</div>
             <div class="calc-card-head">
               <h3>生成计算列</h3>
-              <p>用已有列做单位换算、误差、对数或比值，然后继续 Visualize。</p>
+              <p>用已有列做单位换算、误差、对数或比值，再进入绘图。</p>
             </div>
 
             <div id="numericColumnsBox" class="columns-box"></div>
@@ -276,7 +270,7 @@
 
               <div class="form-actions">
                 <cds-button type="submit" kind="primary" class="form-button">生成新计算列</cds-button>
-                <cds-button type="button" kind="tertiary" data-step-target="plot">继续 Visualize</cds-button>
+                <cds-button type="button" kind="tertiary" data-step-target="plot">继续绘图</cds-button>
               </div>
             </form>
           </div>
@@ -284,9 +278,8 @@
 
         <section id="plotSection" class="panel workbench-step-panel is-hidden" data-step="plot">
           <div class="step-head">
-            <span>3</span>
             <div>
-              <h2>Visualize</h2>
+              <h2>配置图表</h2>
               <p>选择图表类型、X/Y 轴、曲线和拟合方式，生成前会自动检查条件。</p>
             </div>
           </div>
@@ -297,7 +290,7 @@
                 <div id="plotColumnsBox" class="columns-box"></div>
 
                 <cds-accordion class="visualize-accordion">
-                  <cds-accordion-item title="Chart type" open>
+                  <cds-accordion-item title="图表类型" open>
                     <div class="form-grid">
                       <div>
                         <cds-select id="xCol" name="xCol" label-text="X 轴数据列" required></cds-select>
@@ -313,12 +306,12 @@
                     </div>
                   </cds-accordion-item>
 
-                  <cds-accordion-item title="Refine" open>
+                  <cds-accordion-item title="曲线配置" open>
                     <div class="curve-config-box" id="curveConfigBox"></div>
                     <cds-button type="button" kind="tertiary" class="curve-add-button" id="addCurveButton">添加一条曲线</cds-button>
                   </cds-accordion-item>
 
-                  <cds-accordion-item title="Annotate">
+                  <cds-accordion-item title="标题与坐标轴">
                     <div class="annotate-grid">
                       <cds-text-input id="plotTitle" name="plotTitle" label="图表标题" value="X-Y Curve" placeholder="不填则自动生成，例如 power vs voltage"></cds-text-input>
 
@@ -334,7 +327,7 @@
                     </div>
                   </cds-accordion-item>
 
-                  <cds-accordion-item title="Layout">
+                  <cds-accordion-item title="导出与指标">
                     <div class="section-label">图像输出设置</div>
 
                     <div class="form-grid compact-grid">
@@ -398,7 +391,7 @@
                 </cds-accordion>
 
                 <div class="plot-generate-row">
-                  <cds-button type="submit" kind="primary" class="form-button" id="plotSubmitButton">生成并进入 Publish & Embed</cds-button>
+                  <cds-button type="submit" kind="primary" class="form-button" id="plotSubmitButton">生成图表</cds-button>
                   <div id="plotProgress" class="plot-progress is-hidden" role="status" aria-live="polite">
                     <span class="plot-progress-dot"></span>
                     <span id="plotProgressText">准备生成</span>
@@ -425,9 +418,8 @@
 
         <section id="resultSection" class="panel result-panel workbench-step-panel is-hidden" data-step="result">
           <div class="step-head">
-            <span>4</span>
             <div>
-              <h2>Publish & Embed</h2>
+              <h2>导出素材</h2>
               <p>检查图像和拟合摘要，下载可放入实验报告或文档的素材。</p>
             </div>
           </div>

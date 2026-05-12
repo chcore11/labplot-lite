@@ -305,11 +305,6 @@ function updateWorkflowNav() {
     }
   });
 
-  const status = qs("#workflowStatusText");
-  if (status) {
-    status.textContent = WORKFLOW_STATUS[state.activeStep] || WORKFLOW_STATUS.upload;
-  }
-
   updateWorkflowActions();
 }
 

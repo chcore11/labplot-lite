@@ -242,11 +242,6 @@
     gap: 12px;
   }
 
-  .workflow-status {
-    min-width: 0;
-    text-align: left;
-  }
-
   .message {
     margin-left: 16px;
     margin-right: 16px;
@@ -255,15 +250,6 @@
   .step-nav {
     overflow-x: auto;
     padding: 14px 16px 10px;
-  }
-
-  .step-head {
-    grid-template-columns: 34px minmax(0, 1fr);
-  }
-
-  .step-head > span {
-    width: 32px;
-    height: 32px;
   }
 
   .sample-card,

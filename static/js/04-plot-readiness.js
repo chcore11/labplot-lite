@@ -254,7 +254,7 @@ function setPlotGenerating(isGenerating, text = "正在生成") {
     plotForm.setAttribute("aria-busy", String(isGenerating));
   }
   if (submitButton) {
-    submitButton.textContent = isGenerating ? "生成中..." : "生成并进入 Publish & Embed";
+    submitButton.textContent = isGenerating ? "生成中..." : "生成图表";
   }
   setPlotProgress(text, isGenerating);
   updatePlotReadiness();

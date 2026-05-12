@@ -201,26 +201,6 @@
   min-width: 0;
 }
 
-.workflow-status {
-  min-width: 170px;
-  text-align: right;
-}
-
-.workflow-status span {
-  display: block;
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 650;
-}
-
-.workflow-status strong {
-  display: block;
-  margin-top: 4px;
-  color: var(--text-main);
-  font-size: 13px;
-  font-weight: 700;
-}
-
 .workflow-reset-button {
   justify-self: end;
 }
@@ -273,27 +253,9 @@
 }
 
 .step-head {
-  display: grid;
-  grid-template-columns: 30px minmax(0, 1fr);
-  align-items: start;
-  gap: 12px;
   margin-bottom: 18px;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--line-soft);
-}
-
-.step-head > span {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-sm);
-  color: var(--text-main);
-  background: var(--surface-soft);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 700;
 }
 
 .step-head h2 {
