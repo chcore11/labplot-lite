@@ -70,7 +70,7 @@
   }
 
   .nav {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto minmax(0, 1fr);
     gap: 12px;
     padding: 0 16px;
   }
@@ -151,12 +151,6 @@
 
   .brand-text {
     display: none;
-  }
-
-  .nav-cta {
-    min-height: 40px;
-    padding: 0 12px;
-    font-size: 13px;
   }
 
   .landing-hero {
@@ -241,17 +235,6 @@
   .workflow-status {
     min-width: 0;
     text-align: left;
-  }
-
-  .workflow-actions {
-    width: 100%;
-    justify-content: stretch;
-  }
-
-  .workflow-actions .btn {
-    flex: 1;
-    min-height: 44px;
-    min-width: 0;
   }
 
   .message {

@@ -217,14 +217,6 @@ const WORKFLOW_STATUS = {
   result: "导出报告素材",
 };
 
-const WORKFLOW_ACTION_LABELS = {
-  upload: "回到上传",
-  range: "查看数据",
-  calc: "查看加工",
-  plot: "编辑图像",
-  result: "查看导出",
-};
-
 const EMPTY_RESULT_STATE = {
   title: "等待生成图像",
   meta: "待生成",

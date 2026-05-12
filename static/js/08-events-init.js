@@ -49,7 +49,7 @@ function checkRequiredDependencies() {
 
   if (missingKeys.has("chart")) {
     qsa(
-      ".workbench-page .nav-cta, #pasteForm button[type='submit'], #uploadForm button[type='submit'], .sample-load-button, #plotSubmitButton",
+      "#pasteForm button[type='submit'], #uploadForm button[type='submit'], .sample-load-button, #plotSubmitButton",
     ).forEach(disableControl);
   }
 
@@ -262,13 +262,6 @@ function setupEvents() {
       }
     });
   });
-
-  const resumeButton = qs("#resumeWorkflowButton");
-  if (resumeButton) {
-    resumeButton.addEventListener("click", () => {
-      setActiveStep(state.activeStep, { scroll: true });
-    });
-  }
 
   const resetButton = qs("#resetWorkflowButton");
   if (resetButton) {

@@ -180,15 +180,12 @@ function updateWorkflowNav() {
 }
 
 function updateWorkflowActions() {
-  const resumeButton = qs("#resumeWorkflowButton");
   const resetButton = qs("#resetWorkflowButton");
 
-  if (resumeButton) {
-    resumeButton.textContent = WORKFLOW_ACTION_LABELS[state.activeStep] || WORKFLOW_ACTION_LABELS.upload;
-  }
-
   if (resetButton) {
-    resetButton.disabled = !state.rawRows.length && !state.lastPlotPayload;
+    const canReset = Boolean(state.rawRows.length || state.lastPlotPayload);
+    resetButton.disabled = !canReset;
+    resetButton.classList.toggle("is-hidden", !canReset);
   }
 }
 

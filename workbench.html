@@ -34,10 +34,6 @@
         <a href="./index.html#samples">示例图</a>
         <a href="./index.html#workflow">工作流</a>
       </nav>
-
-      <div class="nav-actions">
-        <a class="nav-cta" href="#upload-section">导入数据</a>
-      </div>
     </header>
 
     <div id="dependencyMessage" class="message error is-hidden" role="alert"></div>
@@ -54,10 +50,7 @@
               <span>当前步骤</span>
               <strong id="workflowStatusText">等待导入数据</strong>
             </div>
-            <div class="workflow-actions" aria-label="工作台操作">
-              <button type="button" class="btn btn-secondary" id="resumeWorkflowButton">开始导入</button>
-              <button type="button" class="btn btn-ghost" id="resetWorkflowButton" disabled>重新开始</button>
-            </div>
+            <button type="button" class="btn btn-ghost workflow-reset-button is-hidden" id="resetWorkflowButton" disabled>重新开始</button>
           </div>
         </div>
 
