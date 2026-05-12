@@ -44,8 +44,8 @@ function renderColumnsBox(target, label) {
   );
 }
 
-function getSampleGuide(fileName) {
-  return SAMPLE_GUIDES[fileName] || null;
+function getSamplePreset(fileName) {
+  return SAMPLE_PRESETS[fileName] || null;
 }
 
 function columnOptionExists(column) {
@@ -67,74 +67,28 @@ function setSelectIfExists(selector, value) {
   return true;
 }
 
-function renderSampleGuide() {
-  const box = qs("#sampleGuideBox");
-  if (!box) {
-    return;
-  }
-
-  const guide = state.sampleGuide;
-  if (!guide) {
-    hide(box);
-    renderSampleCoach();
-    return;
-  }
-
-  qs("#sampleGuideKicker").textContent = "已载入示例，下一步";
-  qs("#sampleGuideTitle").textContent = guide.title;
-  qs("#sampleGuideGoal").textContent = guide.goal;
-
-  const steps = qs("#sampleGuideSteps");
-  steps.replaceChildren();
-  steps.append(...guide.steps.map((step) => createElement("li", { textContent: step })));
-
-  show(box);
-  renderSampleCoach();
-}
-
-function renderSampleCoach() {
-  const coach = qs("#sampleCoachMark");
-  if (!coach) {
-    return;
-  }
-
-  const action = state.sampleGuide?.plotActions?.[0];
-  if (!action) {
-    hide(coach);
-    return;
-  }
-
-  const yCols = action.yCols || [action.yCol].filter(Boolean);
-  setText("#sampleCoachTitle", "推荐配置已预填");
-  setText(
-    "#sampleCoachText",
-    `检查 Chart type 和 Refine：X 轴 ${action.xCol}，Y 轴 ${yCols.join(" / ")}，然后生成图像。`,
-  );
-  show(coach);
-}
-
-function applySamplePlotAction(index = 0, options = {}) {
-  const action = state.sampleGuide?.plotActions?.[index];
-  if (!action) {
+function applySamplePreset(options = {}) {
+  const preset = state.samplePreset;
+  if (!preset) {
     return false;
   }
 
-  const yCols = action.yCols || [action.yCol];
-  if (!columnOptionExists(action.xCol) || yCols.some((column) => !columnOptionExists(column))) {
+  const yCols = preset.yCols || [preset.yCol].filter(Boolean);
+  if (!columnOptionExists(preset.xCol) || yCols.some((column) => !columnOptionExists(column))) {
     if (!options.silent) {
       showMessage("error", "推荐绘图列不存在，请重新确认数据范围。");
     }
     return false;
   }
 
-  setSelectIfExists("#xCol", action.xCol);
-  setSelectIfExists("#chartType", action.chartType);
-  setSelectIfExists("#fitType", action.fitType);
-  setControlValue("#plotTitle", action.title || "");
-  setControlValue("#xLabel", action.xLabel || "");
-  setControlValue("#yLabel", action.yLabel || "");
-  if (typeof action.showGrid === "boolean") {
-    setControlChecked("#showGrid", action.showGrid);
+  setSelectIfExists("#xCol", preset.xCol);
+  setSelectIfExists("#chartType", preset.chartType);
+  setSelectIfExists("#fitType", preset.fitType);
+  setControlValue("#plotTitle", preset.title || "");
+  setControlValue("#xLabel", preset.xLabel || "");
+  setControlValue("#yLabel", preset.yLabel || "");
+  if (typeof preset.showGrid === "boolean") {
+    setControlChecked("#showGrid", preset.showGrid);
   }
 
   renderCurveRows(yCols.map((yCol, yIndex) => ({
@@ -279,7 +233,6 @@ function renderDataControls() {
   setOptions(qs("#secondCol"), numericOptions, state.numericColumns[1] || state.numericColumns[0]);
   setOptions(qs("#xCol"), numericOptions, state.numericColumns[0]);
   renderCurveRows(getDefaultCurveConfigs());
-  renderSampleGuide();
   updatePlotReadiness();
 
   if (state.numericColumns.length >= 2) {
@@ -307,9 +260,9 @@ function resetWorkflow() {
   state.simplePlotPayload = null;
   state.isPlotGenerating = false;
   state.activeStep = "upload";
-  state.sampleGuide = null;
+  state.samplePreset = null;
 
-  ["#previewSection", "#calcSection", "#plotSection", "#resultSection", "#sampleGuideBox", "#sampleCoachMark"].forEach((selector) => {
+  ["#previewSection", "#calcSection", "#plotSection", "#resultSection"].forEach((selector) => {
     hide(qs(selector));
   });
 
@@ -363,8 +316,8 @@ function reloadDataFromRange(showSuccess = false) {
   state.numericColumns = loaded.numericColumns;
 
   renderDataControls();
-  if (showSuccess && state.sampleGuide?.plotActions?.length) {
-    applySamplePlotAction(0, { activate: false, silent: true });
+  if (showSuccess && state.samplePreset) {
+    applySamplePreset({ activate: false, silent: true });
   }
   hide(qs("#resultSection"));
   if (showSuccess) {
@@ -379,7 +332,7 @@ function reloadDataFromRange(showSuccess = false) {
 
 function setDataset(rows, fileName) {
   state.fileName = fileName;
-  state.sampleGuide = getSampleGuide(fileName);
+  state.samplePreset = getSamplePreset(fileName);
   state.rawRows = rows.map((row) => Array.isArray(row) ? row.map(cellText) : []);
 
   if (!state.rawRows.length) {
@@ -396,8 +349,8 @@ function setDataset(rows, fileName) {
   renderPreview();
   show(qs("#previewSection"));
   reloadDataFromRange(false);
-  if (state.sampleGuide?.plotActions?.length) {
-    applySamplePlotAction(0, { activate: false, silent: true });
+  if (state.samplePreset) {
+    applySamplePreset({ activate: false, silent: true });
   }
   setActiveStep("range", { scroll: true });
 }

@@ -401,7 +401,6 @@
 .columns-box,
 .warning-box,
 .metric-box,
-.sample-guide,
 .calc-card,
 .plot-readiness,
 .stats div {
@@ -519,8 +518,7 @@ code {
 .info-box,
 .columns-box,
 .warning-box,
-.metric-box,
-.sample-guide {
+.metric-box {
   margin-bottom: 16px;
   padding: var(--callout-pad);
   color: var(--text-soft);
@@ -551,90 +549,6 @@ code {
   --tone-text: var(--warning-text);
   --tone-border: var(--warning-border);
   --tone-bg: var(--warning-bg);
-}
-
-.sample-guide {
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 14px;
-  align-items: center;
-  border-radius: 0;
-  background: var(--surface-raised);
-}
-
-.workbench-main > .sample-guide {
-  margin: 0;
-  border-right: 0;
-  border-left: 0;
-}
-
-.sample-guide-main {
-  grid-column: 1;
-  grid-row: 1;
-  min-width: 0;
-}
-
-.sample-guide-main span {
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 650;
-}
-
-.sample-guide-main strong {
-  display: inline;
-  margin: 0 8px 0 0;
-  color: var(--text-main);
-  font-size: 16px;
-  line-height: 1.3;
-  font-weight: 700;
-}
-
-.sample-guide p {
-  display: inline;
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.sample-guide-steps {
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px;
-  margin: 0;
-  padding: 12px 0 0;
-  border-top: 1px solid var(--line-soft);
-  list-style: none;
-  counter-reset: sample-step;
-}
-
-.sample-guide-steps li {
-  display: grid;
-  grid-template-columns: 24px minmax(0, 1fr);
-  gap: 8px;
-  align-items: start;
-  min-width: 0;
-  color: var(--text-soft);
-  font-size: 13px;
-  line-height: 1.45;
-  counter-increment: sample-step;
-}
-
-.sample-guide-steps li::before {
-  content: counter(sample-step);
-  display: grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-sm);
-  color: var(--text-main);
-  background: var(--surface);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
 }
 
 .sample-list {
