@@ -41,69 +41,6 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.sample-coach {
-  position: relative;
-  justify-self: end;
-  width: min(360px, 100%);
-  margin: -4px 8px 4px 0;
-  padding: 10px 12px;
-  border: 1px solid var(--accent-border);
-  border-radius: var(--radius-sm);
-  color: var(--text-soft);
-  background: var(--surface);
-  box-shadow: var(--shadow-md);
-  font-size: 13px;
-  line-height: 1.45;
-  transform: translateY(-4px);
-}
-
-.sample-coach::before,
-.sample-coach::after {
-  position: absolute;
-  pointer-events: none;
-  content: "";
-}
-
-.sample-coach::before {
-  right: 58px;
-  bottom: -34px;
-  width: 46px;
-  height: 28px;
-  border-right: 2px solid var(--accent);
-  border-bottom: 2px solid var(--accent);
-  border-radius: 0 0 18px 0;
-  transform: skewX(-22deg);
-}
-
-.sample-coach::after {
-  right: 97px;
-  bottom: -38px;
-  width: 9px;
-  height: 9px;
-  border-right: 2px solid var(--accent);
-  border-bottom: 2px solid var(--accent);
-  transform: rotate(45deg);
-}
-
-.sample-coach span {
-  display: block;
-  color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 650;
-}
-
-.sample-coach strong {
-  display: block;
-  margin-top: 2px;
-  color: var(--text-main);
-  font-size: 14px;
-  line-height: 1.35;
-}
-
-.sample-coach p {
-  margin: 4px 0 0;
-}
-
 .curve-config-box {
   display: grid;
   gap: 0;
