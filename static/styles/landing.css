@@ -399,8 +399,7 @@
 }
 
 .workflow-section,
-.sample-gallery,
-.excel-compare {
+.sample-gallery {
   padding-top: 46px;
   margin-bottom: 82px;
 }
@@ -421,102 +420,15 @@
   text-wrap: balance;
 }
 
-.section-heading p {
-  max-width: 66ch;
-  margin: 12px 0 0;
-  color: var(--text-soft);
-  font-size: 15px;
-  line-height: 1.62;
-}
-
-.compact-product .hero-flow li:nth-child(3),
-.compact-product .hero-flow li:nth-child(4) {
-  color: var(--accent);
-  background: var(--accent-soft);
-}
-
-.quick-sample-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.quick-sample-card {
-  display: grid;
-  grid-template-rows: auto auto 1fr;
-  gap: 14px;
-  min-width: 0;
-  padding: 16px;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-md);
-  background: var(--surface-raised);
-  box-shadow: 0 8px 20px oklch(21% 0.014 255 / 0.045);
-}
-
-.quick-sample-card span {
-  display: block;
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 650;
-  line-height: 1.35;
-}
-
-.quick-sample-card strong {
-  display: block;
-  margin-top: 6px;
-  color: var(--text-main);
-  font-size: 16px;
-  line-height: 1.32;
-  font-weight: 700;
-}
-
-.quick-sample-card .chart-svg {
-  align-self: start;
-}
-
-.quick-sample-actions {
-  display: grid;
+.sample-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  align-self: end;
+  margin: -6px 0 18px;
 }
 
-.quick-sample-actions cds-button {
-  width: 100%;
-}
-
-.excel-compare {
-  margin-bottom: 72px;
-}
-
-.compare-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
-  overflow: hidden;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-md);
-  background: var(--line-soft);
-}
-
-.compare-grid > div {
-  min-width: 0;
-  padding: 22px;
-  background: var(--surface-raised);
-}
-
-.compare-grid h3 {
-  margin: 0;
-  color: var(--text-main);
-  font-size: 18px;
-  line-height: 1.3;
-}
-
-.compare-grid p {
-  max-width: 54ch;
-  margin: 10px 0 0;
-  color: var(--text-soft);
-  font-size: 15px;
-  line-height: 1.62;
+.sample-shortcuts cds-button {
+  width: auto;
 }
 
 .workflow-list {

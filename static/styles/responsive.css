@@ -10,7 +10,6 @@
   }
 
   .sample-chart-grid,
-  .quick-sample-grid,
   .workflow-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -109,11 +108,6 @@
     grid-template-columns: 1fr;
   }
 
-  .quick-sample-grid,
-  .compare-grid {
-    grid-template-columns: 1fr;
-  }
-
 }
 
 @media (max-width: 640px) {
@@ -161,6 +155,11 @@
 
   .hero-actions {
     display: grid;
+  }
+
+  .sample-shortcuts,
+  .sample-shortcuts cds-button {
+    width: 100%;
   }
 
   .hero-proof {
@@ -228,17 +227,12 @@
     grid-template-columns: 1fr;
   }
 
-  .quick-sample-grid {
-    grid-template-columns: 1fr;
-  }
-
   .workflow-list {
     grid-template-columns: 1fr;
   }
 
   .workflow-section,
-  .sample-gallery,
-  .excel-compare {
+  .sample-gallery {
     padding-top: 34px;
     margin-bottom: 58px;
   }

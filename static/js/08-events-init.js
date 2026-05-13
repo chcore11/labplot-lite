@@ -328,57 +328,6 @@ async function handleSimpleFile(file) {
   await renderSimplePlotFromColumns(xCol, yCol, `已生成基础图：${file.name}`, { plotReady });
 }
 
-function buildTitleSuggestion(payload) {
-  if (!payload?.stats) {
-    throw new Error("请先生成图表。");
-  }
-  const stats = payload.stats;
-  if (payload.plotTitle && payload.plotTitle !== "X-Y Curve") {
-    return payload.plotTitle;
-  }
-  return `${stats.y_col} 随 ${stats.x_col} 的变化`;
-}
-
-function buildReportTemplate(payload) {
-  if (!payload?.stats) {
-    throw new Error("请先生成图表。");
-  }
-  const stats = payload.stats;
-  const parts = [
-    `图题：${buildTitleSuggestion(payload)}`,
-    `描述：以 ${stats.x_col} 为横轴，${stats.y_col} 为纵轴绘制实验数据图，共包含 ${stats.points} 个有效数据点。`,
-  ];
-  if (stats.has_fit) {
-    parts.push(`拟合：采用 ${stats.fit_type_label}，拟合方程为 ${stats.equation}，R² = ${stats.core_metrics.r2}。`);
-  }
-  parts.push("说明：图像由 LabPlot Lite 在浏览器本地生成，适合插入实验报告。");
-  return parts.join("\n");
-}
-
-async function copyTextToClipboard(text) {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
-    return;
-  }
-
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  textarea.setAttribute("readonly", "");
-  textarea.style.position = "fixed";
-  textarea.style.inset = "0 auto auto 0";
-  textarea.style.opacity = "0";
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  textarea.remove();
-}
-
-async function copyPayloadText(kind, payload, notify) {
-  const text = kind === "title" ? buildTitleSuggestion(payload) : buildReportTemplate(payload);
-  await copyTextToClipboard(text);
-  notify("success", kind === "title" ? "图题建议已复制。" : "报告描述模板已复制。");
-}
-
 function setupModeEvents() {
   qsa("#simpleToAdvanced, #simpleToAdvancedTop").forEach((button) => {
     button.addEventListener("click", async () => {
@@ -406,22 +355,6 @@ function setupModeEvents() {
 
   simpleFileButton?.addEventListener("cds-file-uploader-button-changed", handleSimpleFileChange);
   simpleFileButton?.addEventListener("change", handleSimpleFileChange);
-
-  qs("#simpleCopyTitle")?.addEventListener("click", async () => {
-    try {
-      await copyPayloadText("title", state.simplePlotPayload, setSimpleMessage);
-    } catch (error) {
-      setSimpleMessage("error", error.message);
-    }
-  });
-
-  qs("#simpleCopyReport")?.addEventListener("click", async () => {
-    try {
-      await copyPayloadText("report", state.simplePlotPayload, setSimpleMessage);
-    } catch (error) {
-      setSimpleMessage("error", error.message);
-    }
-  });
 }
 
 function setupTheme() {
@@ -633,22 +566,6 @@ function setupEvents() {
       const zip = await generateZipDownload();
       triggerDownload(zip.url, zip.filename);
       showMessage("success", "ZIP 已生成，开始下载。");
-    } catch (error) {
-      showMessage("error", error.message);
-    }
-  });
-
-  qs("#copyTitleSuggestion")?.addEventListener("click", async () => {
-    try {
-      await copyPayloadText("title", state.lastPlotPayload, showMessage);
-    } catch (error) {
-      showMessage("error", error.message);
-    }
-  });
-
-  qs("#copyReportTemplate")?.addEventListener("click", async () => {
-    try {
-      await copyPayloadText("report", state.lastPlotPayload, showMessage);
     } catch (error) {
       showMessage("error", error.message);
     }
