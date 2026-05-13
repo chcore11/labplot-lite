@@ -228,7 +228,7 @@ const SAMPLE_PRESETS = {
     xAxisMin: 0,
     xLabel: "Concentration (uM)",
     xReferenceValue: 10,
-    yAxisMax: 1.25,
+    yAxisMax: 1.3,
     yAxisMin: 0,
     yLabel: "Absorbance (a.u.)",
     yReferenceValue: 0.6,
