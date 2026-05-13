@@ -67,32 +67,19 @@ function setSelectIfExists(selector, value) {
   return true;
 }
 
-function applySamplePreset(options = {}) {
-  const preset = state.samplePreset;
-  if (!preset) {
-    return false;
+function setControlIfDefined(selector, value) {
+  if (value !== undefined && value !== null) {
+    setControlValue(selector, value);
+  }
+}
+
+function getPresetCurves(preset) {
+  if (Array.isArray(preset.curves) && preset.curves.length) {
+    return preset.curves;
   }
 
   const yCols = preset.yCols || [preset.yCol].filter(Boolean);
-  if (!columnOptionExists(preset.xCol) || yCols.some((column) => !columnOptionExists(column))) {
-    if (!options.silent) {
-      showMessage("error", "推荐列不可用，请检查数据范围。");
-    }
-    return false;
-  }
-
-  setSelectIfExists("#xCol", preset.xCol);
-  setSelectIfExists("#chartType", preset.chartType);
-  setSelectIfExists("#fitType", preset.fitType);
-  setControlValue("#plotTitle", preset.title || "");
-  setControlValue("#xLabel", preset.xLabel || "");
-  setControlValue("#yLabel", preset.yLabel || "");
-  resetPlotAnnotationControls();
-  if (typeof preset.showGrid === "boolean") {
-    setControlChecked("#showGrid", preset.showGrid);
-  }
-
-  renderCurveRows(yCols.map((yCol, yIndex) => ({
+  return yCols.map((yCol, yIndex) => ({
     yCol,
     color: DEFAULT_CURVE_COLORS[yIndex % DEFAULT_CURVE_COLORS.length],
     lineWidth: 1.8,
@@ -100,7 +87,54 @@ function applySamplePreset(options = {}) {
     lineShape: "linear",
     xErrorCol: "",
     yErrorCol: "",
-  })));
+  }));
+}
+
+function getPresetRequiredColumns(preset) {
+  return [
+    preset.xCol,
+    ...getPresetCurves(preset).flatMap((curve) => [curve.yCol, curve.xErrorCol, curve.yErrorCol]),
+  ].filter(Boolean);
+}
+
+function applySamplePreset(options = {}) {
+  const preset = state.samplePreset;
+  if (!preset) {
+    return false;
+  }
+
+  const presetCurves = getPresetCurves(preset);
+  const missingColumns = getPresetRequiredColumns(preset).filter((column) => !columnOptionExists(column));
+  if (missingColumns.length) {
+    if (!options.silent) {
+      showMessage("error", `推荐列不可用，请检查数据范围：${missingColumns.join("、")}`);
+    }
+    return false;
+  }
+
+  setSelectIfExists("#xCol", preset.xCol);
+  setSelectIfExists("#chartType", preset.chartType);
+  setSelectIfExists("#fitType", preset.fitType);
+  setSelectIfExists("#xAxisScale", preset.xAxisScale);
+  setSelectIfExists("#yAxisScale", preset.yAxisScale);
+  setControlValue("#plotTitle", preset.title || "");
+  setControlValue("#xLabel", preset.xLabel || "");
+  setControlValue("#yLabel", preset.yLabel || "");
+  resetPlotAnnotationControls();
+  setControlIfDefined("#xAxisMin", preset.xAxisMin);
+  setControlIfDefined("#xAxisMax", preset.xAxisMax);
+  setControlIfDefined("#yAxisMin", preset.yAxisMin);
+  setControlIfDefined("#yAxisMax", preset.yAxisMax);
+  setControlIfDefined("#xReferenceValue", preset.xReferenceValue);
+  setControlIfDefined("#yReferenceValue", preset.yReferenceValue);
+  setControlIfDefined("#referenceLabel", preset.referenceLabel);
+  setSelectIfExists("#legendMode", preset.legendMode);
+  setSelectIfExists("#dataLabelMode", preset.dataLabelMode);
+  if (typeof preset.showGrid === "boolean") {
+    setControlChecked("#showGrid", preset.showGrid);
+  }
+
+  renderCurveRows(presetCurves);
   updatePlotReadiness();
   if (!options.silent) {
     clearMessage();
