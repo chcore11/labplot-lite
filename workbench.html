@@ -43,23 +43,23 @@
     <section class="simple-mode" id="simpleMode" aria-labelledby="simpleModeTitle">
       <div class="simple-mode-head">
         <div>
-          <span class="section-kicker">单图模式</span>
-          <h1 id="simpleModeTitle">选择表格，生成基础图</h1>
-          <p>自动识别一组 X/Y，输出散点连线图。</p>
+          <span class="section-kicker">简易模式</span>
+          <h1 id="simpleModeTitle">上传表格，先生成一张报告图</h1>
+          <p>自动识别推荐 X/Y 列，生成默认白底图。高级设置先收起来，第一次使用只保留下载和微调入口。</p>
         </div>
-        <cds-button type="button" kind="tertiary" size="sm" id="simpleToAdvancedTop">打开功能模式</cds-button>
+        <cds-button type="button" kind="tertiary" size="sm" id="simpleToAdvancedTop">进入功能模式微调</cds-button>
       </div>
 
       <div class="simple-upload-panel">
         <cds-file-uploader
-          label-title="选择 CSV / XLSX / XLS"
-          label-description="文件只在本地浏览器读取。"
+          label-title="上传 Excel / CSV"
+          label-description="文件只在当前浏览器本地处理，不上传服务器。"
         >
         <cds-file-uploader-button
           id="simpleFileInput"
           accept=".csv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           button-kind="primary"
-        >选择文件</cds-file-uploader-button>
+        >选择文件并自动生成图</cds-file-uploader-button>
         </cds-file-uploader>
       </div>
 
@@ -69,7 +69,7 @@
         <div class="simple-result-meta">
           <div>
             <span>结果</span>
-            <h2 id="simpleResultTitle">图已生成</h2>
+            <h2 id="simpleResultTitle">可用于报告的图已生成</h2>
           </div>
           <cds-structured-list class="simple-meta-list" condensed>
             <cds-structured-list-body>
@@ -95,8 +95,10 @@
 
         <div class="simple-result-actions">
           <cds-button id="simpleDownloadPng" href="#" kind="primary">下载 PNG</cds-button>
-          <cds-button type="button" kind="tertiary" id="simpleSwapAxes">交换 X/Y 轴</cds-button>
-          <cds-button type="button" kind="tertiary" id="simpleToAdvanced">手动调整</cds-button>
+          <cds-button id="simpleDownloadSvg" href="#" kind="tertiary">下载 SVG</cds-button>
+          <cds-button type="button" kind="ghost" id="simpleCopyTitle">复制图题建议</cds-button>
+          <cds-button type="button" kind="ghost" id="simpleCopyReport">复制报告描述模板</cds-button>
+          <cds-button type="button" kind="tertiary" id="simpleToAdvanced">进入功能模式微调</cds-button>
         </div>
       </section>
     </section>
@@ -541,6 +543,8 @@
                 <cds-button id="downloadZip" href="#" kind="primary">下载 ZIP</cds-button>
                 <cds-button id="downloadPng" href="#" kind="tertiary">下载 PNG</cds-button>
                 <cds-button id="downloadSvg" href="#" kind="tertiary">下载 SVG</cds-button>
+                <cds-button type="button" id="copyTitleSuggestion" kind="ghost">复制图题建议</cds-button>
+                <cds-button type="button" id="copyReportTemplate" kind="ghost">复制报告描述模板</cds-button>
                 <cds-button id="downloadFitReport" href="#" kind="tertiary">下载 TXT</cds-button>
                 <cds-button id="downloadOriginCsv" href="#" kind="tertiary">下载绘图 CSV</cds-button>
                 <cds-button id="downloadFullCsv" href="#" kind="tertiary">下载完整数据 CSV</cds-button>

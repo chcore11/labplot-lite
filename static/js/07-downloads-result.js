@@ -289,6 +289,13 @@ function clearResultDownloadLinks() {
   ].forEach(clearDownloadLink);
 }
 
+function clearSimpleDownloadLinks() {
+  [
+    "#simpleDownloadPng",
+    "#simpleDownloadSvg",
+  ].forEach(clearDownloadLink);
+}
+
 async function renderDownloads(payload) {
   revokeDownloadUrls();
 
@@ -333,9 +340,15 @@ async function renderDownloads(payload) {
 }
 
 async function renderSimpleDownloads(payload) {
-  revokeDownloadUrls();
+  clearSimpleDownloadLinks();
   const pngBlob = await renderedPlotToPngBlob("#simplePlotCanvas", payload);
+  const svgBlob = await renderedPlotToSvgBlob("#simplePlotCanvas", payload);
   setDownloadLink("#simpleDownloadPng", pngBlob, payload.filenames.png);
+  if (svgBlob && payload.filenames.svg) {
+    setDownloadLink("#simpleDownloadSvg", svgBlob, payload.filenames.svg);
+  } else {
+    clearDownloadLink("#simpleDownloadSvg");
+  }
 }
 
 async function generateZipDownload() {

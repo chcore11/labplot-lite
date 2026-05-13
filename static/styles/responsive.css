@@ -10,6 +10,7 @@
   }
 
   .sample-chart-grid,
+  .quick-sample-grid,
   .workflow-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -105,6 +106,11 @@
   }
 
   .sample-chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-sample-grid,
+  .compare-grid {
     grid-template-columns: 1fr;
   }
 
@@ -222,12 +228,17 @@
     grid-template-columns: 1fr;
   }
 
+  .quick-sample-grid {
+    grid-template-columns: 1fr;
+  }
+
   .workflow-list {
     grid-template-columns: 1fr;
   }
 
   .workflow-section,
-  .sample-gallery {
+  .sample-gallery,
+  .excel-compare {
     padding-top: 34px;
     margin-bottom: 58px;
   }

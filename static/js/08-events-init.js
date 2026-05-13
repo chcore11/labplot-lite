@@ -75,11 +75,21 @@ async function loadInitialSampleFromUrl() {
 
   clearMessage();
   try {
-    await showMode("advanced", { skipScroll: true });
-    await loadSample(sampleUrl);
+    const mode = getInitialMode();
+    if (mode === "simple") {
+      await showMode("simple", { skipScroll: true });
+      await loadSimpleSample(sampleUrl);
+    } else {
+      await showMode("advanced", { skipScroll: true });
+      await loadSample(sampleUrl);
+    }
     window.history.replaceState(null, "", window.location.pathname);
   } catch (error) {
-    showMessage("error", error.message);
+    if (getInitialMode() === "simple") {
+      setSimpleMessage("error", error.message);
+    } else {
+      showMessage("error", error.message);
+    }
   }
 }
 
@@ -165,7 +175,7 @@ async function loadInitialModeFromUrl() {
 }
 
 function setSimpleMessage(type, text) {
-  renderNotification(qs("#simpleMessage"), type, text, "单图模式");
+  renderNotification(qs("#simpleMessage"), type, text, "简易模式");
 }
 
 function clearSimpleMessage() {
@@ -256,6 +266,7 @@ async function renderSimplePlotFromColumns(xCol, yCol, successMessage = "", opti
   const payload = buildPlotPayload();
   state.simplePlotPayload = payload;
   state.lastPlotPayload = payload;
+  clearSimpleDownloadLinks();
   setSimpleMessage("info", "绘制图表...");
   await plotReady;
   await renderChart(payload, "#simplePlotCanvas");
@@ -269,6 +280,29 @@ async function renderSimplePlotFromColumns(xCol, yCol, successMessage = "", opti
   if (successMessage) {
     setSimpleMessage("success", successMessage);
   }
+}
+
+async function loadSimpleSample(url) {
+  setSimpleMessage("info", "加载示例数据...");
+  await nextFrame();
+
+  const fileName = url.split("/").pop();
+  const extension = fileName.split(".").pop().toLowerCase();
+  const parserReady = fileNeedsSpreadsheetLibrary(fileName)
+    ? ensureExternalLibrary("xlsx")
+    : Promise.resolve();
+  const plotReady = ensureExternalLibrary("plotly");
+  const response = await fetch(url, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error("示例文件加载失败。请通过本地服务器或 GitHub Pages 访问。");
+  }
+
+  const buffer = await response.arrayBuffer();
+  await parserReady;
+  const rows = parseBuffer(buffer, extension);
+  loadSimpleRows(rows, fileName);
+  const { xCol, yCol } = chooseSimpleXYColumns();
+  await renderSimplePlotFromColumns(xCol, yCol, `已用示例数据生成默认图：${fileName}`, { plotReady });
 }
 
 async function handleSimpleFile(file) {
@@ -294,19 +328,55 @@ async function handleSimpleFile(file) {
   await renderSimplePlotFromColumns(xCol, yCol, `已生成基础图：${file.name}`, { plotReady });
 }
 
-async function swapSimpleAxes() {
-  const payload = state.simplePlotPayload;
-  if (!payload?.stats?.x_col || !payload?.stats?.y_col) {
-    throw new Error("请先生成基础图，再交换 X/Y。");
+function buildTitleSuggestion(payload) {
+  if (!payload?.stats) {
+    throw new Error("请先生成图表。");
+  }
+  const stats = payload.stats;
+  if (payload.plotTitle && payload.plotTitle !== "X-Y Curve") {
+    return payload.plotTitle;
+  }
+  return `${stats.y_col} 随 ${stats.x_col} 的变化`;
+}
+
+function buildReportTemplate(payload) {
+  if (!payload?.stats) {
+    throw new Error("请先生成图表。");
+  }
+  const stats = payload.stats;
+  const parts = [
+    `图题：${buildTitleSuggestion(payload)}`,
+    `描述：以 ${stats.x_col} 为横轴，${stats.y_col} 为纵轴绘制实验数据图，共包含 ${stats.points} 个有效数据点。`,
+  ];
+  if (stats.has_fit) {
+    parts.push(`拟合：采用 ${stats.fit_type_label}，拟合方程为 ${stats.equation}，R² = ${stats.core_metrics.r2}。`);
+  }
+  parts.push("说明：图像由 LabPlot Lite 在浏览器本地生成，适合插入实验报告。");
+  return parts.join("\n");
+}
+
+async function copyTextToClipboard(text) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
   }
 
-  const nextXCol = payload.stats.y_col;
-  const nextYCol = payload.stats.x_col;
-  if (!state.numericColumns.includes(nextXCol) || !state.numericColumns.includes(nextYCol)) {
-    throw new Error("当前列不可交换。请在功能模式调整。");
-  }
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.inset = "0 auto auto 0";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  textarea.remove();
+}
 
-  await renderSimplePlotFromColumns(nextXCol, nextYCol, "已交换 X/Y，PNG 已更新。");
+async function copyPayloadText(kind, payload, notify) {
+  const text = kind === "title" ? buildTitleSuggestion(payload) : buildReportTemplate(payload);
+  await copyTextToClipboard(text);
+  notify("success", kind === "title" ? "图题建议已复制。" : "报告描述模板已复制。");
 }
 
 function setupModeEvents() {
@@ -337,9 +407,17 @@ function setupModeEvents() {
   simpleFileButton?.addEventListener("cds-file-uploader-button-changed", handleSimpleFileChange);
   simpleFileButton?.addEventListener("change", handleSimpleFileChange);
 
-  qs("#simpleSwapAxes")?.addEventListener("click", async () => {
+  qs("#simpleCopyTitle")?.addEventListener("click", async () => {
     try {
-      await swapSimpleAxes();
+      await copyPayloadText("title", state.simplePlotPayload, setSimpleMessage);
+    } catch (error) {
+      setSimpleMessage("error", error.message);
+    }
+  });
+
+  qs("#simpleCopyReport")?.addEventListener("click", async () => {
+    try {
+      await copyPayloadText("report", state.simplePlotPayload, setSimpleMessage);
     } catch (error) {
       setSimpleMessage("error", error.message);
     }
@@ -555,6 +633,22 @@ function setupEvents() {
       const zip = await generateZipDownload();
       triggerDownload(zip.url, zip.filename);
       showMessage("success", "ZIP 已生成，开始下载。");
+    } catch (error) {
+      showMessage("error", error.message);
+    }
+  });
+
+  qs("#copyTitleSuggestion")?.addEventListener("click", async () => {
+    try {
+      await copyPayloadText("title", state.lastPlotPayload, showMessage);
+    } catch (error) {
+      showMessage("error", error.message);
+    }
+  });
+
+  qs("#copyReportTemplate")?.addEventListener("click", async () => {
+    try {
+      await copyPayloadText("report", state.lastPlotPayload, showMessage);
     } catch (error) {
       showMessage("error", error.message);
     }

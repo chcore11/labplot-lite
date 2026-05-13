@@ -166,6 +166,11 @@ const SAMPLE_FILES = new Set([
   "sample_02_voltage_scale.xlsx",
   "sample_03_abs_error.xlsx",
   "sample_04_invalid_log.xlsx",
+  "temperature_time.csv",
+  "voltage_current.csv",
+  "concentration_absorbance.csv",
+  "cooling_curve.csv",
+  "free_fall_fit.csv",
 ]);
 
 const SAMPLE_PRESETS = {
