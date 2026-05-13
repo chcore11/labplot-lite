@@ -19,9 +19,9 @@ async function handlePlotSubmit() {
   showMessage("success", "图像已生成，正在准备下载素材。");
   await nextFrame();
 
-  setPlotProgress(window.JSZip ? "正在生成下载文件..." : "正在加载 ZIP 打包库...");
+  setPlotProgress("正在准备下载文件...");
   await renderDownloads(payload);
-  showMessage("success", "已生成图像、CSV、拟合报告和 ZIP 素材包。");
+  showMessage("success", "已生成图像、CSV 和拟合报告。ZIP 会在点击下载时打包。");
 }
 
 async function loadSample(url) {
@@ -75,7 +75,7 @@ async function loadInitialSampleFromUrl() {
 
   clearMessage();
   try {
-    showMode("advanced", { skipScroll: true });
+    await showMode("advanced", { skipScroll: true });
     await loadSample(sampleUrl);
     window.history.replaceState(null, "", window.location.pathname);
   } catch (error) {
@@ -124,13 +124,21 @@ function syncPendingUploadFile(file) {
   setText("#selectedFileHint", file ? `已选择：${file.name}` : "尚未选择文件。");
 }
 
-function showMode(mode, options = {}) {
+function getFileSignature(file) {
+  return file ? `${file.name}:${file.size}:${file.lastModified}` : "";
+}
+
+async function showMode(mode, options = {}) {
   const sections = {
     simple: qs("#simpleMode"),
     advanced: qs("#advancedMode"),
   };
   const targetMode = mode === "advanced" ? "advanced" : "simple";
   const target = sections[targetMode];
+
+  if (targetMode === "advanced") {
+    await ensureAdvancedCarbonComponents();
+  }
 
   Object.values(sections).forEach((section) => {
     if (section) {
@@ -147,10 +155,10 @@ function showMode(mode, options = {}) {
   }
 }
 
-function loadInitialModeFromUrl() {
+async function loadInitialModeFromUrl() {
   const mode = getInitialMode();
 
-  showMode(mode || "simple", { skipScroll: true });
+  await showMode(mode || "simple", { skipScroll: true });
   if (mode) {
     window.history.replaceState(null, "", window.location.pathname);
   }
@@ -265,8 +273,8 @@ async function handleSimpleFile(file) {
   if (!file) {
     throw new Error("请先选择 CSV / Excel 文件。");
   }
-  if (file.size > 5 * 1024 * 1024) {
-    throw new Error("建议单个文件不超过 5MB。");
+  if (file.size > DATA_LIMITS.maxFileBytes) {
+    throw new Error(`建议单个文件不超过 ${Math.round(DATA_LIMITS.maxFileBytes / 1024 / 1024)}MB。`);
   }
 
   setSimpleMessage("info", "正在准备文件解析和绘图环境...");
@@ -302,8 +310,8 @@ async function swapSimpleAxes() {
 
 function setupModeEvents() {
   qsa("#simpleToAdvanced, #simpleToAdvancedTop").forEach((button) => {
-    button.addEventListener("click", () => {
-      showMode("advanced");
+    button.addEventListener("click", async () => {
+      await showMode("advanced");
       if (state.rawRows.length) {
         showMessage("success", "已进入功能模式。可继续手动确认数据范围和绘图配置。");
       }
@@ -312,8 +320,14 @@ function setupModeEvents() {
 
   const simpleFileButton = qs("#simpleFileInput");
   const handleSimpleFileChange = async (event) => {
+    const file = getFileFromUploadEvent(event, simpleFileButton);
+    const signature = getFileSignature(file);
+    if (signature && signature === state.simpleFileSignature) {
+      return;
+    }
+    state.simpleFileSignature = signature;
     try {
-      await handleSimpleFile(getFileFromUploadEvent(event, simpleFileButton));
+      await handleSimpleFile(file);
     } catch (error) {
       setSimpleMessage("error", error.message);
     }
@@ -408,8 +422,8 @@ function setupEvents() {
       if (!file) {
         throw new Error("请先上传 CSV / Excel 文件。");
       }
-      if (file.size > 5 * 1024 * 1024) {
-        throw new Error("建议单个文件不超过 5MB。");
+      if (file.size > DATA_LIMITS.maxFileBytes) {
+        throw new Error(`建议单个文件不超过 ${Math.round(DATA_LIMITS.maxFileBytes / 1024 / 1024)}MB。`);
       }
 
       showMessage("info", fileNeedsSpreadsheetLibrary(file.name) ? "正在加载 Excel 解析库并读取文件..." : "正在读取 CSV 文件...");
@@ -527,6 +541,23 @@ function setupEvents() {
       }
     });
   });
+
+  qs("#downloadZip")?.addEventListener("click", async (event) => {
+    const link = event.currentTarget;
+    if (link.getAttribute("download")) {
+      return;
+    }
+
+    event.preventDefault();
+    try {
+      showMessage("info", window.JSZip ? "正在打包 ZIP 素材包..." : "正在加载 ZIP 打包库...");
+      const zip = await generateZipDownload();
+      triggerDownload(zip.url, zip.filename);
+      showMessage("success", "ZIP 素材包已生成并开始下载。");
+    } catch (error) {
+      showMessage("error", error.message);
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -539,6 +570,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (getInitialSampleUrl()) {
     await loadInitialSampleFromUrl();
   } else {
-    loadInitialModeFromUrl();
+    await loadInitialModeFromUrl();
   }
 });

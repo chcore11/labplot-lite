@@ -1,7 +1,12 @@
 "use strict";
 
 function escapeCsvValue(value) {
-  const text = value === null || value === undefined ? "" : String(value);
+  let text = value === null || value === undefined ? "" : String(value);
+  const trimmed = text.trimStart();
+  const isNumericNegative = /^-\d*\.?\d+(?:e[+-]?\d+)?$/i.test(trimmed);
+  if (/^[=+@]/.test(trimmed) || (trimmed.startsWith("-") && !isNumericNegative)) {
+    text = `'${text}`;
+  }
   if (/[",\n\r]/.test(text)) {
     return `"${text.replace(/"/g, "\"\"")}"`;
   }
@@ -82,12 +87,21 @@ function buildFitReport(stats, title) {
 function revokeDownloadUrls() {
   state.objectUrls.forEach((url) => URL.revokeObjectURL(url));
   state.objectUrls = [];
+  state.pendingZipPackage = null;
+  qsa("[data-object-url]").forEach((link) => {
+    delete link.dataset.objectUrl;
+  });
 }
 
 function setDownloadLink(selector, blob, filename) {
   const link = qs(selector);
+  if (link.dataset.objectUrl) {
+    URL.revokeObjectURL(link.dataset.objectUrl);
+    state.objectUrls = state.objectUrls.filter((url) => url !== link.dataset.objectUrl);
+  }
   const url = URL.createObjectURL(blob);
   state.objectUrls.push(url);
+  link.dataset.objectUrl = url;
   link.href = url;
   link.download = filename;
   link.setAttribute("href", url);
@@ -244,6 +258,11 @@ function clearDownloadLink(selector) {
   if (!link) {
     return;
   }
+  if (link.dataset.objectUrl) {
+    URL.revokeObjectURL(link.dataset.objectUrl);
+    state.objectUrls = state.objectUrls.filter((url) => url !== link.dataset.objectUrl);
+    delete link.dataset.objectUrl;
+  }
   link.href = "#";
   link.removeAttribute("download");
   link.setAttribute("href", "#");
@@ -262,10 +281,6 @@ function clearResultDownloadLinks() {
 }
 
 async function renderDownloads(payload) {
-  if (!window.JSZip) {
-    await ensureExternalLibrary("jszip");
-  }
-
   revokeDownloadUrls();
 
   const pngBlob = await renderedPlotToPngBlob("#plotCanvas", payload);
@@ -281,16 +296,6 @@ async function renderDownloads(payload) {
   const fitReportText = buildFitReport(payload.stats, payload.plotTitle);
   const fitReportBlob = new Blob([fitReportText], { type: "text/plain;charset=utf-8" });
 
-  const zip = new JSZip();
-  zip.file(payload.filenames.png, pngBlob);
-  if (svgBlob && payload.filenames.svg) {
-    zip.file(payload.filenames.svg, svgBlob);
-  }
-  zip.file(payload.filenames.originCsv, originCsvBlob);
-  zip.file(payload.filenames.fullCsv, fullCsvBlob);
-  zip.file(payload.filenames.fitReport, fitReportBlob);
-  const zipBlob = await zip.generateAsync({ type: "blob" });
-
   setDownloadLink("#downloadPng", pngBlob, payload.filenames.png);
   if (svgBlob && payload.filenames.svg) {
     setDownloadLink("#downloadSvg", svgBlob, payload.filenames.svg);
@@ -300,7 +305,22 @@ async function renderDownloads(payload) {
   setDownloadLink("#downloadOriginCsv", originCsvBlob, payload.filenames.originCsv);
   setDownloadLink("#downloadFullCsv", fullCsvBlob, payload.filenames.fullCsv);
   setDownloadLink("#downloadFitReport", fitReportBlob, payload.filenames.fitReport);
-  setDownloadLink("#downloadZip", zipBlob, payload.filenames.zip);
+  state.pendingZipPackage = {
+    filenames: payload.filenames,
+    files: {
+      fitReport: fitReportBlob,
+      fullCsv: fullCsvBlob,
+      originCsv: originCsvBlob,
+      png: pngBlob,
+      svg: svgBlob,
+    },
+  };
+  const zipLink = qs("#downloadZip");
+  zipLink.href = "#";
+  zipLink.setAttribute("href", "#");
+  zipLink.removeAttribute("download");
+  zipLink.removeAttribute("aria-disabled");
+  zipLink.removeAttribute("disabled");
 }
 
 async function renderSimpleDownloads(payload) {
@@ -308,6 +328,43 @@ async function renderSimpleDownloads(payload) {
   const pngBlob = await renderedPlotToPngBlob("#simplePlotCanvas", payload);
   setDownloadLink("#simpleDownloadPng", pngBlob, payload.filenames.png);
 }
+
+async function generateZipDownload() {
+  const packageInfo = state.pendingZipPackage;
+  if (!packageInfo) {
+    throw new Error("请先生成图表，再下载 ZIP 素材包。");
+  }
+  if (!window.JSZip) {
+    await ensureExternalLibrary("jszip");
+  }
+
+  const { filenames, files } = packageInfo;
+  const zip = new JSZip();
+  zip.file(filenames.png, files.png);
+  if (files.svg && filenames.svg) {
+    zip.file(filenames.svg, files.svg);
+  }
+  zip.file(filenames.originCsv, files.originCsv);
+  zip.file(filenames.fullCsv, files.fullCsv);
+  zip.file(filenames.fitReport, files.fitReport);
+  const zipBlob = await zip.generateAsync({ type: "blob" });
+  setDownloadLink("#downloadZip", zipBlob, filenames.zip);
+  return {
+    filename: filenames.zip,
+    url: qs("#downloadZip").href,
+  };
+}
+
+function triggerDownload(url, filename) {
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+}
+
+window.addEventListener("beforeunload", revokeDownloadUrls);
 
 function addResultTableRow(body, label, value, options = {}) {
   body.appendChild(createElement("cds-table-row", {

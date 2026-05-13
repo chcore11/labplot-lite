@@ -222,7 +222,11 @@ function ensureExternalLibrary(key) {
   state.libraryPromises[key] = new Promise((resolve, reject) => {
     const script = document.createElement("script");
     script.async = true;
+    script.crossOrigin = "anonymous";
     script.src = library.src;
+    if (library.integrity) {
+      script.integrity = library.integrity;
+    }
     script.onload = () => {
       if (library.isLoaded()) {
         resolve();
@@ -239,6 +243,41 @@ function ensureExternalLibrary(key) {
   });
 
   return state.libraryPromises[key];
+}
+
+function loadCarbonComponent(component) {
+  if (customElements.get(component.tag)) {
+    return Promise.resolve();
+  }
+
+  const key = `carbon:${component.tag}`;
+  if (state.libraryPromises[key]) {
+    return state.libraryPromises[key];
+  }
+
+  state.libraryPromises[key] = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.dataset.carbonComponent = component.tag;
+    if (component.integrity) {
+      script.integrity = component.integrity;
+    }
+    script.src = component.src;
+    script.type = "module";
+    script.onload = () => resolve();
+    script.onerror = () => {
+      delete state.libraryPromises[key];
+      reject(new Error("Carbon 组件加载失败，请检查网络后重试。"));
+    };
+    document.head.appendChild(script);
+  });
+
+  return state.libraryPromises[key];
+}
+
+function ensureAdvancedCarbonComponents() {
+  return Promise.all(CARBON_ADVANCED_COMPONENTS.map(loadCarbonComponent));
 }
 
 function getWorkflowPanel(step) {

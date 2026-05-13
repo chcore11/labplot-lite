@@ -36,13 +36,16 @@
     border-bottom: 1px solid var(--line-soft);
   }
 
-  .result-layout {
-    grid-template-columns: 1fr;
-  }
-
   .result-side {
     grid-template-columns: minmax(0, 1fr) minmax(260px, 0.8fr);
     align-items: start;
+  }
+
+}
+
+@media (max-width: 1024px) {
+  .result-layout {
+    grid-template-columns: 1fr;
   }
 
   .visualize-layout {
@@ -235,6 +238,16 @@
   .step-nav {
     overflow-x: auto;
     padding: 14px 16px 10px;
+  }
+
+  .visualize-layout,
+  .visualize-editor {
+    overflow-x: clip;
+  }
+
+  .columns-box cds-tag {
+    max-inline-size: 100%;
+    min-inline-size: 0;
   }
 
   .sample-card,

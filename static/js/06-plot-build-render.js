@@ -1,5 +1,14 @@
 "use strict";
 
+function escapePlotlyText(value) {
+  return cellText(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function buildPlotPayload() {
   const xCol = getControlValue("#xCol");
   const curveConfigs = getCurveConfigsFromForm();
@@ -447,7 +456,7 @@ function getFitAnnotation(payload, scale, colors) {
     },
     opacity: 1,
     showarrow: false,
-    text: payload.fitText.replace(/\n/g, "<br>"),
+    text: escapePlotlyText(payload.fitText).replace(/\n/g, "<br>"),
     x: 0.02,
     xanchor: "left",
     xref: "paper",
@@ -503,15 +512,17 @@ function makePlotlyTraces(payload, scale, colors) {
   return payload.datasets.map((dataset) => {
     const stroke = dataset.borderColor || colors.axis;
     const fill = dataset.backgroundColor || stroke;
+    const traceLabel = escapePlotlyText(dataset.label || "Series");
+    const xLabel = escapePlotlyText(payload.xLabel);
 
     if (dataset.chartType === "bar") {
       return {
-        hovertemplate: `${payload.xLabel}: %{x}<br>${dataset.label}: %{y}<extra></extra>`,
+        hovertemplate: `${xLabel}: %{x}<br>${traceLabel}: %{y}<extra></extra>`,
         marker: {
           color: fill,
           line: { color: stroke, width: Math.max((dataset.borderWidth || 1) * 0.4, 0.5) },
         },
-        name: dataset.label || "Series",
+        name: traceLabel,
         type: "bar",
         x: dataset.data.map((point) => point.x),
         y: dataset.data.map((point) => point.y),
@@ -521,7 +532,7 @@ function makePlotlyTraces(payload, scale, colors) {
     return {
       fill: dataset.chartType === "area" && !isLogScale(payload.yAxisScale) ? "tozeroy" : undefined,
       fillcolor: dataset.chartType === "area" && !isLogScale(payload.yAxisScale) ? plotlyFillColor(fill) : undefined,
-      hovertemplate: `${payload.xLabel}: %{x}<br>${dataset.label}: %{y}<extra></extra>`,
+      hovertemplate: `${xLabel}: %{x}<br>${traceLabel}: %{y}<extra></extra>`,
       line: {
         color: stroke,
         dash: plotlyDashStyle(dataset),
@@ -537,7 +548,7 @@ function makePlotlyTraces(payload, scale, colors) {
         size: Math.max((dataset.pointRadius || 0) * 2 * scale, 3 * scale),
       },
       mode: getTraceMode(dataset),
-      name: dataset.label || "Series",
+      name: traceLabel,
       type: "scatter",
       x: dataset.data.map((point) => point.x),
       y: dataset.data.map((point) => point.y),
@@ -637,7 +648,7 @@ async function renderPlotlyChart(payload, selector) {
         automargin: true,
         font: { color: colors.text, size: payload.labelFontsize * scale },
         standoff: 12 * scale,
-        text: payload.xLabel,
+        text: escapePlotlyText(payload.xLabel),
       },
       type: payload.xAxisScale,
       zeroline: false,
@@ -664,7 +675,7 @@ async function renderPlotlyChart(payload, selector) {
         automargin: true,
         font: { color: colors.text, size: payload.labelFontsize * scale },
         standoff: 12 * scale,
-        text: payload.yLabel,
+        text: escapePlotlyText(payload.yLabel),
       },
       type: payload.yAxisScale,
       zeroline: false,

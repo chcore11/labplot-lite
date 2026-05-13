@@ -271,10 +271,12 @@
 
 .plotly-export-surface {
   position: relative;
+  max-width: 100%;
 }
 
 .plotly-export-surface .main-svg {
   display: block;
+  max-width: 100%;
 }
 
 .plotly-export-surface .modebar {

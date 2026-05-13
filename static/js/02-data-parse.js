@@ -14,12 +14,70 @@ function decodeText(buffer) {
   return new TextDecoder("utf-8").decode(buffer);
 }
 
+function assertTableSize(rows, label = "数据") {
+  let maxColumns = 0;
+  let cellCount = 0;
+
+  rows.forEach((row) => {
+    maxColumns = Math.max(maxColumns, row.length);
+    cellCount += row.length;
+  });
+
+  if (rows.length > DATA_LIMITS.maxRows) {
+    throw new Error(`${label}超过 ${DATA_LIMITS.maxRows} 行，请先精简数据范围。`);
+  }
+  if (maxColumns > DATA_LIMITS.maxColumns) {
+    throw new Error(`${label}超过 ${DATA_LIMITS.maxColumns} 列，请先删除无关列。`);
+  }
+  if (cellCount > DATA_LIMITS.maxCells) {
+    throw new Error(`${label}超过 ${DATA_LIMITS.maxCells} 个单元格，请先精简表格。`);
+  }
+
+  return rows;
+}
+
+function assertSheetRange(ref, sheetName) {
+  if (!ref || !window.XLSX?.utils?.decode_range) {
+    return;
+  }
+
+  const range = XLSX.utils.decode_range(ref);
+  const rows = range.e.r - range.s.r + 1;
+  const columns = range.e.c - range.s.c + 1;
+  const cells = rows * columns;
+
+  if (
+    rows > DATA_LIMITS.maxRows ||
+    columns > DATA_LIMITS.maxColumns ||
+    cells > DATA_LIMITS.maxCells
+  ) {
+    throw new Error(
+      `工作表「${sheetName}」过大（${rows} 行 × ${columns} 列），请先精简到 ${DATA_LIMITS.maxRows} 行、${DATA_LIMITS.maxColumns} 列以内。`,
+    );
+  }
+}
+
 function parseCsv(text) {
   const rows = [];
   let row = [];
   let field = "";
   let inQuotes = false;
   let index = 0;
+  let cellCount = 0;
+
+  function pushRow(nextRow) {
+    if (nextRow.length > DATA_LIMITS.maxColumns) {
+      throw new Error(`CSV 超过 ${DATA_LIMITS.maxColumns} 列，请先删除无关列。`);
+    }
+    if (rows.length >= DATA_LIMITS.maxRows) {
+      throw new Error(`CSV 超过 ${DATA_LIMITS.maxRows} 行，请先精简数据范围。`);
+    }
+    cellCount += nextRow.length;
+    if (cellCount > DATA_LIMITS.maxCells) {
+      throw new Error(`CSV 超过 ${DATA_LIMITS.maxCells} 个单元格，请先精简表格。`);
+    }
+    rows.push(nextRow);
+  }
 
   if (text.charCodeAt(0) === 0xfeff) {
     text = text.slice(1);
@@ -46,7 +104,7 @@ function parseCsv(text) {
       field = "";
     } else if (char === "\n") {
       row.push(field);
-      rows.push(row);
+      pushRow(row);
       row = [];
       field = "";
     } else if (char === "\r") {
@@ -54,7 +112,7 @@ function parseCsv(text) {
         index += 1;
       }
       row.push(field);
-      rows.push(row);
+      pushRow(row);
       row = [];
       field = "";
     } else {
@@ -66,7 +124,7 @@ function parseCsv(text) {
 
   if (field !== "" || row.length > 0) {
     row.push(field);
-    rows.push(row);
+    pushRow(row);
   }
 
   return rows;
@@ -77,18 +135,25 @@ function parsePastedTable(text) {
   if (!source) {
     throw new Error("请先粘贴表格数据。");
   }
-
-  if (source.includes("\t")) {
-    return source
-      .split(/\r?\n/)
-      .filter((line) => cellText(line))
-      .map((line) => line.split("\t").map(cellText));
+  if (source.length > DATA_LIMITS.maxPasteChars) {
+    throw new Error(`粘贴内容超过 ${DATA_LIMITS.maxPasteChars} 个字符，请改用文件上传或先精简数据。`);
   }
 
-  return parseCsv(source);
+  if (source.includes("\t")) {
+    return assertTableSize(source
+      .split(/\r?\n/)
+      .filter((line) => cellText(line))
+      .map((line) => line.split("\t").map(cellText)), "粘贴数据");
+  }
+
+  return assertTableSize(parseCsv(source), "粘贴数据");
 }
 
 async function parseFile(file) {
+  if (file.size > DATA_LIMITS.maxFileBytes) {
+    throw new Error(`建议单个文件不超过 ${Math.round(DATA_LIMITS.maxFileBytes / 1024 / 1024)}MB。`);
+  }
+
   const extension = file.name.split(".").pop().toLowerCase();
   if (extension === "xlsx" || extension === "xls") {
     await ensureExternalLibrary("xlsx");
@@ -100,7 +165,7 @@ async function parseFile(file) {
 
 function parseBuffer(buffer, extension) {
   if (extension === "csv") {
-    return parseCsv(decodeText(buffer));
+    return assertTableSize(parseCsv(decodeText(buffer)), "CSV");
   }
 
   if (extension === "xlsx" || extension === "xls") {
@@ -115,11 +180,12 @@ function parseBuffer(buffer, extension) {
     }
 
     const sheet = workbook.Sheets[firstSheetName];
-    return XLSX.utils.sheet_to_json(sheet, {
+    assertSheetRange(sheet["!ref"], firstSheetName);
+    return assertTableSize(XLSX.utils.sheet_to_json(sheet, {
       header: 1,
       raw: false,
       defval: "",
-    });
+    }), "Excel 工作表");
   }
 
   throw new Error("目前只支持 CSV、XLS、XLSX 文件。");

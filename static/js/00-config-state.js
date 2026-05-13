@@ -80,23 +80,66 @@ const BASIC_METRICS = ["r2", "rmse", "mae", "max_abs_error"];
 const MULTI_Y_FIT_LABEL = "多曲线不拟合";
 const MULTI_Y_FIT_NOTICE = "多曲线模式下暂不进行拟合，如需拟合请只保留一条曲线。";
 
+const DATA_LIMITS = {
+  maxCells: 200000,
+  maxColumns: 80,
+  maxFileBytes: 5 * 1024 * 1024,
+  maxPasteChars: 1000000,
+  maxRows: 5000,
+};
+
 const EXTERNAL_LIBRARIES = {
   xlsx: {
     label: "Excel 解析库",
     src: "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",
+    integrity: "sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw",
     isLoaded: () => Boolean(window.XLSX),
   },
   plotly: {
     label: "图表绘制库",
-    src: "https://cdn.plot.ly/plotly-3.4.0.min.js",
+    src: "https://cdn.plot.ly/plotly-basic-3.4.0.min.js",
+    integrity: "sha384-I/jFvZCE5jIjNC2uiuudU21nFNmrIU7uZDcPSsgoWUQhGPzhnIP1pM/fL9Ee7UTZ",
     isLoaded: () => Boolean(window.Plotly),
   },
   jszip: {
     label: "ZIP 打包库",
     src: "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js",
+    integrity: "sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG",
     isLoaded: () => Boolean(window.JSZip),
   },
 };
+
+const CARBON_COMPONENT_INTEGRITY = {
+  accordion: "sha384-xxLGyTg2CeGlFLyBAsGXNRm1aLUE+HSe/D+03h62gsQbiPYFxiMLpHM5i5zWGY/X",
+  checkbox: "sha384-7El13wYwJWnC7HzszQTPBWHAQHF3aTxdd6g8HTMlL353GATj/ae7+Do7RyDIEN1s",
+  "data-table": "sha384-/oXdCYZB+XjtcRpbz9UPniEsH/kMwnCon6xljbksIAh3KABt+6sLoJLr1R0eC7WX",
+  "inline-loading": "sha384-ChklNAnnmqMI+jLKYNEH/dPLn/EJIqO6iz30h0tX6h9IjCL7BscNN4t5nq1nKtBb",
+  "number-input": "sha384-pL9IAIhJqILbaluoVxc+j5OUM+LoGHgienL2/7WIY+TLmYZtiYRIlSxwl0edeYlL",
+  "progress-indicator": "sha384-tSROjx/jQQ9krWgZHpo1HfSL1ph/S5KUb5bk8IuGAIxF6ICpMjiUx04FUZUH9wxx",
+  select: "sha384-R4vQ8L7MHK1lC4zeWAvI6xDAmJUSvxMtScjhSCS8lzdTeYKcsoO8vsFuwDmDIGpB",
+  tag: "sha384-NpoJHdjFIu4oAsxDDC3EvmV30fMvu1K6SqC6bD051jBHokJ6Cy1thSy1kOoZtvQO",
+  "text-input": "sha384-bZvVjrEqPMt5rITX2akoxM+C8ypv/bnWsk+uHdxwxwYUBri9sKWGAldHDZ8QVzXq",
+  textarea: "sha384-O9iqxR6PuTaWXO40/vmScHnc42P09VXvS2l6u4XtxYmXFJcTpatsBP47YJzStXQz",
+  tile: "sha384-tgV2oAv8cQFbNSopF2nerc5kd/VhSxSJNAELnA8koOE1pnnM0AdALjMr+bRXTuUr",
+};
+
+const CARBON_ADVANCED_COMPONENTS = [
+  "accordion",
+  "checkbox",
+  "data-table",
+  "inline-loading",
+  "number-input",
+  "progress-indicator",
+  "select",
+  "tag",
+  "text-input",
+  "textarea",
+  "tile",
+].map((name) => ({
+  integrity: CARBON_COMPONENT_INTEGRITY[name],
+  src: `https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/${name}.min.js`,
+  tag: `cds-${name === "data-table" ? "table" : name}`,
+}));
 
 const SAMPLE_FILES = new Set([
   "sample_01_temp_c_to_k.xlsx",
@@ -168,8 +211,10 @@ const state = {
   isPlotGenerating: false,
   activeStep: "upload",
   objectUrls: [],
+  pendingZipPackage: null,
   libraryPromises: {},
   samplePreset: null,
+  simpleFileSignature: "",
 };
 
 const WORKFLOW_STEPS = ["upload", "range", "calc", "plot", "result"];

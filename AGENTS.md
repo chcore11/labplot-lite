@@ -105,7 +105,7 @@ Use Carbon Web Components for generic UI:
 - `cds-progress-indicator` / `cds-progress-step` for workflow steps.
 - `cds-file-uploader` and `cds-file-uploader-button` for file selection.
 - `cds-select`, `cds-text-input`, `cds-textarea`, `cds-number-input`, `cds-checkbox` for forms.
-- `cds-actionable-notification` for status, success, warning, and error messaging.
+- `cds-actionable-notification` / `cds-inline-notification` for status, success, warning, and error messaging.
 - `cds-table` for spreadsheet preview.
 - `cds-accordion` for advanced or progressive settings.
 - `cds-tag` for compact metadata and column labels.
@@ -127,9 +127,9 @@ Do not write a custom canvas or SVG chart engine for scientific plots.
 
 ## File Responsibilities
 
-- `workbench.html`: static app shell, Carbon component imports, Carbon component markup.
-- `static/js/00-config-state.js`: constants and shared state.
-- `static/js/01-dom-workflow-utils.js`: DOM helpers, Carbon control read/write helpers, workflow utilities.
+- `workbench.html`: static app shell, minimal startup Carbon imports, Carbon component markup.
+- `static/js/00-config-state.js`: constants, shared state, external library and lazy Carbon component manifests.
+- `static/js/01-dom-workflow-utils.js`: DOM helpers, Carbon control read/write helpers, lazy Carbon loading, workflow utilities.
 - `static/js/02-data-parse.js`: CSV / Excel parsing and table normalization.
 - `static/js/03-workbench-ui.js`: workbench UI rendering, preview rows, dynamic Carbon controls.
 - `static/js/04-plot-readiness.js`: validation before plotting.
@@ -212,7 +212,8 @@ Then test:
 - apply a sample plotting preset
 - generate the Plotly chart
 - confirm result summary appears
-- confirm ZIP and PNG download links are populated
+- confirm PNG / SVG / CSV / TXT download links are populated
+- click the ZIP download once and confirm the lazy ZIP package is generated
 
 ## Commit Hygiene
 
