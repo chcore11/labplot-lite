@@ -539,6 +539,20 @@ function parsePositiveFloat(value, fallback, label, minValue, maxValue = null) {
   return number;
 }
 
+function parseOptionalNumber(value, label) {
+  const text = cellText(value);
+  if (!text) {
+    return null;
+  }
+
+  const number = toNumber(text);
+  if (!Number.isFinite(number)) {
+    throw new Error(`${label}必须是数字：${text}`);
+  }
+
+  return number;
+}
+
 function safeFilenamePart(text) {
   const cleaned = cellText(text)
     .replace(/[^\w\u4e00-\u9fff]+/g, "_")

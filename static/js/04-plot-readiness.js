@@ -12,7 +12,16 @@ function normalizeSelectedMetrics() {
   return selected.length ? selected : BASIC_METRICS.slice();
 }
 
-function getPlotSeries(xCol, yCol) {
+function getErrorValue(row, column) {
+  if (!column) {
+    return null;
+  }
+
+  const value = toNumber(row[column]);
+  return Number.isFinite(value) && value >= 0 ? value : null;
+}
+
+function getPlotSeries(xCol, yCol, config = {}) {
   return state.data
     .map((row, rowIndex) => {
       const x = toNumber(row[xCol]);
@@ -23,6 +32,8 @@ function getPlotSeries(xCol, yCol) {
       return {
         x,
         y: Number.isFinite(y) ? y : null,
+        xError: getErrorValue(row, config.xErrorCol),
+        yError: getErrorValue(row, config.yErrorCol),
         isGap: !Number.isFinite(y),
         rowIndex,
       };
@@ -30,10 +41,10 @@ function getPlotSeries(xCol, yCol) {
     .filter(Boolean);
 }
 
-function getPlotPairs(xCol, yCol) {
-  return getPlotSeries(xCol, yCol)
+function getPlotPairs(xCol, yCol, config = {}) {
+  return getPlotSeries(xCol, yCol, config)
     .filter((point) => !point.isGap)
-    .map(({ x, y, rowIndex }) => ({ x, y, rowIndex }));
+    .map(({ x, y, xError, yError, rowIndex }) => ({ x, y, xError, yError, rowIndex }));
 }
 
 function comparePlotPoints(a, b) {
@@ -87,6 +98,48 @@ function readOutputSize() {
   };
 }
 
+function readAxisRangeControls(xAxisScale, yAxisScale) {
+  return {
+    x: readSingleAxisRange("#xAxisMin", "#xAxisMax", "X 轴", xAxisScale),
+    y: readSingleAxisRange("#yAxisMin", "#yAxisMax", "Y 轴", yAxisScale),
+  };
+}
+
+function readSingleAxisRange(minSelector, maxSelector, axisName, scaleType) {
+  const min = parseOptionalNumber(getControlValue(minSelector), `${axisName}最小值`);
+  const max = parseOptionalNumber(getControlValue(maxSelector), `${axisName}最大值`);
+
+  if (min !== null && max !== null && min >= max) {
+    throw new Error(`${axisName}最小值必须小于最大值。`);
+  }
+  if (scaleType === "log") {
+    if (min !== null && min <= 0) {
+      throw new Error(`${axisName}对数刻度的最小值必须大于 0。`);
+    }
+    if (max !== null && max <= 0) {
+      throw new Error(`${axisName}对数刻度的最大值必须大于 0。`);
+    }
+  }
+
+  return { min, max };
+}
+
+function readReferenceControls(xAxisScale, yAxisScale) {
+  const x = parseOptionalNumber(getControlValue("#xReferenceValue"), "X 参考线");
+  const y = parseOptionalNumber(getControlValue("#yReferenceValue"), "Y 参考线");
+  if (xAxisScale === "log" && x !== null && x <= 0) {
+    throw new Error("X 参考线在对数刻度下必须大于 0。");
+  }
+  if (yAxisScale === "log" && y !== null && y <= 0) {
+    throw new Error("Y 参考线在对数刻度下必须大于 0。");
+  }
+  return {
+    label: cellText(getControlValue("#referenceLabel")),
+    x,
+    y,
+  };
+}
+
 function getPendingReadiness(status, hint, overrides = {}) {
   return {
     level: "neutral",
@@ -136,8 +189,10 @@ function inspectPlotReadiness() {
   let outputSize;
   try {
     outputSize = readOutputSize();
+    readAxisRangeControls(xAxisScale, yAxisScale);
+    readReferenceControls(xAxisScale, yAxisScale);
   } catch (error) {
-    return getPendingReadiness("检查导出尺寸", error.message, {
+    return getPendingReadiness("检查绘图参数", error.message, {
       level: "danger",
       fit: "待检查",
     });

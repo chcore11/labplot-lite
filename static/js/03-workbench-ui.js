@@ -87,6 +87,7 @@ function applySamplePreset(options = {}) {
   setControlValue("#plotTitle", preset.title || "");
   setControlValue("#xLabel", preset.xLabel || "");
   setControlValue("#yLabel", preset.yLabel || "");
+  resetPlotAnnotationControls();
   if (typeof preset.showGrid === "boolean") {
     setControlChecked("#showGrid", preset.showGrid);
   }
@@ -96,6 +97,9 @@ function applySamplePreset(options = {}) {
     color: DEFAULT_CURVE_COLORS[yIndex % DEFAULT_CURVE_COLORS.length],
     lineWidth: 1.8,
     lineStyle: "solid",
+    lineShape: "linear",
+    xErrorCol: "",
+    yErrorCol: "",
   })));
   updatePlotReadiness();
   if (!options.silent) {
@@ -114,6 +118,8 @@ function renderStaticOptions() {
   setOptions(qs("#metricMode"), objectEntriesToOptions(METRIC_MODES), "basic");
   setOptions(qs("#xAxisScale"), objectEntriesToOptions(AXIS_SCALE_TYPES), "linear");
   setOptions(qs("#yAxisScale"), objectEntriesToOptions(AXIS_SCALE_TYPES), "linear");
+  setOptions(qs("#legendMode"), objectEntriesToOptions(LEGEND_MODES), "auto");
+  setOptions(qs("#dataLabelMode"), objectEntriesToOptions(DATA_LABEL_MODES), "none");
 
   const metricBox = qs("#metricBox");
   metricBox.replaceChildren();
@@ -130,10 +136,10 @@ function renderStaticOptions() {
   });
 }
 
-function createSelectField(labelText, name, options, selectedValue) {
+function createSelectField(labelText, name, options, selectedValue, settings = {}) {
   const id = `${name}-${randomId()}`;
   const select = createElement("cds-select", {
-    attributes: { id, name, required: true },
+    attributes: { id, name, required: settings.required !== false },
   });
   setOptions(select, options, selectedValue);
   return createLabeledControl(labelText, select);
@@ -159,8 +165,10 @@ function createCurveRow(config, index) {
   const row = createElement("div", { className: "curve-row" });
 
   const yOptions = state.numericColumns.map((column) => ({ value: column, label: column }));
+  const optionalColumnOptions = getOptionalNumericColumnOptions();
   const colorOptions = objectEntriesToOptions(CURVE_COLORS);
   const styleOptions = objectEntriesToOptions(LINE_STYLES);
+  const shapeOptions = objectEntriesToOptions(LINE_SHAPES);
 
   const button = createButton("移除", "curve-remove-button");
   button.disabled = index === 0 && qs("#curveConfigBox").children.length === 0;
@@ -172,6 +180,9 @@ function createCurveRow(config, index) {
         createSelectField("颜色", "curveColors", colorOptions, config.color),
         createInputField("线宽", "curveWidths", config.lineWidth),
         createSelectField("线型", "curveStyles", styleOptions, config.lineStyle),
+        createSelectField("连接", "curveLineShapes", shapeOptions, config.lineShape || "linear"),
+        createSelectField("Y 误差", "curveYErrorCols", optionalColumnOptions, config.yErrorCol || "", { required: false }),
+        createSelectField("X 误差", "curveXErrorCols", optionalColumnOptions, config.xErrorCol || "", { required: false }),
       ],
     }),
     createElement("div", {
@@ -183,6 +194,13 @@ function createCurveRow(config, index) {
   return row;
 }
 
+function getOptionalNumericColumnOptions() {
+  return [
+    { value: "", label: "不使用" },
+    ...state.numericColumns.map((column) => ({ value: column, label: column })),
+  ];
+}
+
 function getDefaultCurveConfigs() {
   const firstY = state.numericColumns[1] || state.numericColumns[0] || "";
   return [{
@@ -190,6 +208,9 @@ function getDefaultCurveConfigs() {
     color: DEFAULT_CURVE_COLORS[0],
     lineWidth: 1.8,
     lineStyle: "solid",
+    lineShape: "linear",
+    xErrorCol: "",
+    yErrorCol: "",
   }];
 }
 
@@ -221,9 +242,14 @@ function getCurveConfigsFromForm() {
       "线条粗细",
       0.1,
     );
-    const lineStyle = getControlValue(row.querySelector('[name="curveStyles"]')) || "solid";
+    const lineStyleValue = getControlValue(row.querySelector('[name="curveStyles"]')) || "solid";
+    const lineShapeValue = getControlValue(row.querySelector('[name="curveLineShapes"]')) || "linear";
+    const lineStyle = LINE_STYLES[lineStyleValue] ? lineStyleValue : "solid";
+    const lineShape = LINE_SHAPES[lineShapeValue] ? lineShapeValue : "linear";
+    const yErrorCol = getControlValue(row.querySelector('[name="curveYErrorCols"]'));
+    const xErrorCol = getControlValue(row.querySelector('[name="curveXErrorCols"]'));
 
-    return { yCol, color, lineWidth, lineStyle };
+    return { yCol, color, lineWidth, lineStyle, lineShape, xErrorCol, yErrorCol };
   }).filter((config) => config.yCol);
 
   if (!configs.length) {
@@ -231,6 +257,18 @@ function getCurveConfigsFromForm() {
   }
 
   return configs;
+}
+
+function resetPlotAnnotationControls() {
+  setControlValue("#xAxisMin", "");
+  setControlValue("#xAxisMax", "");
+  setControlValue("#yAxisMin", "");
+  setControlValue("#yAxisMax", "");
+  setControlValue("#xReferenceValue", "");
+  setControlValue("#yReferenceValue", "");
+  setControlValue("#referenceLabel", "");
+  setControlValue("#legendMode", "auto");
+  setControlValue("#dataLabelMode", "none");
 }
 
 function renderDataControls() {

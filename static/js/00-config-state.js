@@ -49,6 +49,26 @@ const LINE_DASHES = {
   dashdot: [8, 4, 2, 4],
 };
 
+const LINE_SHAPES = {
+  linear: "直线连接",
+  spline: "平滑曲线",
+  hv: "阶梯线",
+};
+
+const LEGEND_MODES = {
+  auto: "自动",
+  top: "顶部",
+  right: "右侧",
+  bottom: "底部",
+  hidden: "隐藏",
+};
+
+const DATA_LABEL_MODES = {
+  none: "不显示",
+  last: "末端标签",
+  all: "全部点值",
+};
+
 const CURVE_COLORS = {
   "#0072B2": "论文蓝",
   "#D55E00": "朱红",

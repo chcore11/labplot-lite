@@ -240,12 +240,16 @@ async function renderSimplePlotFromColumns(xCol, yCol, successMessage = "", opti
   setControlValue("#titleFontsize", "15");
   setControlValue("#labelFontsize", "13");
   setControlValue("#legendFontsize", "11");
+  resetPlotAnnotationControls();
   setControlChecked("#showGrid", false);
   renderCurveRows([{
     yCol,
     color: DEFAULT_CURVE_COLORS[0],
     lineWidth: 1.8,
     lineStyle: "solid",
+    lineShape: "linear",
+    xErrorCol: "",
+    yErrorCol: "",
   }]);
   updatePlotReadiness();
 
@@ -479,6 +483,9 @@ function setupEvents() {
       color: DEFAULT_CURVE_COLORS[nextIndex % DEFAULT_CURVE_COLORS.length],
       lineWidth: 1.8,
       lineStyle: "solid",
+      lineShape: "linear",
+      xErrorCol: "",
+      yErrorCol: "",
     };
     qs("#curveConfigBox").appendChild(createCurveRow(config, nextIndex));
     updateRemoveButtons();

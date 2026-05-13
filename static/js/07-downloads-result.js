@@ -35,7 +35,13 @@ function buildFitReport(stats, title) {
   lines.push(`Y 轴标题：${stats.y_label}`);
   lines.push(`X 轴刻度：${stats.x_axis_scale_label}`);
   lines.push(`Y 轴刻度：${stats.y_axis_scale_label}`);
+  lines.push(`X 轴范围：${stats.x_axis_range_label}`);
+  lines.push(`Y 轴范围：${stats.y_axis_range_label}`);
   lines.push(`图表类型：${stats.chart_type}`);
+  lines.push(`图例：${stats.legend_mode_label}`);
+  lines.push(`数据标签：${stats.data_label_mode_label}`);
+  lines.push(`参考线：${stats.reference_lines_label}`);
+  lines.push(`误差棒：${stats.error_bar_count_label}`);
   lines.push(`数据点数：${stats.points}`);
   if (hasMissingPoints(stats)) {
     lines.push(`缺失值处理：${stats.missing_points_label}`);
@@ -426,6 +432,7 @@ function renderResult(payload) {
   addSummaryRow(summary, "Y 轴", stats.y_cols_label || stats.y_col);
   addSummaryRow(summary, "曲线数", stats.curve_count);
   addSummaryRow(summary, "类型", stats.chart_type);
+  addSummaryRow(summary, "参考线", stats.reference_lines_label);
 
   const statsGrid = qs("#statsBody");
   statsGrid.replaceChildren();
@@ -433,6 +440,12 @@ function renderResult(payload) {
   addStat(statsGrid, "Y 轴标题", stats.y_label);
   addStat(statsGrid, "X 轴刻度", stats.x_axis_scale_label);
   addStat(statsGrid, "Y 轴刻度", stats.y_axis_scale_label);
+  addStat(statsGrid, "X 轴范围", stats.x_axis_range_label);
+  addStat(statsGrid, "Y 轴范围", stats.y_axis_range_label);
+  addStat(statsGrid, "图例", stats.legend_mode_label);
+  addStat(statsGrid, "数据标签", stats.data_label_mode_label);
+  addStat(statsGrid, "参考线", stats.reference_lines_label);
+  addStat(statsGrid, "误差棒", stats.error_bar_count_label);
   addStat(statsGrid, "Y 最大值", stats.max_value);
   addStat(statsGrid, "Y 最小值", stats.min_value);
   addStat(statsGrid, "Y 平均值", stats.avg_value);

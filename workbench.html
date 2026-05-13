@@ -336,6 +336,50 @@
                           <cds-text-input id="yLabel" name="yLabel" label="Y 轴标题" placeholder="例如：温度 / C、Power / W"></cds-text-input>
                         </div>
                       </div>
+
+                      <div class="form-grid compact-grid">
+                        <div>
+                          <cds-number-input id="xAxisMin" name="xAxisMin" label="X 最小值" placeholder="自动" allow-empty></cds-number-input>
+                        </div>
+
+                        <div>
+                          <cds-number-input id="xAxisMax" name="xAxisMax" label="X 最大值" placeholder="自动" allow-empty></cds-number-input>
+                        </div>
+
+                        <div>
+                          <cds-number-input id="yAxisMin" name="yAxisMin" label="Y 最小值" placeholder="自动" allow-empty></cds-number-input>
+                        </div>
+
+                        <div>
+                          <cds-number-input id="yAxisMax" name="yAxisMax" label="Y 最大值" placeholder="自动" allow-empty></cds-number-input>
+                        </div>
+                      </div>
+                    </div>
+                  </cds-accordion-item>
+
+                  <cds-accordion-item title="标注与图例">
+                    <div class="form-grid compact-grid">
+                      <div>
+                        <cds-select id="legendMode" name="legendMode" label-text="图例位置" required></cds-select>
+                      </div>
+
+                      <div>
+                        <cds-select id="dataLabelMode" name="dataLabelMode" label-text="数据标签" required></cds-select>
+                      </div>
+                    </div>
+
+                    <div class="form-grid compact-grid">
+                      <div>
+                        <cds-number-input id="xReferenceValue" name="xReferenceValue" label="X 参考线" placeholder="不添加" allow-empty></cds-number-input>
+                      </div>
+
+                      <div>
+                        <cds-number-input id="yReferenceValue" name="yReferenceValue" label="Y 参考线" placeholder="不添加" allow-empty></cds-number-input>
+                      </div>
+
+                      <div>
+                        <cds-text-input id="referenceLabel" name="referenceLabel" label="参考线标签" placeholder="例如阈值、目标值"></cds-text-input>
+                      </div>
                     </div>
                   </cds-accordion-item>
 
