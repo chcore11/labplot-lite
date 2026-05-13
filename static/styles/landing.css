@@ -109,6 +109,8 @@
 }
 
 .hero-product {
+  --preview-x: 0px;
+  --preview-y: 0px;
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--line-soft);
@@ -234,6 +236,10 @@
   border-radius: var(--radius-sm);
   background: var(--surface-raised);
   box-shadow: 0 10px 26px oklch(21% 0.014 255 / 0.06);
+  transform: translate3d(0, 0, 0);
+  transition:
+    box-shadow var(--duration-med) var(--ease-out),
+    transform var(--duration-med) var(--ease-out);
 }
 
 .report-preview-head {
@@ -339,17 +345,24 @@
   stroke-width: 2;
   transform-box: fill-box;
   transform-origin: center;
+  transition:
+    stroke-width var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .chart-errorbars path {
   stroke: var(--accent);
   stroke-width: 1.5;
+  transition: stroke-width var(--duration-fast) var(--ease-out);
 }
 
 .chart-reference-line {
   stroke: var(--data-teal);
   stroke-width: 1.2;
   stroke-dasharray: 8 8;
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    stroke-width var(--duration-fast) var(--ease-out);
 }
 
 .chart-legend circle {
@@ -360,6 +373,22 @@
   stroke: var(--paper-ink);
   stroke-width: 2;
   stroke-dasharray: 9 7;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hero-product:is(:hover, .is-tracking) .report-preview {
+    box-shadow: 0 14px 30px oklch(21% 0.014 255 / 0.09);
+    transform: translate3d(var(--preview-x), var(--preview-y), 0);
+  }
+
+  .hero-product:is(:hover, .is-tracking) :is(.chart-reference-line, .chart-errorbars path) {
+    stroke-width: 1.9;
+  }
+
+  .hero-product:is(:hover, .is-tracking) .report-chart .chart-points circle {
+    stroke-width: 2.5;
+    transform: scale(1.08);
+  }
 }
 
 .chart-svg text {
@@ -463,20 +492,22 @@
     box-shadow var(--duration-fast) var(--ease-out);
 }
 
-.sample-chart-card:hover {
+.sample-chart-card:is(:hover, :focus-visible) {
   border-color: var(--accent-border);
   background: var(--surface);
   box-shadow: 0 10px 24px oklch(21% 0.014 255 / 0.07);
   transform: translateY(-1px);
 }
 
-.sample-chart-card:hover .chart-fit-line,
-.sample-chart-card:hover .chart-line-a,
-.sample-chart-card:hover .chart-line-b {
+.sample-chart-card:active {
+  transform: translateY(0);
+}
+
+.sample-chart-card:is(:hover, :focus-visible) :is(.chart-fit-line, .chart-line-a, .chart-line-b) {
   stroke-width: 2.7;
 }
 
-.sample-chart-card:hover .chart-points circle {
+.sample-chart-card:is(:hover, :focus-visible) .chart-points circle {
   transform: scale(1.08);
 }
 
