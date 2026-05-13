@@ -30,14 +30,7 @@
       <div class="hero-copy">
         <div class="eyebrow">学生实验绘图工具</div>
         <h1 id="heroTitle">把实验表做成报告图</h1>
-        <p class="hero-desc">导入 CSV / Excel，确认范围，生成白底图、拟合摘要和 PNG / SVG / ZIP。</p>
-
-        <div class="hero-proof" aria-label="核心输出">
-          <span>本地读取</span>
-          <span>误差棒</span>
-          <span>线性拟合</span>
-          <span>PNG + SVG</span>
-        </div>
+        <p class="hero-desc">导入 CSV / Excel，检查范围，生成白底图、拟合摘要和 PNG / SVG / ZIP。</p>
 
         <div class="hero-actions">
           <cds-button href="./workbench.html?mode=simple" kind="primary" size="lg">开始绘图</cds-button>
@@ -45,53 +38,32 @@
         </div>
       </div>
 
-      <div class="hero-product" aria-label="LabPlot Lite 图表流程预览">
-        <div class="hero-product-toolbar">
-          <span>sample_03_abs_error.xlsx</span>
-          <strong>7 x 4.6 in / 300 DPI</strong>
-        </div>
+      <div class="hero-showcase" aria-label="真实样例图件预览">
+        <a class="hero-showcase-card hero-showcase-card-side hero-showcase-card-left-far" href="./workbench.html?sample=sample_02_voltage_scale.xlsx">
+          <span>反应动力学</span>
+          <img class="sample-preview-image" src="./static/sample-previews/sample_02_voltage_scale.svg" alt="" decoding="async">
+        </a>
 
-        <ol class="hero-flow" aria-hidden="true">
-          <li>导入</li>
-          <li>检查</li>
-          <li>配置</li>
-          <li>导出</li>
-        </ol>
+        <a class="hero-showcase-card hero-showcase-card-side hero-showcase-card-left" href="./workbench.html?sample=sample_01_temp_c_to_k.xlsx">
+          <span>荧光发射光谱</span>
+          <img class="sample-preview-image" src="./static/sample-previews/sample_01_temp_c_to_k.svg" alt="" decoding="async">
+        </a>
 
-        <div class="hero-product-body">
-          <div class="mini-table" aria-hidden="true">
-            <div class="mini-table-head">
-              <span>row</span>
-              <span>conc.</span>
-              <span>mean</span>
-            </div>
-            <div><span>1</span><span>0</span><span>0.005</span></div>
-            <div><span>2</span><span>4</span><span>0.241</span></div>
-            <div><span>3</span><span>8</span><span>0.481</span></div>
-            <div><span>4</span><span>12</span><span>0.728</span></div>
-            <div><span>5</span><span>16</span><span>0.965</span></div>
-          </div>
+        <a class="hero-showcase-card hero-showcase-card-main" href="./workbench.html?sample=sample_03_abs_error.xlsx" aria-label="打开标准曲线拟合样例">
+          <span>标准曲线拟合</span>
+          <strong>校准曲线与误差棒</strong>
+          <img
+            class="sample-preview-image"
+            src="./static/sample-previews/sample_03_abs_error.svg"
+            alt="由 sample_03_abs_error.xlsx 生成的标准曲线拟合图预览"
+            decoding="async"
+          >
+        </a>
 
-          <article class="report-preview">
-            <div class="report-preview-head">
-              <span>标准曲线</span>
-              <strong>error_y: absorbance_sd</strong>
-            </div>
-            <img
-              class="sample-preview-image report-preview-image"
-              src="./static/sample-previews/sample_03_abs_error.svg"
-              alt="由 sample_03_abs_error.xlsx 生成的标准曲线拟合图预览"
-              decoding="async"
-            >
-          </article>
-
-          <aside class="hero-inspector" aria-hidden="true">
-            <div><span>X 列</span><strong>concentration</strong></div>
-            <div><span>Y 列</span><strong>absorbance</strong></div>
-            <div><span>Y 误差</span><strong>absorbance_sd</strong></div>
-            <div><span>导出</span><strong>PNG / SVG / ZIP</strong></div>
-          </aside>
-        </div>
+        <a class="hero-showcase-card hero-showcase-card-side hero-showcase-card-right" href="./workbench.html?sample=sample_04_invalid_log.xlsx">
+          <span>拉曼谱峰对比</span>
+          <img class="sample-preview-image" src="./static/sample-previews/sample_04_invalid_log.svg" alt="" decoding="async">
+        </a>
       </div>
     </section>
 

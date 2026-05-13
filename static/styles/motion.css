@@ -25,17 +25,6 @@
   }
 }
 
-@keyframes tableRowIn {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 .nav {
   animation: revealDown 0.45s var(--ease-out) both;
 }
@@ -44,17 +33,12 @@
   animation: riseFadeIn 0.55s var(--ease-out) 0.08s both;
 }
 
-.landing-hero .hero-product {
+.landing-hero .hero-showcase {
   animation: measuredScaleIn 0.64s var(--ease-out) 0.16s both;
 }
 
 .simple-mode:not(.is-hidden) {
   animation: measuredScaleIn 0.32s var(--ease-out) both;
-}
-
-.landing-hero .mini-table > div:not(.mini-table-head),
-.landing-hero .hero-inspector div {
-  animation: tableRowIn 0.34s var(--ease-out) both;
 }
 
 html.motion-ready [data-reveal] {
