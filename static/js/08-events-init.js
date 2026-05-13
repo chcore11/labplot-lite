@@ -69,27 +69,19 @@ function getInitialMode() {
 
 async function loadInitialSampleFromUrl() {
   const sampleUrl = getInitialSampleUrl();
-  if (!sampleUrl) {
-    return;
+  if (!sampleUrl || getInitialMode() === "simple") {
+    return false;
   }
 
   clearMessage();
   try {
-    const mode = getInitialMode();
-    if (mode === "simple") {
-      await showMode("simple", { skipScroll: true });
-      await loadSimpleSample(sampleUrl);
-    } else {
-      await showMode("advanced", { skipScroll: true });
-      await loadSample(sampleUrl);
-    }
+    await showMode("advanced", { skipScroll: true });
+    await loadSample(sampleUrl);
     window.history.replaceState(null, "", window.location.pathname);
+    return true;
   } catch (error) {
-    if (getInitialMode() === "simple") {
-      setSimpleMessage("error", error.message);
-    } else {
-      showMessage("error", error.message);
-    }
+    showMessage("error", error.message);
+    return true;
   }
 }
 
@@ -280,29 +272,6 @@ async function renderSimplePlotFromColumns(xCol, yCol, successMessage = "", opti
   if (successMessage) {
     setSimpleMessage("success", successMessage);
   }
-}
-
-async function loadSimpleSample(url) {
-  setSimpleMessage("info", "加载示例数据...");
-  await nextFrame();
-
-  const fileName = url.split("/").pop();
-  const extension = fileName.split(".").pop().toLowerCase();
-  const parserReady = fileNeedsSpreadsheetLibrary(fileName)
-    ? ensureExternalLibrary("xlsx")
-    : Promise.resolve();
-  const plotReady = ensureExternalLibrary("plotly");
-  const response = await fetch(url, { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error("示例文件加载失败。请通过本地服务器或 GitHub Pages 访问。");
-  }
-
-  const buffer = await response.arrayBuffer();
-  await parserReady;
-  const rows = parseBuffer(buffer, extension);
-  loadSimpleRows(rows, fileName);
-  const { xCol, yCol } = chooseSimpleXYColumns();
-  await renderSimplePlotFromColumns(xCol, yCol, `已用示例数据生成默认图：${fileName}`, { plotReady });
 }
 
 async function handleSimpleFile(file) {
@@ -579,9 +548,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupEvents();
   updateWorkflowNav();
 
-  if (getInitialSampleUrl()) {
-    await loadInitialSampleFromUrl();
-  } else {
+  if (!(await loadInitialSampleFromUrl())) {
     await loadInitialModeFromUrl();
   }
 });

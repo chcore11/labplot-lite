@@ -371,7 +371,7 @@ function resetWorkflow() {
   setText("#simpleXCol", "待识别");
   setText("#simpleYCol", "待识别");
   setText("#simplePointCount", "待生成");
-  clearDownloadLink("#simpleDownloadPng");
+  clearSimpleDownloadLinks();
 
   qsa(".download-panel [href]").forEach((link) => {
     link.removeAttribute("download");

@@ -15,15 +15,16 @@
 
 .landing-hero {
   display: grid;
-  grid-template-columns: minmax(0, 0.82fr) minmax(520px, 1.18fr);
+  grid-template-columns: minmax(0, 0.78fr) minmax(540px, 1.22fr);
   align-items: center;
-  gap: 48px;
-  min-height: calc(86svh - 68px);
-  padding: 54px 0 42px;
+  gap: 64px;
+  min-height: calc(88svh - 68px);
+  padding: 68px 0 54px;
 }
 
 .hero-copy {
   min-width: 0;
+  padding-bottom: 24px;
 }
 
 .eyebrow,
@@ -48,11 +49,11 @@
 }
 
 .hero h1 {
-  max-width: 760px;
+  max-width: 720px;
   margin: 22px 0 0;
   color: var(--text-main);
   font-family: var(--font-display);
-  font-size: 56px;
+  font-size: 64px;
   line-height: 1.08;
   font-weight: 700;
   letter-spacing: 0;
@@ -61,10 +62,10 @@
 }
 
 .hero-desc {
-  max-width: 48ch;
-  margin: 22px 0 0;
+  max-width: 46ch;
+  margin: 24px 0 0;
   color: var(--text-soft);
-  font-size: 18px;
+  font-size: 19px;
   line-height: 1.68;
 }
 
@@ -73,7 +74,7 @@
   flex-wrap: wrap;
   gap: 8px;
   max-width: 46ch;
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 .hero-proof span {
@@ -94,7 +95,7 @@
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
-  margin-top: 28px;
+  margin-top: 34px;
 }
 
 .hero-actions cds-button {
@@ -117,7 +118,7 @@
   border-radius: var(--radius-md);
   background: var(--surface-raised);
   box-shadow:
-    0 26px 60px oklch(21% 0.014 255 / 0.11),
+    0 32px 72px oklch(21% 0.014 255 / 0.12),
     0 0 0 1px var(--line-soft);
   transform-origin: 52% 50%;
 }
@@ -406,7 +407,7 @@
 
 .section-heading {
   max-width: 740px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .section-heading h2 {
@@ -418,17 +419,6 @@
   font-weight: 700;
   letter-spacing: 0;
   text-wrap: balance;
-}
-
-.sample-shortcuts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: -6px 0 18px;
-}
-
-.sample-shortcuts cds-button {
-  width: auto;
 }
 
 .workflow-list {

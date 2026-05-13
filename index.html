@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://1.www.s81c.com https://cdn.jsdelivr.net https://cdn.plot.ly; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
   <link rel="icon" href="./static/logo_dark.png" type="image/png">
-  <title>LabPlot Lite - 实验图表工具</title>
+  <title>LabPlot Lite - 学生实验绘图工具</title>
   <script src="./static/theme.js"></script>
   <link rel="stylesheet" href="./static/style.css">
   <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/button.min.js" integrity="sha384-37nzM7RkCqKEoweIhup6IehzDkCjyC3H0004vi7UYiESsNPlRlporfpXPCtAKk6b" crossorigin="anonymous"></script>
@@ -29,19 +29,19 @@
     <section class="hero landing-hero" id="heroSection" aria-labelledby="heroTitle">
       <div class="hero-copy">
         <div class="eyebrow">学生实验绘图工具</div>
-        <h1 id="heroTitle">从实验表到报告图</h1>
-        <p class="hero-desc">导入 CSV / Excel，检查范围，生成白底图、拟合摘要和导出文件。</p>
+        <h1 id="heroTitle">把实验表做成报告图</h1>
+        <p class="hero-desc">导入 CSV / Excel，确认范围，生成白底图、拟合摘要和 PNG / SVG / ZIP。</p>
 
         <div class="hero-proof" aria-label="核心输出">
           <span>本地读取</span>
           <span>误差棒</span>
-          <span>参考线</span>
-          <span>ZIP 打包</span>
+          <span>线性拟合</span>
+          <span>PNG + SVG</span>
         </div>
 
         <div class="hero-actions">
-          <cds-button href="./workbench.html?mode=simple" kind="primary" size="lg">打开工作台</cds-button>
-          <cds-button href="#samples" kind="tertiary" size="md">看示例</cds-button>
+          <cds-button href="./workbench.html?mode=simple" kind="primary" size="lg">开始绘图</cds-button>
+          <cds-button href="#samples" kind="tertiary" size="md">查看样张</cds-button>
         </div>
       </div>
 
@@ -120,7 +120,7 @@
     <section class="workflow-section" id="workflow" aria-labelledby="workflowTitle">
       <div class="section-heading" data-reveal>
         <span>默认路径</span>
-        <h2 id="workflowTitle">先确认数据，再调整图表</h2>
+        <h2 id="workflowTitle">按实验报告的顺序完成</h2>
       </div>
 
       <ol class="workflow-list" aria-label="LabPlot Lite 使用流程" data-reveal>
@@ -150,15 +150,7 @@
     <section class="sample-gallery" id="samples" aria-labelledby="samplesTitle">
       <div class="section-heading" data-reveal>
         <span>示例</span>
-        <h2 id="samplesTitle">选择一张图件样张</h2>
-      </div>
-
-      <div class="sample-shortcuts" aria-label="简易模式 CSV 示例" data-reveal>
-        <cds-button href="./workbench.html?mode=simple&sample=temperature_time.csv" kind="ghost" size="sm">温度-时间</cds-button>
-        <cds-button href="./workbench.html?mode=simple&sample=voltage_current.csv" kind="ghost" size="sm">电压-电流</cds-button>
-        <cds-button href="./workbench.html?mode=simple&sample=concentration_absorbance.csv" kind="ghost" size="sm">浓度-吸光度</cds-button>
-        <cds-button href="./workbench.html?mode=simple&sample=cooling_curve.csv" kind="ghost" size="sm">冷却曲线</cds-button>
-        <cds-button href="./workbench.html?mode=simple&sample=free_fall_fit.csv" kind="ghost" size="sm">自由落体</cds-button>
+        <h2 id="samplesTitle">先看完整图件样张</h2>
       </div>
 
       <div class="sample-chart-grid">
