@@ -77,34 +77,12 @@
               <span>标准曲线</span>
               <strong>error_y: absorbance_sd</strong>
             </div>
-            <svg class="chart-svg report-chart" viewBox="0 0 520 300" role="img" aria-label="标准曲线拟合图预览">
-              <path class="chart-grid-line" d="M54 38H486M54 92H486M54 146H486M54 200H486M54 254H486M108 30V260M186 30V260M264 30V260M342 30V260M420 30V260"/>
-              <path class="chart-axis" d="M54 30V260H486"/>
-              <path class="chart-reference-line" d="M270 30V260M54 146H486"/>
-              <path class="chart-fit-line" d="M76 230L454 64"/>
-              <g class="chart-errorbars">
-                <path d="M88 218V238M80 218H96M80 238H96M156 184V202M148 184H164M148 202H164M224 150V170M216 150H232M216 170H232M292 116V144M284 116H300M284 144H300M360 82V114M352 82H368M352 114H368M430 50V92M422 50H438M422 92H438"/>
-              </g>
-              <g class="chart-points">
-                <circle cx="88" cy="224" r="5"/>
-                <circle cx="156" cy="193" r="5"/>
-                <circle cx="224" cy="164" r="5"/>
-                <circle cx="292" cy="133" r="5"/>
-                <circle cx="360" cy="102" r="5"/>
-                <circle cx="430" cy="71" r="5"/>
-              </g>
-              <g class="chart-legend" aria-hidden="true">
-                <circle cx="338" cy="48" r="4"/>
-                <path d="M382 48H418"/>
-                <text x="350" y="52">Data</text>
-                <text x="424" y="52">Linear Fit</text>
-              </g>
-              <text x="74" y="48">y = 0.0604x - 0.0002</text>
-              <text x="278" y="72">X = 10</text>
-              <text x="398" y="138">Y = 0.6</text>
-              <text x="22" y="154" transform="rotate(-90 22 154)">absorbance</text>
-              <text x="74" y="276">concentration / umol L-1</text>
-            </svg>
+            <img
+              class="sample-preview-image report-preview-image"
+              src="./static/sample-previews/sample_03_abs_error.svg"
+              alt="由 sample_03_abs_error.xlsx 生成的标准曲线拟合图预览"
+              decoding="async"
+            >
           </article>
 
           <aside class="hero-inspector" aria-hidden="true">
@@ -159,22 +137,13 @@
             <span>标准曲线拟合</span>
             <strong>校准曲线与误差棒</strong>
           </div>
-          <svg class="chart-svg" viewBox="0 0 520 260" aria-hidden="true">
-            <path class="chart-grid-line" d="M54 36H486M54 84H486M54 132H486M54 180H486M54 228H486M132 28V236M210 28V236M288 28V236M366 28V236M444 28V236"/>
-            <path class="chart-axis" d="M54 28V236H486"/>
-            <path class="chart-reference-line" d="M288 28V236M54 132H486"/>
-            <path class="chart-fit-line" d="M76 212L454 54"/>
-            <g class="chart-errorbars">
-              <path d="M98 192V212M90 192H106M90 212H106M172 164V182M164 164H180M164 182H180M246 130V152M238 130H254M238 152H254M320 96V126M312 96H328M312 126H328M394 60V98M386 60H402M386 98H402"/>
-            </g>
-            <g class="chart-points">
-              <circle cx="98" cy="202" r="5"/>
-              <circle cx="172" cy="173" r="5"/>
-              <circle cx="246" cy="141" r="5"/>
-              <circle cx="320" cy="111" r="5"/>
-              <circle cx="394" cy="79" r="5"/>
-            </g>
-          </svg>
+          <img
+            class="sample-preview-image"
+            src="./static/sample-previews/sample_03_abs_error.svg"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          >
         </a>
 
         <div class="sample-chart-list" data-reveal>
@@ -183,12 +152,7 @@
               <span>荧光发射光谱</span>
               <strong>末端标签光谱</strong>
             </div>
-            <svg class="chart-svg small" viewBox="0 0 320 180" aria-hidden="true">
-              <path class="chart-grid-line" d="M36 24H294M36 70H294M36 116H294M36 162H294M96 20V164M156 20V164M216 20V164M276 20V164"/>
-              <path class="chart-axis" d="M36 20V164H294"/>
-              <path class="chart-line-a" d="M48 146C82 92 112 38 146 92C176 140 206 54 246 92C266 112 280 132 292 144"/>
-              <path class="chart-line-b" d="M48 152C92 118 118 64 150 106C178 144 212 82 246 102C270 116 286 136 292 150"/>
-            </svg>
+            <img class="sample-preview-image" src="./static/sample-previews/sample_01_temp_c_to_k.svg" alt="" loading="lazy" decoding="async">
           </a>
 
           <a class="sample-chart-card sample-chart-row" href="./workbench.html?sample=sample_02_voltage_scale.xlsx">
@@ -196,12 +160,7 @@
               <span>反应动力学</span>
               <strong>脉冲参考线</strong>
             </div>
-            <svg class="chart-svg small" viewBox="0 0 320 180" aria-hidden="true">
-              <path class="chart-grid-line" d="M36 24H294M36 70H294M36 116H294M36 162H294M96 20V164M156 20V164M216 20V164M276 20V164"/>
-              <path class="chart-axis" d="M36 20V164H294"/>
-              <path class="chart-line-a" d="M48 38C88 62 110 86 148 108C188 130 230 145 292 154"/>
-              <path class="chart-line-b" d="M48 54C90 76 126 96 164 118C208 140 244 150 292 158"/>
-            </svg>
+            <img class="sample-preview-image" src="./static/sample-previews/sample_02_voltage_scale.svg" alt="" loading="lazy" decoding="async">
           </a>
 
           <a class="sample-chart-card sample-chart-row" href="./workbench.html?sample=sample_04_invalid_log.xlsx">
@@ -209,13 +168,7 @@
               <span>拉曼谱峰对比</span>
               <strong>对数轴与 D 峰</strong>
             </div>
-            <svg class="chart-svg small" viewBox="0 0 320 180" aria-hidden="true">
-              <path class="chart-grid-line" d="M36 24H294M36 70H294M36 116H294M36 162H294M96 20V164M156 20V164M216 20V164M276 20V164"/>
-              <path class="chart-axis" d="M36 20V164H294"/>
-              <path class="chart-reference-line" d="M164 20V164"/>
-              <path class="chart-line-a" d="M44 140C76 128 98 106 118 126C142 152 152 64 176 74C204 88 212 38 234 54C252 68 270 118 292 130"/>
-              <path class="chart-line-b" d="M44 148C82 140 104 118 126 132C146 146 158 78 178 92C204 104 214 50 236 68C260 86 274 126 292 142"/>
-            </svg>
+            <img class="sample-preview-image" src="./static/sample-previews/sample_04_invalid_log.svg" alt="" loading="lazy" decoding="async">
           </a>
         </div>
       </div>

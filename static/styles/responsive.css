@@ -202,15 +202,7 @@
     overflow-wrap: anywhere;
   }
 
-  .report-chart .chart-legend {
-    display: none;
-  }
-
-  .report-chart text {
-    font-size: 10px;
-  }
-
-  .chart-svg {
+  .sample-preview-image {
     min-width: 0;
     max-width: 100%;
   }
@@ -230,6 +222,15 @@
 
   .sample-chart-row {
     grid-template-columns: 1fr;
+  }
+
+  .sample-chart-wide {
+    min-height: 0;
+  }
+
+  .sample-chart-row .sample-preview-image {
+    justify-self: stretch;
+    max-width: 100%;
   }
 
   .workflow-list {
