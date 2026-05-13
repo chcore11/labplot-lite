@@ -88,7 +88,7 @@ node scripts/check-architecture.mjs
 
 发布前按这个顺序自查：
 
-1. Subtraction: 是否删掉了多余入口、重复样式、隐藏旧路径或过度说明。
+1. Subtraction: 是否删掉了多余入口、重复样式、隐藏旧路径或过度说明。同一个信息、入口、状态或样例说明不要在同一屏里出现多次；如果必须重复，必须服务不同任务层级。
 2. Product fit: 是否仍然服务学生实验绘图和报告输出。
 3. Ownership: 是否没有新增 Carbon / Plotly 之外的平行系统。
 4. Boundaries: 是否把代码放在对应 owner 文件，而不是临时塞进一个模块。
