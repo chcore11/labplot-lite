@@ -158,14 +158,18 @@
   }
 
   .mini-table {
-    overflow-x: auto;
-  }
-
-  .mini-table > div {
-    min-width: 360px;
+    display: none;
   }
 
   .hero-inspector {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero-inspector div:nth-child(n+3) {
+    display: none;
+  }
+
+  .sample-chart-row {
     grid-template-columns: 1fr;
   }
 

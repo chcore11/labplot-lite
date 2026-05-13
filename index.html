@@ -29,12 +29,12 @@
     <section class="hero landing-hero" id="heroSection" aria-labelledby="heroTitle">
       <div class="hero-copy">
         <div class="eyebrow">学生实验绘图工具</div>
-        <h1 id="heroTitle">从表格到图件</h1>
-        <p class="hero-desc">导入 CSV / Excel，确认范围，导出白底图、拟合摘要和数据文件。</p>
+        <h1 id="heroTitle">从实验表到报告图</h1>
+        <p class="hero-desc">导入 CSV / Excel，检查范围，生成白底图、拟合摘要和导出文件。</p>
 
         <div class="hero-actions">
           <cds-button href="./workbench.html?mode=simple" kind="primary" size="lg">打开工作台</cds-button>
-          <cds-button href="#samples" kind="tertiary" size="lg">看示例</cds-button>
+          <cds-button href="#samples" kind="tertiary" size="md">看示例</cds-button>
         </div>
       </div>
 
@@ -43,6 +43,13 @@
           <span>sample_03_abs_error.xlsx</span>
           <strong>7 x 4.6 in / 300 DPI</strong>
         </div>
+
+        <ol class="hero-flow" aria-hidden="true">
+          <li>导入</li>
+          <li>检查</li>
+          <li>配置</li>
+          <li>导出</li>
+        </ol>
 
         <div class="hero-product-body">
           <div class="mini-table" aria-hidden="true">
@@ -76,6 +83,7 @@
                 <circle cx="430" cy="71" r="5"/>
               </g>
               <text x="74" y="48">y = 0.0604x - 0.0002</text>
+              <text x="22" y="154" transform="rotate(-90 22 154)">absorbance</text>
               <text x="74" y="276">concentration / umol L-1</text>
             </svg>
           </article>
@@ -83,8 +91,8 @@
           <aside class="hero-inspector" aria-hidden="true">
             <div><span>X 列</span><strong>concentration</strong></div>
             <div><span>Y 列</span><strong>absorbance</strong></div>
-            <div><span>拟合</span><strong>linear</strong></div>
-            <div><span>导出</span><strong>PNG + TXT + CSV</strong></div>
+            <div><span>拟合</span><strong>线性拟合</strong></div>
+            <div><span>导出</span><strong>PNG / SVG / ZIP</strong></div>
           </aside>
         </div>
       </div>
@@ -123,7 +131,7 @@
     <section class="sample-gallery" id="samples" aria-labelledby="samplesTitle">
       <div class="section-heading" data-reveal>
         <span>示例</span>
-        <h2 id="samplesTitle">从一组真实场景开始</h2>
+        <h2 id="samplesTitle">选择一张图件样张</h2>
       </div>
 
       <div class="sample-chart-grid">
@@ -146,31 +154,33 @@
           </svg>
         </a>
 
-        <a class="sample-chart-card" href="./workbench.html?sample=sample_01_temp_c_to_k.xlsx" data-reveal>
-          <div>
-            <span>荧光发射光谱</span>
-            <strong>三条发射曲线</strong>
-          </div>
-          <svg class="chart-svg small" viewBox="0 0 320 180" aria-hidden="true">
-            <path class="chart-grid-line" d="M36 24H294M36 70H294M36 116H294M36 162H294M96 20V164M156 20V164M216 20V164M276 20V164"/>
-            <path class="chart-axis" d="M36 20V164H294"/>
-            <path class="chart-line-a" d="M48 146C82 92 112 38 146 92C176 140 206 54 246 92C266 112 280 132 292 144"/>
-            <path class="chart-line-b" d="M48 152C92 118 118 64 150 106C178 144 212 82 246 102C270 116 286 136 292 150"/>
-          </svg>
-        </a>
+        <div class="sample-chart-list" data-reveal>
+          <a class="sample-chart-card sample-chart-row" href="./workbench.html?sample=sample_01_temp_c_to_k.xlsx">
+            <div>
+              <span>荧光发射光谱</span>
+              <strong>三条发射曲线</strong>
+            </div>
+            <svg class="chart-svg small" viewBox="0 0 320 180" aria-hidden="true">
+              <path class="chart-grid-line" d="M36 24H294M36 70H294M36 116H294M36 162H294M96 20V164M156 20V164M216 20V164M276 20V164"/>
+              <path class="chart-axis" d="M36 20V164H294"/>
+              <path class="chart-line-a" d="M48 146C82 92 112 38 146 92C176 140 206 54 246 92C266 112 280 132 292 144"/>
+              <path class="chart-line-b" d="M48 152C92 118 118 64 150 106C178 144 212 82 246 102C270 116 286 136 292 150"/>
+            </svg>
+          </a>
 
-        <a class="sample-chart-card" href="./workbench.html?sample=sample_02_voltage_scale.xlsx" data-reveal>
-          <div>
-            <span>反应动力学</span>
-            <strong>多组衰减曲线</strong>
-          </div>
-          <svg class="chart-svg small" viewBox="0 0 320 180" aria-hidden="true">
-            <path class="chart-grid-line" d="M36 24H294M36 70H294M36 116H294M36 162H294M96 20V164M156 20V164M216 20V164M276 20V164"/>
-            <path class="chart-axis" d="M36 20V164H294"/>
-            <path class="chart-line-a" d="M48 38C88 62 110 86 148 108C188 130 230 145 292 154"/>
-            <path class="chart-line-b" d="M48 54C90 76 126 96 164 118C208 140 244 150 292 158"/>
-          </svg>
-        </a>
+          <a class="sample-chart-card sample-chart-row" href="./workbench.html?sample=sample_02_voltage_scale.xlsx">
+            <div>
+              <span>反应动力学</span>
+              <strong>多组衰减曲线</strong>
+            </div>
+            <svg class="chart-svg small" viewBox="0 0 320 180" aria-hidden="true">
+              <path class="chart-grid-line" d="M36 24H294M36 70H294M36 116H294M36 162H294M96 20V164M156 20V164M216 20V164M276 20V164"/>
+              <path class="chart-axis" d="M36 20V164H294"/>
+              <path class="chart-line-a" d="M48 38C88 62 110 86 148 108C188 130 230 145 292 154"/>
+              <path class="chart-line-b" d="M48 54C90 76 126 96 164 118C208 140 244 150 292 158"/>
+            </svg>
+          </a>
+        </div>
       </div>
     </section>
 
