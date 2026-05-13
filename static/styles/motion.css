@@ -77,10 +77,6 @@ html.motion-ready .workflow-list[data-reveal].is-visible li {
     transition-duration: 0.01ms !important;
   }
 
-  .sample-chart-card:is(:hover, :focus-visible) {
-    transform: none;
-  }
-
   html.motion-ready [data-reveal],
   html.motion-ready .workflow-list[data-reveal] li {
     opacity: 1;

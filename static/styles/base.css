@@ -133,8 +133,7 @@ body,
 cds-button,
 cds-progress-step,
 .sample-list cds-button,
-.sample-list a,
-.sample-chart-card {
+.sample-list a {
   transition:
     background-color var(--duration-med) var(--ease-out),
     border-color var(--duration-med) var(--ease-out),

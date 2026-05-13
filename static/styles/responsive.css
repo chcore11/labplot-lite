@@ -25,13 +25,8 @@
     --card-x: 350px;
   }
 
-  .sample-chart-grid,
   .workflow-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .sample-chart-wide {
-    grid-row: auto;
   }
 
   .workbench-main {
@@ -85,10 +80,6 @@
     grid-template-columns: auto minmax(0, 1fr);
     gap: 12px;
     padding: 0 16px;
-  }
-
-  .nav-links {
-    display: none;
   }
 
   .hero h1 {
@@ -169,10 +160,6 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .sample-chart-grid {
-    grid-template-columns: 1fr;
-  }
-
 }
 
 @media (max-width: 640px) {
@@ -235,25 +222,11 @@
     font-size: 18px;
   }
 
-  .sample-chart-row {
-    grid-template-columns: 1fr;
-  }
-
-  .sample-chart-wide {
-    min-height: 0;
-  }
-
-  .sample-chart-row .sample-preview-image {
-    justify-self: stretch;
-    max-width: 100%;
-  }
-
   .workflow-list {
     grid-template-columns: 1fr;
   }
 
-  .workflow-section,
-  .sample-gallery {
+  .workflow-section {
     padding-top: 34px;
     margin-bottom: 58px;
   }
