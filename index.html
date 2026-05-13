@@ -3,11 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://1.www.s81c.com https://cdn.jsdelivr.net https://cdn.plot.ly; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
   <link rel="icon" href="./static/logo_dark.png" type="image/png">
-  <title>LabPlot Lite - 实验数据，快速成图</title>
+  <title>LabPlot Lite - 学生实验绘图工具</title>
   <script src="./static/theme.js"></script>
-  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/button.min.js"></script>
   <link rel="stylesheet" href="./static/style.css">
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/button.min.js" integrity="sha384-37nzM7RkCqKEoweIhup6IehzDkCjyC3H0004vi7UYiESsNPlRlporfpXPCtAKk6b" crossorigin="anonymous"></script>
   <script defer src="./static/js/landing-motion.js"></script>
 </head>
 
@@ -18,159 +19,85 @@
         <span class="brand-mark" aria-hidden="true"></span>
         <span class="brand-text">LabPlot Lite</span>
       </a>
-
-      <nav class="nav-links" aria-label="首页导航">
-        <a href="#workflow">流程</a>
-        <a href="#samples">示例</a>
-      </nav>
     </header>
 
     <section class="hero landing-hero" id="heroSection" aria-labelledby="heroTitle">
       <div class="hero-copy">
-        <div class="eyebrow">学生实验报告绘图工具</div>
-        <h1 id="heroTitle">把实验表格变成可提交图件</h1>
-        <p class="hero-desc">上传 CSV / Excel，确认表头和数据范围，生成白底图、拟合摘要和报告素材包。</p>
+        <div class="eyebrow">学生实验绘图工具</div>
+        <h1 id="heroTitle">把实验表做成报告图</h1>
+        <p class="hero-desc">导入 CSV / Excel，检查范围，生成白底图、拟合摘要和 PNG / SVG / ZIP。</p>
 
         <div class="hero-actions">
-          <cds-button href="./workbench.html?mode=simple" kind="primary" size="lg">进入工作台</cds-button>
-          <cds-button href="#samples" kind="tertiary" size="lg">查看示例</cds-button>
+          <cds-button href="./workbench.html?mode=simple" kind="primary" size="lg">开始绘图</cds-button>
         </div>
       </div>
 
-      <div class="hero-product" aria-label="LabPlot Lite 图表工作流预览">
-        <div class="hero-product-toolbar">
-          <span>sample_03_abs_error.xlsx</span>
-          <strong>7 x 4.6 in / 300 DPI</strong>
+      <div class="hero-showcase-shell" data-hero-carousel>
+        <cds-button class="hero-showcase-control hero-showcase-control-prev" kind="tertiary" size="sm" aria-label="上一张样张" tooltip-text="上一张样张" has-icon-only data-hero-prev>‹</cds-button>
+
+        <div class="hero-showcase" aria-label="真实样例图件预览" data-hero-track>
+          <a class="hero-showcase-card hero-showcase-card-side hero-showcase-card-left-far" href="./workbench.html?sample=sample_01_temp_c_to_k.xlsx" data-hero-card>
+            <span>荧光发射光谱</span>
+            <strong>末端标签光谱</strong>
+            <img class="sample-preview-image" src="./static/sample-previews/sample_01_temp_c_to_k.svg" alt="" decoding="async">
+          </a>
+
+          <a class="hero-showcase-card hero-showcase-card-side hero-showcase-card-left" href="./workbench.html?sample=sample_02_voltage_scale.xlsx" data-hero-card>
+            <span>反应动力学</span>
+            <strong>脉冲参考线</strong>
+            <img class="sample-preview-image" src="./static/sample-previews/sample_02_voltage_scale.svg" alt="" decoding="async">
+          </a>
+
+          <a class="hero-showcase-card hero-showcase-card-main" href="./workbench.html?sample=sample_03_abs_error.xlsx" aria-label="打开标准曲线拟合样例" data-hero-card data-hero-active="true">
+            <span>标准曲线拟合</span>
+            <strong>校准曲线与误差棒</strong>
+            <img
+              class="sample-preview-image"
+              src="./static/sample-previews/sample_03_abs_error.svg"
+              alt="由 sample_03_abs_error.xlsx 生成的标准曲线拟合图预览"
+              decoding="async"
+            >
+          </a>
+
+          <a class="hero-showcase-card hero-showcase-card-side hero-showcase-card-right" href="./workbench.html?sample=sample_04_invalid_log.xlsx" data-hero-card>
+            <span>拉曼谱峰对比</span>
+            <strong>对数轴与 D 峰</strong>
+            <img class="sample-preview-image" src="./static/sample-previews/sample_04_invalid_log.svg" alt="" decoding="async">
+          </a>
         </div>
 
-        <div class="hero-product-body">
-          <div class="mini-table" aria-hidden="true">
-            <div class="mini-table-head">
-              <span>row</span>
-              <span>concentration</span>
-              <span>absorbance</span>
-            </div>
-            <div><span>1</span><span>0.00</span><span>0.002</span></div>
-            <div><span>2</span><span>2.00</span><span>0.121</span></div>
-            <div><span>3</span><span>4.00</span><span>0.241</span></div>
-            <div><span>4</span><span>6.00</span><span>0.361</span></div>
-            <div><span>5</span><span>8.00</span><span>0.482</span></div>
-          </div>
-
-          <article class="report-preview">
-            <div class="report-preview-head">
-              <span>标准曲线拟合</span>
-              <strong>R² 0.9999</strong>
-            </div>
-            <svg class="chart-svg report-chart" viewBox="0 0 520 300" role="img" aria-label="标准曲线拟合图预览">
-              <path class="chart-grid-line" d="M54 38H486M54 92H486M54 146H486M54 200H486M54 254H486M108 30V260M186 30V260M264 30V260M342 30V260M420 30V260"/>
-              <path class="chart-axis" d="M54 30V260H486"/>
-              <path class="chart-fit-line" d="M76 230L454 62"/>
-              <g class="chart-points">
-                <circle cx="88" cy="224" r="5"/>
-                <circle cx="156" cy="193" r="5"/>
-                <circle cx="224" cy="164" r="5"/>
-                <circle cx="292" cy="133" r="5"/>
-                <circle cx="360" cy="102" r="5"/>
-                <circle cx="430" cy="71" r="5"/>
-              </g>
-              <text x="74" y="48">y = 0.0604x - 0.0002</text>
-              <text x="74" y="276">concentration / umol L-1</text>
-            </svg>
-          </article>
-
-          <aside class="hero-inspector" aria-hidden="true">
-            <div><span>X 列</span><strong>concentration</strong></div>
-            <div><span>Y 列</span><strong>absorbance</strong></div>
-            <div><span>拟合</span><strong>linear</strong></div>
-            <div><span>导出</span><strong>PNG + TXT + CSV</strong></div>
-          </aside>
-        </div>
+        <cds-button class="hero-showcase-control hero-showcase-control-next" kind="tertiary" size="sm" aria-label="下一张样张" tooltip-text="下一张样张" has-icon-only data-hero-next>›</cds-button>
       </div>
     </section>
 
     <section class="workflow-section" id="workflow" aria-labelledby="workflowTitle">
       <div class="section-heading" data-reveal>
-        <span>线性流程</span>
-        <h2 id="workflowTitle">先跑通默认路径，再展开高级参数</h2>
+        <span>默认路径</span>
+        <h2 id="workflowTitle">按实验报告的顺序完成</h2>
       </div>
 
       <ol class="workflow-list" aria-label="LabPlot Lite 使用流程" data-reveal>
         <li>
           <span>01</span>
-          <strong>导入数据</strong>
-          <p>上传 CSV / Excel，保留原始表格预览。</p>
+          <strong>导入表格</strong>
+          <p>粘贴或上传 CSV / Excel。</p>
         </li>
         <li>
           <span>02</span>
-          <strong>确认范围</strong>
-          <p>检查表头行、数据起止行和数值列。</p>
+          <strong>检查范围</strong>
+          <p>确认表头、起止行和数值列。</p>
         </li>
         <li>
           <span>03</span>
-          <strong>配置图像</strong>
-          <p>选择 X/Y、曲线、拟合方式和导出尺寸。</p>
+          <strong>设置图表</strong>
+          <p>选择 X/Y、曲线、拟合和尺寸。</p>
         </li>
         <li>
           <span>04</span>
-          <strong>下载素材</strong>
-          <p>导出 PNG、拟合报告、绘图数据和 ZIP。</p>
+          <strong>导出文件</strong>
+          <p>下载 PNG、SVG、CSV、TXT 和 ZIP。</p>
         </li>
       </ol>
-    </section>
-
-    <section class="sample-gallery" id="samples" aria-labelledby="samplesTitle">
-      <div class="section-heading" data-reveal>
-        <span>示例图件</span>
-        <h2 id="samplesTitle">用接近实验报告的图件进入工作台</h2>
-      </div>
-
-      <div class="sample-chart-grid">
-        <a class="sample-chart-card sample-chart-wide" href="./workbench.html?sample=sample_03_abs_error.xlsx" data-reveal>
-          <div>
-            <span>标准曲线拟合</span>
-            <strong>线性校准，残差检查</strong>
-          </div>
-          <svg class="chart-svg" viewBox="0 0 520 260" aria-hidden="true">
-            <path class="chart-grid-line" d="M54 36H486M54 84H486M54 132H486M54 180H486M54 228H486M132 28V236M210 28V236M288 28V236M366 28V236M444 28V236"/>
-            <path class="chart-axis" d="M54 28V236H486"/>
-            <path class="chart-fit-line" d="M76 212L454 54"/>
-            <g class="chart-points">
-              <circle cx="98" cy="202" r="5"/>
-              <circle cx="172" cy="173" r="5"/>
-              <circle cx="246" cy="141" r="5"/>
-              <circle cx="320" cy="111" r="5"/>
-              <circle cx="394" cy="79" r="5"/>
-            </g>
-          </svg>
-        </a>
-
-        <a class="sample-chart-card" href="./workbench.html?sample=sample_01_temp_c_to_k.xlsx" data-reveal>
-          <div>
-            <span>荧光发射光谱</span>
-            <strong>多峰光谱，三组曲线对比</strong>
-          </div>
-          <svg class="chart-svg small" viewBox="0 0 320 180" aria-hidden="true">
-            <path class="chart-grid-line" d="M36 24H294M36 70H294M36 116H294M36 162H294M96 20V164M156 20V164M216 20V164M276 20V164"/>
-            <path class="chart-axis" d="M36 20V164H294"/>
-            <path class="chart-line-a" d="M48 146C82 92 112 38 146 92C176 140 206 54 246 92C266 112 280 132 292 144"/>
-            <path class="chart-line-b" d="M48 152C92 118 118 64 150 106C178 144 212 82 246 102C270 116 286 136 292 150"/>
-          </svg>
-        </a>
-
-        <a class="sample-chart-card" href="./workbench.html?sample=sample_02_voltage_scale.xlsx" data-reveal>
-          <div>
-            <span>反应动力学</span>
-            <strong>衰减曲线，时间序列检查</strong>
-          </div>
-          <svg class="chart-svg small" viewBox="0 0 320 180" aria-hidden="true">
-            <path class="chart-grid-line" d="M36 24H294M36 70H294M36 116H294M36 162H294M96 20V164M156 20V164M216 20V164M276 20V164"/>
-            <path class="chart-axis" d="M36 20V164H294"/>
-            <path class="chart-line-a" d="M48 38C88 62 110 86 148 108C188 130 230 145 292 154"/>
-            <path class="chart-line-b" d="M48 54C90 76 126 96 164 118C208 140 244 150 292 158"/>
-          </svg>
-        </a>
-      </div>
     </section>
 
     <footer class="footer">
@@ -178,7 +105,7 @@
         <span class="brand-mark" aria-hidden="true"></span>
         <strong>LabPlot Lite</strong>
       </div>
-      <p>面向学生实验数据处理的轻量工具。</p>
+      <p>学生实验绘图工具。</p>
     </footer>
   </main>
 </body>

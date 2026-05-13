@@ -3,25 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://1.www.s81c.com https://cdn.jsdelivr.net https://cdn.plot.ly; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
   <link rel="icon" href="./static/logo_dark.png" type="image/png">
+  <link rel="stylesheet" href="./static/style.css">
   <link rel="preconnect" href="https://1.www.s81c.com" crossorigin>
   <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
   <link rel="dns-prefetch" href="//cdn.plot.ly">
   <title>LabPlot Lite 工作台</title>
   <script src="./static/theme.js"></script>
-  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/accordion.min.js"></script>
-  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/button.min.js"></script>
-  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/checkbox.min.js"></script>
-  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/data-table.min.js"></script>
-  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/file-uploader.min.js"></script>
-  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/notification.min.js"></script>
-  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/number-input.min.js"></script>
-  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/progress-indicator.min.js"></script>
-  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/select.min.js"></script>
-  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/tag.min.js"></script>
-  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/text-input.min.js"></script>
-  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/textarea.min.js"></script>
-  <link rel="stylesheet" href="./static/style.css">
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/button.min.js" integrity="sha384-37nzM7RkCqKEoweIhup6IehzDkCjyC3H0004vi7UYiESsNPlRlporfpXPCtAKk6b" crossorigin="anonymous"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/file-uploader.min.js" integrity="sha384-xUNvjWqtxBm/CSlQxdi4/jNlM8jCbvLel2GxSlYFnq74Ixdwwbg5WIEPfvWd1YFD" crossorigin="anonymous"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/notification.min.js" integrity="sha384-xF9z4ZeZrLxDkDXb7yC10UvbEb0AINzydN/e8zNh1VevO4LpU7YWAUD1eK/e6PJN" crossorigin="anonymous"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/version/v2.17.0/structured-list.min.js" integrity="sha384-aHWP2laOAoNkx4MDT7rodFzJJhr+f9oOX1QQRBNBfFP6DXcQj+T7eLTu4t5hrtAZ" crossorigin="anonymous"></script>
   <script defer src="./static/js/00-config-state.js"></script>
   <script defer src="./static/js/01-dom-workflow-utils.js"></script>
   <script defer src="./static/js/02-data-parse.js"></script>
@@ -40,33 +33,28 @@
         <span class="brand-mark" aria-hidden="true"></span>
         <span class="brand-text">LabPlot Lite</span>
       </a>
-
-      <nav class="nav-links" aria-label="工作台导航">
-        <a href="./index.html#samples">示例图</a>
-        <a href="./index.html#workflow">工作流</a>
-      </nav>
     </header>
 
     <section class="simple-mode" id="simpleMode" aria-labelledby="simpleModeTitle">
       <div class="simple-mode-head">
         <div>
           <span class="section-kicker">简易模式</span>
-          <h1 id="simpleModeTitle">选择 Excel / CSV，生成基础图</h1>
-          <p>系统自动选择一组 X/Y，默认散点连线，不做自动拟合。</p>
+          <h1 id="simpleModeTitle">上传表格，先生成一张报告图</h1>
+          <p>自动识别推荐 X/Y 列，生成默认白底图。高级设置先收起来，第一次使用只保留下载和微调入口。</p>
         </div>
-        <cds-button type="button" kind="tertiary" size="sm" id="simpleToAdvancedTop">进入功能模式</cds-button>
+        <cds-button type="button" kind="tertiary" size="sm" id="simpleToAdvancedTop">进入功能模式微调</cds-button>
       </div>
 
       <div class="simple-upload-panel">
         <cds-file-uploader
-          label-title="选择 CSV / XLSX / XLS 文件"
-          label-description="页面只在浏览器本地读取数据，不上传到服务器。"
+          label-title="上传 Excel / CSV"
+          label-description="文件只在当前浏览器本地处理，不上传服务器。"
         >
         <cds-file-uploader-button
           id="simpleFileInput"
           accept=".csv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           button-kind="primary"
-        >选择文件</cds-file-uploader-button>
+        >选择文件并自动生成图</cds-file-uploader-button>
         </cds-file-uploader>
       </div>
 
@@ -75,24 +63,35 @@
       <section class="simple-result is-hidden" id="simpleResult" aria-labelledby="simpleResultTitle">
         <div class="simple-result-meta">
           <div>
-            <span>识别结果</span>
-            <h2 id="simpleResultTitle">基础图已生成</h2>
+            <span>结果</span>
+            <h2 id="simpleResultTitle">可用于报告的图已生成</h2>
           </div>
-          <div class="simple-meta-grid">
-            <div><span>X 列</span><strong id="simpleXCol">待识别</strong></div>
-            <div><span>Y 列</span><strong id="simpleYCol">待识别</strong></div>
-            <div><span>有效点数</span><strong id="simplePointCount">待生成</strong></div>
-          </div>
+          <cds-structured-list class="simple-meta-list" condensed>
+            <cds-structured-list-body>
+              <cds-structured-list-row>
+                <cds-structured-list-cell>X 列</cds-structured-list-cell>
+                <cds-structured-list-cell><strong id="simpleXCol">待识别</strong></cds-structured-list-cell>
+              </cds-structured-list-row>
+              <cds-structured-list-row>
+                <cds-structured-list-cell>Y 列</cds-structured-list-cell>
+                <cds-structured-list-cell><strong id="simpleYCol">待识别</strong></cds-structured-list-cell>
+              </cds-structured-list-row>
+              <cds-structured-list-row>
+                <cds-structured-list-cell>有效点数</cds-structured-list-cell>
+                <cds-structured-list-cell><strong id="simplePointCount">待生成</strong></cds-structured-list-cell>
+              </cds-structured-list-row>
+            </cds-structured-list-body>
+          </cds-structured-list>
         </div>
 
         <div class="simple-plot-wrap">
-          <div id="simplePlotCanvas" class="plot plot-viewport" role="img" aria-label="简易模式 X-Y 图"></div>
+          <div id="simplePlotCanvas" class="plot plot-viewport" role="img" aria-label="单图模式 X-Y 图"></div>
         </div>
 
         <div class="simple-result-actions">
-          <cds-button id="simpleDownloadPng" href="#" kind="primary">下载 PNG</cds-button>
-          <cds-button type="button" kind="tertiary" id="simpleSwapAxes">交换 X/Y 轴</cds-button>
-          <cds-button type="button" kind="tertiary" id="simpleToAdvanced">进入功能模式手动调整</cds-button>
+          <cds-button id="simpleDownloadPng" kind="primary" disabled>下载 PNG</cds-button>
+          <cds-button id="simpleDownloadSvg" kind="tertiary" disabled>下载 SVG</cds-button>
+          <cds-button type="button" kind="tertiary" id="simpleToAdvanced">进入功能模式微调</cds-button>
         </div>
       </section>
     </section>
@@ -102,8 +101,8 @@
       <div class="workbench-main">
         <div class="workbench-head">
           <div>
-            <span class="section-kicker">图表编辑器</span>
-            <h1>创建报告图</h1>
+            <span class="section-kicker">功能模式</span>
+            <h1>编辑图表</h1>
           </div>
           <div class="workflow-head-tools">
             <cds-button type="button" kind="ghost" size="sm" class="workflow-reset-button is-hidden" id="resetWorkflowButton" disabled>重新开始</cds-button>
@@ -111,19 +110,19 @@
         </div>
 
         <cds-progress-indicator class="step-nav" aria-label="工作台步骤" space-equally>
-          <cds-progress-step label-text="Step 1" secondary-label-text="Upload Data" data-step-target="upload" aria-controls="step-upload" state="current"></cds-progress-step>
-          <cds-progress-step label-text="Step 2" secondary-label-text="Check & Describe" data-step-target="range" aria-controls="previewSection" state="incomplete" disabled></cds-progress-step>
-          <cds-progress-step label-text="Step 3" secondary-label-text="Visualize" data-step-target="plot" aria-controls="plotSection" state="incomplete" disabled></cds-progress-step>
-          <cds-progress-step label-text="Step 4" secondary-label-text="Publish & Embed" data-step-target="result" aria-controls="resultSection" state="incomplete" disabled></cds-progress-step>
+          <cds-progress-step label-text="导入数据" secondary-label-text="粘贴 / 上传" data-step-target="upload" aria-controls="step-upload" state="current"></cds-progress-step>
+          <cds-progress-step label-text="检查数据" secondary-label-text="范围 / 列" data-step-target="range" aria-controls="previewSection" state="incomplete" disabled></cds-progress-step>
+          <cds-progress-step label-text="配置图表" secondary-label-text="曲线 / 拟合" data-step-target="plot" aria-controls="plotSection" state="incomplete" disabled></cds-progress-step>
+          <cds-progress-step label-text="导出文件" secondary-label-text="PNG / ZIP" data-step-target="result" aria-controls="resultSection" state="incomplete" disabled></cds-progress-step>
         </cds-progress-indicator>
 
-        <cds-actionable-notification id="statusMessage" class="message is-hidden" kind="info" title="状态" hide-close-button low-contrast inline role="status" aria-live="polite"></cds-actionable-notification>
+        <cds-actionable-notification id="statusMessage" class="message is-hidden" kind="info" title="提示" hide-close-button low-contrast inline role="status" aria-live="polite"></cds-actionable-notification>
 
         <section id="step-upload" class="panel workbench-step-panel is-active" data-step="upload">
           <div class="step-head">
             <div>
               <h2>导入数据</h2>
-              <p>粘贴表格、上传 CSV / Excel，或载入示例数据。</p>
+              <p>粘贴表格、上传文件，或载入示例。</p>
             </div>
           </div>
 
@@ -132,18 +131,18 @@
               <cds-textarea
                 id="pasteData"
                 name="pasteData"
-                label="复制粘贴表格"
+                label="粘贴表格"
                 rows="12"
-                placeholder="从 Excel、Numbers 或表格网页复制数据，粘贴到这里..."
+                placeholder="从 Excel、Numbers 或网页表格复制后粘贴"
               ></cds-textarea>
               <p class="hint">支持制表符分隔和 CSV。第一行通常作为列名。</p>
-              <cds-button type="submit" kind="primary" class="form-button">使用粘贴数据</cds-button>
+              <cds-button type="submit" kind="primary" class="form-button">读取粘贴数据</cds-button>
             </form>
 
             <form id="uploadForm" class="form-card upload-card">
               <cds-file-uploader
-                label-title="选择 CSV / Excel 文件"
-                label-description="文件前几行有实验名称、姓名、日期也没关系。下一步可以指定真正的表头行。"
+                label-title="选择 CSV / Excel"
+                label-description="前几行是实验名称、姓名或日期也可以，下一步再指定表头。"
               >
                 <cds-file-uploader-button
                   id="dataFile"
@@ -155,22 +154,27 @@
               <p class="hint" id="selectedFileHint">尚未选择文件。</p>
 
               <p class="hint">
-                选择文件后点击上传并预览，当前页面不会把数据发送到服务器。
+                文件不会离开当前浏览器。
               </p>
 
-              <cds-button type="submit" kind="primary" class="form-button">上传并预览</cds-button>
+              <cds-button type="submit" kind="primary" class="form-button">读取文件</cds-button>
             </form>
 
-            <div class="sample-card inline-samples">
-              <h3>使用示例数据</h3>
-              <p>四个示例分别覆盖光谱、多曲线动力学、标准曲线拟合和谱峰对比。</p>
+            <cds-tile class="sample-card inline-samples">
+              <h3>示例数据</h3>
+              <p>选择一个场景，载入后仍使用同一工作台。</p>
               <div class="sample-list">
                 <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/sample_01_temp_c_to_k.xlsx">1 荧光发射光谱</cds-button>
                 <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/sample_02_voltage_scale.xlsx">2 反应动力学</cds-button>
                 <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/sample_03_abs_error.xlsx">3 标准曲线拟合</cds-button>
                 <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/sample_04_invalid_log.xlsx">4 拉曼谱峰对比</cds-button>
+                <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/temperature_time.csv">5 温度-时间</cds-button>
+                <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/voltage_current.csv">6 电压-电流</cds-button>
+                <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/concentration_absorbance.csv">7 浓度-吸光度</cds-button>
+                <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/cooling_curve.csv">8 冷却曲线</cds-button>
+                <cds-button type="button" kind="tertiary" class="sample-load-button" data-sample="./samples/free_fall_fit.csv">9 自由落体</cds-button>
               </div>
-            </div>
+            </cds-tile>
           </div>
         </section>
 
@@ -178,20 +182,27 @@
           <div class="step-head">
             <div>
               <h2>检查数据</h2>
-              <p>确认数据是否被正确理解，设置表头、数据范围和必要的计算列。</p>
+              <p>确认表头、数据范围和可用数值列。</p>
             </div>
           </div>
 
           <div class="file-banner">
-            当前文件：<strong id="currentFileName"></strong>
+            文件：<strong id="currentFileName"></strong>
           </div>
 
-          <div id="headerGuessBox" class="info-box">
-            <strong>自动识别提示</strong>
-            <p id="headerGuessMessage"></p>
-          </div>
+          <cds-inline-notification
+            id="headerGuessBox"
+            class="context-note"
+            kind="info"
+            title="识别结果"
+            hide-close-button
+            low-contrast
+            inline
+            role="status"
+            aria-live="polite"
+          ></cds-inline-notification>
 
-          <p class="table-scroll-hint" id="previewTableHint">窄屏可左右滑动查看完整表格。</p>
+          <p class="table-scroll-hint" id="previewTableHint">窄屏可横向查看。</p>
           <div class="table-wrap" tabindex="0" aria-describedby="previewTableHint">
             <cds-table size="sm" class="preview-table">
               <cds-table-head>
@@ -206,30 +217,30 @@
           <form id="rangeForm" class="form-card range-card">
             <div class="form-grid">
               <div>
-                <cds-number-input id="headerRow" name="headerRow" label="表头在第几行" min="1" value="1" required></cds-number-input>
+                <cds-number-input id="headerRow" name="headerRow" label="表头行" min="1" value="1" required></cds-number-input>
               </div>
 
               <div>
-                <cds-number-input id="dataStartRow" name="dataStartRow" label="数据从第几行开始" min="1" value="2" required></cds-number-input>
+                <cds-number-input id="dataStartRow" name="dataStartRow" label="数据起始行" min="1" value="2" required></cds-number-input>
               </div>
 
               <div>
-                <cds-number-input id="dataEndRow" name="dataEndRow" label="数据到第几行结束" min="1" placeholder="不填则读取到文件末尾" allow-empty></cds-number-input>
+                <cds-number-input id="dataEndRow" name="dataEndRow" label="数据结束行" min="1" placeholder="留空则读取到末尾" allow-empty></cds-number-input>
               </div>
             </div>
 
             <p class="hint">
-              例如第 5 行是 <code>voltage,current</code>，第 6 行开始是数字数据，就填写 5 和 6。
+              例如表头在第 5 行、数字从第 6 行开始，就填 5 和 6。
             </p>
 
-            <cds-button type="submit" kind="primary" class="form-button">确认数据</cds-button>
+            <cds-button type="submit" kind="primary" class="form-button">确认范围</cds-button>
           </form>
 
           <div id="calcSection" class="advanced-box calc-card is-hidden">
-            <div class="section-label">可选数据加工</div>
+            <div class="section-label">可选加工</div>
             <div class="calc-card-head">
-              <h3>生成计算列</h3>
-              <p>用已有列做单位换算、误差、对数或比值，再进入绘图。</p>
+              <h3>计算列</h3>
+              <p>用已有列做换算、误差、对数或比值。</p>
             </div>
 
             <div id="numericColumnsBox" class="columns-box"></div>
@@ -270,8 +281,8 @@
               </p>
 
               <div class="form-actions">
-                <cds-button type="submit" kind="primary" class="form-button">生成新计算列</cds-button>
-                <cds-button type="button" kind="tertiary" data-step-target="plot">继续绘图</cds-button>
+                <cds-button type="submit" kind="primary" class="form-button">生成计算列</cds-button>
+                <cds-button type="button" kind="tertiary" data-step-target="plot">继续</cds-button>
               </div>
             </form>
           </div>
@@ -281,7 +292,7 @@
           <div class="step-head">
             <div>
               <h2>配置图表</h2>
-              <p>选择图表类型、X/Y 轴、曲线和拟合方式，生成前会自动检查条件。</p>
+              <p>选择 X/Y、曲线、拟合和导出尺寸。</p>
             </div>
           </div>
 
@@ -291,7 +302,7 @@
                 <div id="plotColumnsBox" class="columns-box"></div>
 
                 <cds-accordion class="visualize-accordion">
-                  <cds-accordion-item title="基础设置" open>
+                  <cds-accordion-item title="基础" open>
                     <div class="form-grid">
                       <div>
                         <cds-select id="xCol" name="xCol" label-text="X 轴数据列" required></cds-select>
@@ -309,27 +320,71 @@
 
                   <cds-accordion-item title="曲线" open>
                     <div class="curve-config-box" id="curveConfigBox"></div>
-                    <cds-button type="button" kind="tertiary" class="curve-add-button" id="addCurveButton">添加一条曲线</cds-button>
+                    <cds-button type="button" kind="tertiary" class="curve-add-button" id="addCurveButton">添加曲线</cds-button>
                   </cds-accordion-item>
 
-                  <cds-accordion-item title="标题和坐标轴">
+                  <cds-accordion-item title="标题与坐标轴">
                     <div class="annotate-grid">
-                      <cds-text-input id="plotTitle" name="plotTitle" label="图表标题" value="X-Y Curve" placeholder="不填则自动生成，例如 power vs voltage"></cds-text-input>
+                      <cds-text-input id="plotTitle" name="plotTitle" label="标题" value="X-Y Curve" placeholder="留空则使用列名，例如 power vs voltage"></cds-text-input>
 
                       <div class="form-grid">
                         <div>
-                          <cds-text-input id="xLabel" name="xLabel" label="X 轴显示名称" placeholder="例如：时间 / s、Voltage / V"></cds-text-input>
+                          <cds-text-input id="xLabel" name="xLabel" label="X 轴标题" placeholder="例如：时间 / s、Voltage / V"></cds-text-input>
                         </div>
 
                         <div>
-                          <cds-text-input id="yLabel" name="yLabel" label="Y 轴显示名称" placeholder="例如：温度 / C、Power / W"></cds-text-input>
+                          <cds-text-input id="yLabel" name="yLabel" label="Y 轴标题" placeholder="例如：温度 / C、Power / W"></cds-text-input>
+                        </div>
+                      </div>
+
+                      <div class="form-grid compact-grid">
+                        <div>
+                          <cds-number-input id="xAxisMin" name="xAxisMin" label="X 最小值" placeholder="自动" allow-empty></cds-number-input>
+                        </div>
+
+                        <div>
+                          <cds-number-input id="xAxisMax" name="xAxisMax" label="X 最大值" placeholder="自动" allow-empty></cds-number-input>
+                        </div>
+
+                        <div>
+                          <cds-number-input id="yAxisMin" name="yAxisMin" label="Y 最小值" placeholder="自动" allow-empty></cds-number-input>
+                        </div>
+
+                        <div>
+                          <cds-number-input id="yAxisMax" name="yAxisMax" label="Y 最大值" placeholder="自动" allow-empty></cds-number-input>
                         </div>
                       </div>
                     </div>
                   </cds-accordion-item>
 
-                  <cds-accordion-item title="导出设置">
-                    <div class="section-label">图像输出设置</div>
+                  <cds-accordion-item title="标注与图例">
+                    <div class="form-grid compact-grid">
+                      <div>
+                        <cds-select id="legendMode" name="legendMode" label-text="图例位置" required></cds-select>
+                      </div>
+
+                      <div>
+                        <cds-select id="dataLabelMode" name="dataLabelMode" label-text="数据标签" required></cds-select>
+                      </div>
+                    </div>
+
+                    <div class="form-grid compact-grid">
+                      <div>
+                        <cds-number-input id="xReferenceValue" name="xReferenceValue" label="X 参考线" placeholder="不添加" allow-empty></cds-number-input>
+                      </div>
+
+                      <div>
+                        <cds-number-input id="yReferenceValue" name="yReferenceValue" label="Y 参考线" placeholder="不添加" allow-empty></cds-number-input>
+                      </div>
+
+                      <div>
+                        <cds-text-input id="referenceLabel" name="referenceLabel" label="参考线标签" placeholder="例如阈值、目标值"></cds-text-input>
+                      </div>
+                    </div>
+                  </cds-accordion-item>
+
+                  <cds-accordion-item title="导出">
+                    <div class="section-label">尺寸</div>
 
                     <div class="form-grid compact-grid">
                       <div>
@@ -373,49 +428,68 @@
 
                     <cds-select id="metricMode" name="metricMode" label-text="拟合指标输出模式" required></cds-select>
 
-                    <div class="metric-box">
-                      <strong>基础指标包含</strong>
+                    <cds-tile class="metric-box">
+                      <strong>默认指标</strong>
                       <p>
                         <code>R²</code>、<code>RMSE</code>、<code>MAE</code>、<code>最大绝对误差</code>。
-                        不想花时间选择时，保持基础指标即可。
                       </p>
 
                       <div id="metricBox" class="checkbox-grid"></div>
-                    </div>
+                    </cds-tile>
 
-                    <div class="warning-box">
-                      <strong>拟合提醒</strong>
-                      <p>一次拟合适合近似 <code>y = ax + b</code> 的数据；二次拟合适合近似 <code>y = ax² + bx + c</code> 的数据。</p>
-                      <p>不要只看 R²，必须结合实验原理判断模型是否合理。</p>
-                    </div>
+                    <cds-inline-notification
+                      class="context-note"
+                      kind="warning"
+                      title="拟合说明"
+                      subtitle="线性拟合适用于 y = ax + b；二次拟合适用于 y = ax² + bx + c。R² 不能单独判断模型。"
+                      hide-close-button
+                      low-contrast
+                      inline
+                      open
+                    ></cds-inline-notification>
                   </cds-accordion-item>
                 </cds-accordion>
               </div>
 
-              <aside class="visualize-side" aria-label="生成前检查">
+              <aside class="visualize-side" aria-label="生成检查">
                 <div class="visualize-side-head">
-                  <h3>生成前检查</h3>
-                  <p>配置会实时检查，不通过时生成按钮不可用。</p>
+                  <h3>生成检查</h3>
+                  <p>不通过时不能生成。</p>
                 </div>
 
-                <div id="plotReadinessBox" class="plot-readiness" aria-live="polite">
-                  <div class="plot-readiness-main">
-                    <span id="plotReadyStatus">等待选择绘图列</span>
-                    <strong id="plotReadyHint">选择 X/Y 轴后会自动检查有效数据点。</strong>
-                  </div>
-                  <div class="plot-readiness-grid">
-                    <div><span>有效点数</span><strong id="plotReadyPoints">待选择</strong></div>
-                    <div><span>拟合状态</span><strong id="plotReadyFit">待选择</strong></div>
-                    <div><span>导出尺寸</span><strong id="plotReadyExport">待生成</strong></div>
-                  </div>
-                </div>
+                <cds-tile id="plotReadinessBox" class="plot-readiness" aria-live="polite">
+                  <cds-inline-notification
+                    id="plotReadinessMessage"
+                    class="plot-readiness-message"
+                    kind="info"
+                    title="等待选择列"
+                    subtitle="选择 X 轴和至少一条 Y 轴。"
+                    hide-close-button
+                    low-contrast
+                    inline
+                    open
+                  ></cds-inline-notification>
+                  <cds-structured-list class="plot-readiness-list" condensed>
+                    <cds-structured-list-body>
+                      <cds-structured-list-row>
+                        <cds-structured-list-cell>有效点数</cds-structured-list-cell>
+                        <cds-structured-list-cell><strong id="plotReadyPoints">待选择</strong></cds-structured-list-cell>
+                      </cds-structured-list-row>
+                      <cds-structured-list-row>
+                        <cds-structured-list-cell>拟合状态</cds-structured-list-cell>
+                        <cds-structured-list-cell><strong id="plotReadyFit">待选择</strong></cds-structured-list-cell>
+                      </cds-structured-list-row>
+                      <cds-structured-list-row>
+                        <cds-structured-list-cell>导出尺寸</cds-structured-list-cell>
+                        <cds-structured-list-cell><strong id="plotReadyExport">待生成</strong></cds-structured-list-cell>
+                      </cds-structured-list-row>
+                    </cds-structured-list-body>
+                  </cds-structured-list>
+                </cds-tile>
 
                 <div class="plot-generate-row">
                   <cds-button type="submit" kind="primary" class="form-button" id="plotSubmitButton">生成图表</cds-button>
-                  <div id="plotProgress" class="plot-progress is-hidden" role="status" aria-live="polite">
-                    <span class="plot-progress-dot"></span>
-                    <span id="plotProgressText">准备生成</span>
-                  </div>
+                  <cds-inline-loading id="plotProgress" class="plot-progress is-hidden" status="active" description="准备"></cds-inline-loading>
                 </div>
               </aside>
             </div>
@@ -425,8 +499,8 @@
         <section id="resultSection" class="panel result-panel workbench-step-panel is-hidden" data-step="result">
           <div class="step-head">
             <div>
-              <h2>导出素材</h2>
-              <p>检查图像和拟合摘要，下载可放入实验报告或文档的素材。</p>
+              <h2>导出文件</h2>
+              <p>检查图和摘要，下载报告用文件。</p>
             </div>
           </div>
 
@@ -434,8 +508,8 @@
             <div class="result-figure">
               <div class="figure-toolbar">
                 <div>
-                  <span>图像预览</span>
-                  <strong id="resultFigureTitle">等待生成图像</strong>
+                  <span>预览</span>
+                  <strong id="resultFigureTitle">等待生成</strong>
                 </div>
                 <div class="figure-meta">
                   <cds-tag id="resultFigureMeta" type="gray">待生成</cds-tag>
@@ -449,8 +523,8 @@
             </div>
 
             <div class="result-side">
-              <div class="summary-card">
-                <h3>拟合与数据摘要</h3>
+              <cds-tile class="summary-card">
+                <h3>摘要</h3>
                 <cds-table id="summaryRows" class="result-table" size="sm">
                   <cds-table-head>
                     <cds-table-header-row>
@@ -460,17 +534,17 @@
                   </cds-table-head>
                   <cds-table-body id="summaryBody"></cds-table-body>
                 </cds-table>
-              </div>
+              </cds-tile>
 
-              <div class="download-panel">
-                <h3>下载文件</h3>
-                <cds-button id="downloadZip" href="#" kind="primary">下载报告素材包 ZIP</cds-button>
-                <cds-button id="downloadPng" href="#" kind="tertiary">下载 PNG 图片</cds-button>
-                <cds-button id="downloadSvg" href="#" kind="tertiary">下载 SVG 矢量图</cds-button>
-                <cds-button id="downloadFitReport" href="#" kind="tertiary">下载拟合报告 TXT</cds-button>
-                <cds-button id="downloadOriginCsv" href="#" kind="tertiary">下载绘图数据 CSV</cds-button>
-                <cds-button id="downloadFullCsv" href="#" kind="tertiary">下载完整数据 CSV</cds-button>
-              </div>
+              <cds-tile class="download-panel">
+                <h3>下载</h3>
+                <cds-button id="downloadZip" kind="primary" disabled>下载 ZIP</cds-button>
+                <cds-button id="downloadPng" kind="tertiary" disabled>下载 PNG</cds-button>
+                <cds-button id="downloadSvg" kind="tertiary" disabled>下载 SVG</cds-button>
+                <cds-button id="downloadFitReport" kind="tertiary" disabled>下载 TXT</cds-button>
+                <cds-button id="downloadOriginCsv" kind="tertiary" disabled>下载绘图 CSV</cds-button>
+                <cds-button id="downloadFullCsv" kind="tertiary" disabled>下载完整数据 CSV</cds-button>
+              </cds-tile>
             </div>
           </div>
 

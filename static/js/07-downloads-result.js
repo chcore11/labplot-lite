@@ -1,7 +1,12 @@
 "use strict";
 
 function escapeCsvValue(value) {
-  const text = value === null || value === undefined ? "" : String(value);
+  let text = value === null || value === undefined ? "" : String(value);
+  const trimmed = text.trimStart();
+  const isNumericNegative = /^-\d*\.?\d+(?:e[+-]?\d+)?$/i.test(trimmed);
+  if (/^[=+@]/.test(trimmed) || (trimmed.startsWith("-") && !isNumericNegative)) {
+    text = `'${text}`;
+  }
   if (/[",\n\r]/.test(text)) {
     return `"${text.replace(/"/g, "\"\"")}"`;
   }
@@ -19,32 +24,41 @@ function rowsToCsv(rows, columns) {
 
 function buildFitReport(stats, title) {
   const lines = [];
-  lines.push("LabPlot Lite 拟合报告");
+  lines.push("LabPlot Lite 图表报告");
   lines.push("================================");
   lines.push("");
-  lines.push("一、图表信息");
+  lines.push("一、图表");
   lines.push(`图表标题：${title || "未填写"}`);
   lines.push(`X 数据列：${stats.x_col}`);
   lines.push(`Y 数据列：${stats.y_col}`);
-  lines.push(`X 轴显示名称：${stats.x_label}`);
-  lines.push(`Y 轴显示名称：${stats.y_label}`);
+  lines.push(`X 轴标题：${stats.x_label}`);
+  lines.push(`Y 轴标题：${stats.y_label}`);
   lines.push(`X 轴刻度：${stats.x_axis_scale_label}`);
   lines.push(`Y 轴刻度：${stats.y_axis_scale_label}`);
+  lines.push(`X 轴范围：${stats.x_axis_range_label}`);
+  lines.push(`Y 轴范围：${stats.y_axis_range_label}`);
   lines.push(`图表类型：${stats.chart_type}`);
+  lines.push(`图例：${stats.legend_mode_label}`);
+  lines.push(`数据标签：${stats.data_label_mode_label}`);
+  lines.push(`参考线：${stats.reference_lines_label}`);
+  lines.push(`误差棒：${stats.error_bar_count_label}`);
   lines.push(`数据点数：${stats.points}`);
+  if (hasMissingPoints(stats)) {
+    lines.push(`缺失值处理：${stats.missing_points_label}`);
+  }
   lines.push("");
-  lines.push("二、数据范围");
+  lines.push("二、范围");
   lines.push(`表头行：第 ${stats.header_row} 行`);
   lines.push(`数据起始行：第 ${stats.data_start_row} 行`);
   lines.push(`数据结束行：${stats.data_end_row}`);
   lines.push("");
-  lines.push("三、基础统计");
+  lines.push("三、统计");
   lines.push(`Y 最大值：${stats.max_value}`);
   lines.push(`Y 最小值：${stats.min_value}`);
   lines.push(`Y 平均值：${stats.avg_value}`);
   lines.push(`峰值对应 X：${stats.peak_x}`);
   lines.push("");
-  lines.push("四、拟合结果");
+  lines.push("四、拟合");
   lines.push(`拟合方式：${stats.fit_type_label}`);
 
   if (stats.has_fit) {
@@ -59,22 +73,22 @@ function buildFitReport(stats, title) {
       lines.push(`常数项 c：${stats.fit_c}`);
     }
     lines.push("");
-    lines.push("五、拟合指标");
+    lines.push("五、指标");
     stats.metric_display.forEach((metric) => {
       lines.push(`${metric.label}：${metric.value}`);
     });
   } else {
-    lines.push("本次未进行拟合。");
+    lines.push("本次未拟合。");
     lines.push("");
-    lines.push("五、拟合指标");
-    lines.push(stats.multi_y ? "多曲线模式下暂不进行拟合。" : "未进行拟合，因此没有拟合误差指标。");
+    lines.push("五、指标");
+    lines.push(stats.multi_y ? "多曲线暂不拟合。" : "未拟合，无拟合误差指标。");
   }
 
   lines.push("");
-  lines.push("六、提醒");
-  lines.push("R² 只能反映拟合程度，不能单独证明物理模型正确。");
-  lines.push("RMSE、MAE、最大绝对误差可以辅助判断拟合误差大小。");
-  lines.push("请结合实验原理判断一次拟合或二次拟合是否合理。");
+  lines.push("六、说明");
+  lines.push("R² 只反映拟合程度，不能证明模型正确。");
+  lines.push("RMSE、MAE、最大绝对误差可辅助判断误差大小。");
+  lines.push("请结合实验原理判断模型。");
 
   return lines.join("\n");
 }
@@ -82,44 +96,26 @@ function buildFitReport(stats, title) {
 function revokeDownloadUrls() {
   state.objectUrls.forEach((url) => URL.revokeObjectURL(url));
   state.objectUrls = [];
+  state.pendingZipPackage = null;
+  qsa("[data-object-url]").forEach((link) => {
+    delete link.dataset.objectUrl;
+  });
 }
 
 function setDownloadLink(selector, blob, filename) {
   const link = qs(selector);
+  if (link.dataset.objectUrl) {
+    URL.revokeObjectURL(link.dataset.objectUrl);
+    state.objectUrls = state.objectUrls.filter((url) => url !== link.dataset.objectUrl);
+  }
   const url = URL.createObjectURL(blob);
   state.objectUrls.push(url);
+  link.dataset.objectUrl = url;
   link.href = url;
   link.download = filename;
   link.setAttribute("href", url);
   link.setAttribute("download", filename);
-  link.removeAttribute("aria-disabled");
-  link.removeAttribute("disabled");
-}
-
-function canvasToBlob(canvas) {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) {
-        resolve(blob);
-      } else {
-        reject(new Error("PNG 图片生成失败。"));
-      }
-    }, "image/png");
-  });
-}
-
-function getRenderedCanvas(target) {
-  if (target instanceof HTMLCanvasElement) {
-    return target;
-  }
-  return target ? target.querySelector("canvas") : null;
-}
-
-function getRenderedSvg(target) {
-  if (target instanceof SVGSVGElement) {
-    return target;
-  }
-  return target ? target.querySelector("svg") : null;
+  setControlDisabled(link, false);
 }
 
 function getRenderedPlotlyGraph(target) {
@@ -143,100 +139,43 @@ function getRenderedPlotlySize(target, payload) {
 async function dataUrlToBlob(dataUrl) {
   const response = await fetch(dataUrl);
   if (!response.ok) {
-    throw new Error("图像导出失败。");
+    throw new Error("图表导出失败。");
   }
   return response.blob();
-}
-
-function svgToBlob(svg) {
-  if (!svg) {
-    return null;
-  }
-
-  const clone = svg.cloneNode(true);
-  clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-  if (!clone.getAttribute("width") && svg.viewBox && svg.viewBox.baseVal.width) {
-    clone.setAttribute("width", String(svg.viewBox.baseVal.width));
-  }
-  if (!clone.getAttribute("height") && svg.viewBox && svg.viewBox.baseVal.height) {
-    clone.setAttribute("height", String(svg.viewBox.baseVal.height));
-  }
-
-  const source = new XMLSerializer().serializeToString(clone);
-  return new Blob([source], { type: "image/svg+xml;charset=utf-8" });
-}
-
-function loadImage(url) {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error("SVG 图像转换失败。"));
-    image.src = url;
-  });
-}
-
-async function svgBlobToPngBlob(svgBlob, width, height) {
-  const url = URL.createObjectURL(svgBlob);
-  try {
-    const image = await loadImage(url);
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const context = canvas.getContext("2d");
-    context.fillStyle = getThemeColors().surface;
-    context.fillRect(0, 0, width, height);
-    context.drawImage(image, 0, 0, width, height);
-    return canvasToBlob(canvas);
-  } finally {
-    URL.revokeObjectURL(url);
-  }
 }
 
 async function renderedPlotToPngBlob(selector, payload) {
   const target = qs(selector);
   const plotlyGraph = getRenderedPlotlyGraph(target);
-  if (plotlyGraph && window.Plotly) {
-    const { outputSize, renderHeight, renderWidth } = getRenderedPlotlySize(target, payload);
-    const dataUrl = await Plotly.toImage(plotlyGraph, {
-      format: "png",
-      height: renderHeight,
-      scale: outputSize.width / renderWidth,
-      width: renderWidth,
-    });
-    return dataUrlToBlob(dataUrl);
+  if (!plotlyGraph || !window.Plotly) {
+    throw new Error("没有可导出的图表。");
   }
 
-  const canvas = getRenderedCanvas(target);
-  if (canvas) {
-    return canvasToBlob(canvas);
-  }
-
-  const svg = getRenderedSvg(target);
-  const svgBlob = svgToBlob(svg);
-  if (!svg || !svgBlob) {
-    throw new Error("没有找到可导出的图像。");
-  }
-
-  const width = Math.round(Number(svg.getAttribute("width")) || payload.figWidth * payload.figDpi);
-  const height = Math.round(Number(svg.getAttribute("height")) || payload.figHeight * payload.figDpi);
-  return svgBlobToPngBlob(svgBlob, width, height);
+  const { outputSize, renderHeight, renderWidth } = getRenderedPlotlySize(target, payload);
+  const dataUrl = await Plotly.toImage(plotlyGraph, {
+    format: "png",
+    height: renderHeight,
+    scale: outputSize.width / renderWidth,
+    width: renderWidth,
+  });
+  return dataUrlToBlob(dataUrl);
 }
 
 async function renderedPlotToSvgBlob(selector, payload) {
   const target = qs(selector);
   const plotlyGraph = getRenderedPlotlyGraph(target);
-  if (plotlyGraph && window.Plotly) {
-    const { renderHeight, renderWidth } = getRenderedPlotlySize(target, payload);
-    const dataUrl = await Plotly.toImage(plotlyGraph, {
-      format: "svg",
-      height: renderHeight,
-      scale: 1,
-      width: renderWidth,
-    });
-    return dataUrlToBlob(dataUrl);
+  if (!plotlyGraph || !window.Plotly) {
+    throw new Error("没有可导出的图表。");
   }
 
-  return svgToBlob(getRenderedSvg(target));
+  const { renderHeight, renderWidth } = getRenderedPlotlySize(target, payload);
+  const dataUrl = await Plotly.toImage(plotlyGraph, {
+    format: "svg",
+    height: renderHeight,
+    scale: 1,
+    width: renderWidth,
+  });
+  return dataUrlToBlob(dataUrl);
 }
 
 function clearDownloadLink(selector) {
@@ -244,10 +183,14 @@ function clearDownloadLink(selector) {
   if (!link) {
     return;
   }
-  link.href = "#";
+  if (link.dataset.objectUrl) {
+    URL.revokeObjectURL(link.dataset.objectUrl);
+    state.objectUrls = state.objectUrls.filter((url) => url !== link.dataset.objectUrl);
+    delete link.dataset.objectUrl;
+  }
   link.removeAttribute("download");
-  link.setAttribute("href", "#");
-  link.setAttribute("aria-disabled", "true");
+  link.removeAttribute("href");
+  setControlDisabled(link, true);
 }
 
 function clearResultDownloadLinks() {
@@ -261,11 +204,14 @@ function clearResultDownloadLinks() {
   ].forEach(clearDownloadLink);
 }
 
-async function renderDownloads(payload) {
-  if (!window.JSZip) {
-    await ensureExternalLibrary("jszip");
-  }
+function clearSimpleDownloadLinks() {
+  [
+    "#simpleDownloadPng",
+    "#simpleDownloadSvg",
+  ].forEach(clearDownloadLink);
+}
 
+async function renderDownloads(payload) {
   revokeDownloadUrls();
 
   const pngBlob = await renderedPlotToPngBlob("#plotCanvas", payload);
@@ -281,16 +227,6 @@ async function renderDownloads(payload) {
   const fitReportText = buildFitReport(payload.stats, payload.plotTitle);
   const fitReportBlob = new Blob([fitReportText], { type: "text/plain;charset=utf-8" });
 
-  const zip = new JSZip();
-  zip.file(payload.filenames.png, pngBlob);
-  if (svgBlob && payload.filenames.svg) {
-    zip.file(payload.filenames.svg, svgBlob);
-  }
-  zip.file(payload.filenames.originCsv, originCsvBlob);
-  zip.file(payload.filenames.fullCsv, fullCsvBlob);
-  zip.file(payload.filenames.fitReport, fitReportBlob);
-  const zipBlob = await zip.generateAsync({ type: "blob" });
-
   setDownloadLink("#downloadPng", pngBlob, payload.filenames.png);
   if (svgBlob && payload.filenames.svg) {
     setDownloadLink("#downloadSvg", svgBlob, payload.filenames.svg);
@@ -300,14 +236,71 @@ async function renderDownloads(payload) {
   setDownloadLink("#downloadOriginCsv", originCsvBlob, payload.filenames.originCsv);
   setDownloadLink("#downloadFullCsv", fullCsvBlob, payload.filenames.fullCsv);
   setDownloadLink("#downloadFitReport", fitReportBlob, payload.filenames.fitReport);
-  setDownloadLink("#downloadZip", zipBlob, payload.filenames.zip);
+  state.pendingZipPackage = {
+    filenames: payload.filenames,
+    files: {
+      fitReport: fitReportBlob,
+      fullCsv: fullCsvBlob,
+      originCsv: originCsvBlob,
+      png: pngBlob,
+      svg: svgBlob,
+    },
+  };
+  const zipLink = qs("#downloadZip");
+  zipLink.href = "#";
+  zipLink.setAttribute("href", "#");
+  zipLink.removeAttribute("download");
+  setControlDisabled(zipLink, false);
 }
 
 async function renderSimpleDownloads(payload) {
-  revokeDownloadUrls();
+  clearSimpleDownloadLinks();
   const pngBlob = await renderedPlotToPngBlob("#simplePlotCanvas", payload);
+  const svgBlob = await renderedPlotToSvgBlob("#simplePlotCanvas", payload);
   setDownloadLink("#simpleDownloadPng", pngBlob, payload.filenames.png);
+  if (svgBlob && payload.filenames.svg) {
+    setDownloadLink("#simpleDownloadSvg", svgBlob, payload.filenames.svg);
+  } else {
+    clearDownloadLink("#simpleDownloadSvg");
+  }
 }
+
+async function generateZipDownload() {
+  const packageInfo = state.pendingZipPackage;
+  if (!packageInfo) {
+    throw new Error("请先生成图表，再下载 ZIP。");
+  }
+  if (!window.JSZip) {
+    await ensureExternalLibrary("jszip");
+  }
+
+  const { filenames, files } = packageInfo;
+  const zip = new JSZip();
+  zip.file(filenames.png, files.png);
+  if (files.svg && filenames.svg) {
+    zip.file(filenames.svg, files.svg);
+  }
+  zip.file(filenames.originCsv, files.originCsv);
+  zip.file(filenames.fullCsv, files.fullCsv);
+  zip.file(filenames.fitReport, files.fitReport);
+  const zipBlob = await zip.generateAsync({ type: "blob" });
+  setDownloadLink("#downloadZip", zipBlob, filenames.zip);
+  return {
+    filename: filenames.zip,
+    url: qs("#downloadZip").href,
+  };
+}
+
+function triggerDownload(url, filename) {
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+}
+
+window.addEventListener("beforeunload", revokeDownloadUrls);
 
 function addResultTableRow(body, label, value, options = {}) {
   body.appendChild(createElement("cds-table-row", {
@@ -327,9 +320,19 @@ function addStat(body, label, value) {
   addResultTableRow(body, label, value);
 }
 
+function hasMissingPoints(stats) {
+  return Number(stats.missing_points) > 0;
+}
+
+function addMissingSummaryRow(body, stats) {
+  if (hasMissingPoints(stats)) {
+    addSummaryRow(body, "缺失值", stats.missing_points_label, true);
+  }
+}
+
 function renderResult(payload) {
   const stats = payload.stats;
-  qs("#resultFigureTitle").textContent = payload.plotTitle || "未命名图像";
+  qs("#resultFigureTitle").textContent = payload.plotTitle || "未命名";
   qs("#resultFigureMeta").textContent = `${stats.fig_width} × ${stats.fig_height} in / ${stats.fig_dpi} DPI`;
   qs("#resultFigureCurves").textContent = `${stats.curve_count} 条曲线`;
 
@@ -341,34 +344,46 @@ function renderResult(payload) {
     addSummaryRow(summary, "R²", stats.core_metrics.r2);
     addSummaryRow(summary, "RMSE", stats.core_metrics.rmse);
     addSummaryRow(summary, "MAE", stats.core_metrics.mae);
-    addSummaryRow(summary, "数据点数", stats.points);
-    addSummaryRow(summary, "拟合判断", stats.fit_quality, true);
+    addSummaryRow(summary, "点数", stats.points);
+    addMissingSummaryRow(summary, stats);
+    addSummaryRow(summary, "判断", stats.fit_quality, true);
   } else {
-    addSummaryRow(summary, "拟合方式", stats.fit_type_label);
-    addSummaryRow(summary, "数据点数", stats.points);
+    addSummaryRow(summary, "拟合", stats.fit_type_label);
+    addSummaryRow(summary, "点数", stats.points);
+    addMissingSummaryRow(summary, stats);
     if (stats.multi_y) {
       addSummaryRow(summary, "提示", stats.fit_notice, true);
     }
   }
   addSummaryRow(summary, "X 轴", stats.x_col);
   addSummaryRow(summary, "Y 轴", stats.y_cols_label || stats.y_col);
-  addSummaryRow(summary, "曲线数量", stats.curve_count);
-  addSummaryRow(summary, "图表类型", stats.chart_type);
+  addSummaryRow(summary, "曲线数", stats.curve_count);
+  addSummaryRow(summary, "类型", stats.chart_type);
+  addSummaryRow(summary, "参考线", stats.reference_lines_label);
 
   const statsGrid = qs("#statsBody");
   statsGrid.replaceChildren();
-  addStat(statsGrid, "X 轴显示名称", stats.x_label);
-  addStat(statsGrid, "Y 轴显示名称", stats.y_label);
+  addStat(statsGrid, "X 轴标题", stats.x_label);
+  addStat(statsGrid, "Y 轴标题", stats.y_label);
   addStat(statsGrid, "X 轴刻度", stats.x_axis_scale_label);
   addStat(statsGrid, "Y 轴刻度", stats.y_axis_scale_label);
+  addStat(statsGrid, "X 轴范围", stats.x_axis_range_label);
+  addStat(statsGrid, "Y 轴范围", stats.y_axis_range_label);
+  addStat(statsGrid, "图例", stats.legend_mode_label);
+  addStat(statsGrid, "数据标签", stats.data_label_mode_label);
+  addStat(statsGrid, "参考线", stats.reference_lines_label);
+  addStat(statsGrid, "误差棒", stats.error_bar_count_label);
   addStat(statsGrid, "Y 最大值", stats.max_value);
   addStat(statsGrid, "Y 最小值", stats.min_value);
   addStat(statsGrid, "Y 平均值", stats.avg_value);
+  if (hasMissingPoints(stats)) {
+    addStat(statsGrid, "缺失值", stats.missing_points_label);
+  }
   addStat(statsGrid, "峰值对应 X", stats.peak_x);
   addStat(statsGrid, "表头行", `第 ${stats.header_row} 行`);
   addStat(statsGrid, "数据起始行", `第 ${stats.data_start_row} 行`);
   addStat(statsGrid, "数据结束行", stats.data_end_row);
-  addStat(statsGrid, "图片尺寸", `${stats.fig_width} × ${stats.fig_height} inch`);
+  addStat(statsGrid, "导出尺寸", `${stats.fig_width} × ${stats.fig_height} inch`);
   addStat(statsGrid, "图片 DPI", String(stats.fig_dpi));
   addStat(statsGrid, "网格线", stats.show_grid ? "显示" : "隐藏");
 

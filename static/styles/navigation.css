@@ -61,27 +61,6 @@
   white-space: nowrap;
 }
 
-.nav-links {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(18px, 3vw, 32px);
-  min-width: 0;
-  overflow: hidden;
-}
-
-.nav-links a {
-  color: var(--text-muted);
-  font-size: 14px;
-  font-weight: 560;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.nav-links a:hover {
-  color: var(--text-main);
-}
-
 .sample-load-button:active {
   transform: translateY(1px);
 }

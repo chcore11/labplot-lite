@@ -67,16 +67,47 @@ function setSelectIfExists(selector, value) {
   return true;
 }
 
+function setControlIfDefined(selector, value) {
+  if (value !== undefined && value !== null) {
+    setControlValue(selector, value);
+  }
+}
+
+function getPresetCurves(preset) {
+  if (Array.isArray(preset.curves) && preset.curves.length) {
+    return preset.curves;
+  }
+
+  const yCols = preset.yCols || [preset.yCol].filter(Boolean);
+  return yCols.map((yCol, yIndex) => ({
+    yCol,
+    color: DEFAULT_CURVE_COLORS[yIndex % DEFAULT_CURVE_COLORS.length],
+    lineWidth: 1.8,
+    lineStyle: "solid",
+    lineShape: "linear",
+    xErrorCol: "",
+    yErrorCol: "",
+  }));
+}
+
+function getPresetRequiredColumns(preset) {
+  return [
+    preset.xCol,
+    ...getPresetCurves(preset).flatMap((curve) => [curve.yCol, curve.xErrorCol, curve.yErrorCol]),
+  ].filter(Boolean);
+}
+
 function applySamplePreset(options = {}) {
   const preset = state.samplePreset;
   if (!preset) {
     return false;
   }
 
-  const yCols = preset.yCols || [preset.yCol].filter(Boolean);
-  if (!columnOptionExists(preset.xCol) || yCols.some((column) => !columnOptionExists(column))) {
+  const presetCurves = getPresetCurves(preset);
+  const missingColumns = getPresetRequiredColumns(preset).filter((column) => !columnOptionExists(column));
+  if (missingColumns.length) {
     if (!options.silent) {
-      showMessage("error", "推荐绘图列不存在，请重新确认数据范围。");
+      showMessage("error", `推荐列不可用，请检查数据范围：${missingColumns.join("、")}`);
     }
     return false;
   }
@@ -84,19 +115,26 @@ function applySamplePreset(options = {}) {
   setSelectIfExists("#xCol", preset.xCol);
   setSelectIfExists("#chartType", preset.chartType);
   setSelectIfExists("#fitType", preset.fitType);
+  setSelectIfExists("#xAxisScale", preset.xAxisScale);
+  setSelectIfExists("#yAxisScale", preset.yAxisScale);
   setControlValue("#plotTitle", preset.title || "");
   setControlValue("#xLabel", preset.xLabel || "");
   setControlValue("#yLabel", preset.yLabel || "");
+  resetPlotAnnotationControls();
+  setControlIfDefined("#xAxisMin", preset.xAxisMin);
+  setControlIfDefined("#xAxisMax", preset.xAxisMax);
+  setControlIfDefined("#yAxisMin", preset.yAxisMin);
+  setControlIfDefined("#yAxisMax", preset.yAxisMax);
+  setControlIfDefined("#xReferenceValue", preset.xReferenceValue);
+  setControlIfDefined("#yReferenceValue", preset.yReferenceValue);
+  setControlIfDefined("#referenceLabel", preset.referenceLabel);
+  setSelectIfExists("#legendMode", preset.legendMode);
+  setSelectIfExists("#dataLabelMode", preset.dataLabelMode);
   if (typeof preset.showGrid === "boolean") {
     setControlChecked("#showGrid", preset.showGrid);
   }
 
-  renderCurveRows(yCols.map((yCol, yIndex) => ({
-    yCol,
-    color: DEFAULT_CURVE_COLORS[yIndex % DEFAULT_CURVE_COLORS.length],
-    lineWidth: 1.8,
-    lineStyle: "solid",
-  })));
+  renderCurveRows(presetCurves);
   updatePlotReadiness();
   if (!options.silent) {
     clearMessage();
@@ -114,6 +152,8 @@ function renderStaticOptions() {
   setOptions(qs("#metricMode"), objectEntriesToOptions(METRIC_MODES), "basic");
   setOptions(qs("#xAxisScale"), objectEntriesToOptions(AXIS_SCALE_TYPES), "linear");
   setOptions(qs("#yAxisScale"), objectEntriesToOptions(AXIS_SCALE_TYPES), "linear");
+  setOptions(qs("#legendMode"), objectEntriesToOptions(LEGEND_MODES), "auto");
+  setOptions(qs("#dataLabelMode"), objectEntriesToOptions(DATA_LABEL_MODES), "none");
 
   const metricBox = qs("#metricBox");
   metricBox.replaceChildren();
@@ -130,10 +170,10 @@ function renderStaticOptions() {
   });
 }
 
-function createSelectField(labelText, name, options, selectedValue) {
+function createSelectField(labelText, name, options, selectedValue, settings = {}) {
   const id = `${name}-${randomId()}`;
   const select = createElement("cds-select", {
-    attributes: { id, name, required: true },
+    attributes: { id, name, required: settings.required !== false },
   });
   setOptions(select, options, selectedValue);
   return createLabeledControl(labelText, select);
@@ -159,21 +199,40 @@ function createCurveRow(config, index) {
   const row = createElement("div", { className: "curve-row" });
 
   const yOptions = state.numericColumns.map((column) => ({ value: column, label: column }));
+  const optionalColumnOptions = getOptionalNumericColumnOptions();
   const colorOptions = objectEntriesToOptions(CURVE_COLORS);
   const styleOptions = objectEntriesToOptions(LINE_STYLES);
-
-  row.append(
-    createSelectField("Y 列", "curveYCols", yOptions, config.yCol),
-    createSelectField("颜色", "curveColors", colorOptions, config.color),
-    createInputField("线宽", "curveWidths", config.lineWidth),
-    createSelectField("线型", "curveStyles", styleOptions, config.lineStyle),
-  );
+  const shapeOptions = objectEntriesToOptions(LINE_SHAPES);
 
   const button = createButton("移除", "curve-remove-button");
   button.disabled = index === 0 && qs("#curveConfigBox").children.length === 0;
-  row.appendChild(button);
+  row.append(
+    createElement("div", {
+      className: "curve-fields",
+      children: [
+        createSelectField("Y 列", "curveYCols", yOptions, config.yCol),
+        createSelectField("颜色", "curveColors", colorOptions, config.color),
+        createInputField("线宽", "curveWidths", config.lineWidth),
+        createSelectField("线型", "curveStyles", styleOptions, config.lineStyle),
+        createSelectField("连接", "curveLineShapes", shapeOptions, config.lineShape || "linear"),
+        createSelectField("Y 误差", "curveYErrorCols", optionalColumnOptions, config.yErrorCol || "", { required: false }),
+        createSelectField("X 误差", "curveXErrorCols", optionalColumnOptions, config.xErrorCol || "", { required: false }),
+      ],
+    }),
+    createElement("div", {
+      className: "curve-actions",
+      children: [button],
+    }),
+  );
 
   return row;
+}
+
+function getOptionalNumericColumnOptions() {
+  return [
+    { value: "", label: "不使用" },
+    ...state.numericColumns.map((column) => ({ value: column, label: column })),
+  ];
 }
 
 function getDefaultCurveConfigs() {
@@ -183,6 +242,9 @@ function getDefaultCurveConfigs() {
     color: DEFAULT_CURVE_COLORS[0],
     lineWidth: 1.8,
     lineStyle: "solid",
+    lineShape: "linear",
+    xErrorCol: "",
+    yErrorCol: "",
   }];
 }
 
@@ -214,9 +276,14 @@ function getCurveConfigsFromForm() {
       "线条粗细",
       0.1,
     );
-    const lineStyle = getControlValue(row.querySelector('[name="curveStyles"]')) || "solid";
+    const lineStyleValue = getControlValue(row.querySelector('[name="curveStyles"]')) || "solid";
+    const lineShapeValue = getControlValue(row.querySelector('[name="curveLineShapes"]')) || "linear";
+    const lineStyle = LINE_STYLES[lineStyleValue] ? lineStyleValue : "solid";
+    const lineShape = LINE_SHAPES[lineShapeValue] ? lineShapeValue : "linear";
+    const yErrorCol = getControlValue(row.querySelector('[name="curveYErrorCols"]'));
+    const xErrorCol = getControlValue(row.querySelector('[name="curveXErrorCols"]'));
 
-    return { yCol, color, lineWidth, lineStyle };
+    return { yCol, color, lineWidth, lineStyle, lineShape, xErrorCol, yErrorCol };
   }).filter((config) => config.yCol);
 
   if (!configs.length) {
@@ -226,9 +293,21 @@ function getCurveConfigsFromForm() {
   return configs;
 }
 
+function resetPlotAnnotationControls() {
+  setControlValue("#xAxisMin", "");
+  setControlValue("#xAxisMax", "");
+  setControlValue("#yAxisMin", "");
+  setControlValue("#yAxisMax", "");
+  setControlValue("#xReferenceValue", "");
+  setControlValue("#yReferenceValue", "");
+  setControlValue("#referenceLabel", "");
+  setControlValue("#legendMode", "auto");
+  setControlValue("#dataLabelMode", "none");
+}
+
 function renderDataControls() {
-  renderColumnsBox(qs("#numericColumnsBox"), "当前可用数值列：");
-  renderColumnsBox(qs("#plotColumnsBox"), "当前识别到的数值列：");
+  renderColumnsBox(qs("#numericColumnsBox"), "数值列：");
+  renderColumnsBox(qs("#plotColumnsBox"), "数值列：");
 
   const numericOptions = state.numericColumns.map((column) => ({ value: column, label: column }));
   setOptions(qs("#firstCol"), numericOptions);
@@ -243,10 +322,35 @@ function renderDataControls() {
   } else {
     hide(qs("#calcSection"));
     hide(qs("#plotSection"));
-    showMessage("error", `至少需要两列数值数据才能绘图。当前可用数值列：${state.numericColumns.join("、") || "无"}`);
+    showMessage("error", `至少需要两列数值数据。当前数值列：${state.numericColumns.join("、") || "无"}`);
   }
 
   updateWorkflowNav();
+}
+
+function clearAdvancedResultState() {
+  state.lastPlotPayload = null;
+  state.pendingZipPackage = null;
+  hide(qs("#resultSection"));
+  qs("#summaryBody").replaceChildren();
+  qs("#statsBody").replaceChildren();
+  resetResultFigure();
+  clearResultDownloadLinks();
+  if (typeof clearRenderedPlot === "function") {
+    clearRenderedPlot(qs("#plotCanvas"));
+  }
+}
+
+function clearSimpleResultState() {
+  state.simplePlotPayload = null;
+  hide(qs("#simpleResult"));
+  setText("#simpleXCol", "待识别");
+  setText("#simpleYCol", "待识别");
+  setText("#simplePointCount", "待生成");
+  clearSimpleDownloadLinks();
+  if (typeof clearRenderedPlot === "function") {
+    clearRenderedPlot(qs("#simplePlotCanvas"));
+  }
 }
 
 function resetWorkflow() {
@@ -278,31 +382,19 @@ function resetWorkflow() {
   setControlValue("#dataEndRow", "");
   setText("#selectedFileHint", "尚未选择文件。");
   qs("#currentFileName").textContent = "";
-  qs("#headerGuessMessage").textContent = "";
+  renderContextNotification(qs("#headerGuessBox"), "info", "", "识别结果");
   qs("#previewHeaderRow").replaceChildren(createElement("cds-table-header-cell", { textContent: "行" }));
   qs("#previewBody").replaceChildren();
   qs("#numericColumnsBox").replaceChildren();
   qs("#plotColumnsBox").replaceChildren();
   qs("#curveConfigBox").replaceChildren();
-  qs("#summaryBody").replaceChildren();
-  qs("#statsBody").replaceChildren();
-  resetResultFigure();
-  hide(qs("#simpleResult"));
+  clearAdvancedResultState();
+  clearSimpleResultState();
   clearNotification(qs("#simpleMessage"));
-  setText("#simpleXCol", "待识别");
-  setText("#simpleYCol", "待识别");
-  setText("#simplePointCount", "待生成");
-  clearDownloadLink("#simpleDownloadPng");
-
-  qsa(".download-panel [href]").forEach((link) => {
-    link.removeAttribute("download");
-    link.href = "#";
-    link.setAttribute("href", "#");
-  });
 
   renderStaticOptions();
   clearMessage();
-  showMessage("success", "已清空当前数据。可以重新上传文件，或载入一份示例数据。");
+  showMessage("success", "已清空。可重新上传或载入示例。");
   updateWorkflowNav();
   setActiveStep("upload", { scroll: true });
 }
@@ -317,17 +409,17 @@ function reloadDataFromRange(showSuccess = false) {
   state.data = loaded.data;
   state.numericColumns = loaded.numericColumns;
 
+  clearAdvancedResultState();
   renderDataControls();
   if (showSuccess && state.samplePreset) {
     applySamplePreset({ activate: false, silent: true });
   }
-  hide(qs("#resultSection"));
   if (showSuccess) {
     if (state.numericColumns.length >= 2) {
       clearMessage();
       setActiveStep("plot", { scroll: true });
     } else {
-      showMessage("success", "已按新的表头和数据范围重新读取。");
+      showMessage("success", "已更新表头和数据范围。");
     }
   }
 
@@ -345,7 +437,7 @@ function setDataset(rows, fileName) {
 
   const guess = guessHeaderAndDataRows(state.rawRows);
   qs("#currentFileName").textContent = fileName;
-  qs("#headerGuessMessage").textContent = guess.message;
+  renderContextNotification(qs("#headerGuessBox"), "info", guess.message, "识别结果");
   setControlValue("#headerRow", String(guess.headerRow));
   setControlValue("#dataStartRow", String(guess.dataStartRow));
   setControlValue("#dataEndRow", "");
@@ -385,7 +477,7 @@ function calculateColumn() {
     throw new Error("请输入新列名。");
   }
   if (state.columns.includes(newColName)) {
-    throw new Error(`新列名已经存在：${newColName}。请换一个名字。`);
+    throw new Error(`新列名已存在：${newColName}。`);
   }
   if (!CALC_TEMPLATES[calcTemplate]) {
     throw new Error("请选择正确的计算类型。");
@@ -405,7 +497,7 @@ function calculateColumn() {
       throw new Error(`常数 k 必须是数字：${cellText(constantKText)}`);
     }
     if (calcTemplate === "divide_const" && k === 0) {
-      throw new Error("常数 k 不能为 0，否则会出现除以 0。");
+      throw new Error("常数 k 不能为 0。");
     }
   }
 
@@ -438,10 +530,10 @@ function calculateColumn() {
   });
 
   if (!result.some(Number.isFinite)) {
-    throw new Error("计算结果没有可用数值，请检查所选列或常数。");
+    throw new Error("计算结果没有可用数值。请检查列或常数。");
   }
   if (result.some((value) => value === Infinity || value === -Infinity)) {
-    throw new Error("计算结果出现无穷大，可能存在除以 0、log 非法输入或数值过大。");
+    throw new Error("计算结果包含无穷大。请检查除以 0、log 输入或数值范围。");
   }
 
   state.columns.push(newColName);

@@ -12,22 +12,72 @@ function normalizeSelectedMetrics() {
   return selected.length ? selected : BASIC_METRICS.slice();
 }
 
-function getPlotPairs(xCol, yCol) {
+function getErrorValue(row, column) {
+  if (!column) {
+    return null;
+  }
+
+  const value = toNumber(row[column]);
+  return Number.isFinite(value) && value >= 0 ? value : null;
+}
+
+function getPlotSeries(xCol, yCol, config = {}) {
   return state.data
-    .map((row) => ({
-      x: toNumber(row[xCol]),
-      y: toNumber(row[yCol]),
-    }))
-    .filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+    .map((row, rowIndex) => {
+      const x = toNumber(row[xCol]);
+      const y = toNumber(row[yCol]);
+      if (!Number.isFinite(x)) {
+        return null;
+      }
+      return {
+        x,
+        y: Number.isFinite(y) ? y : null,
+        xError: getErrorValue(row, config.xErrorCol),
+        yError: getErrorValue(row, config.yErrorCol),
+        isGap: !Number.isFinite(y),
+        rowIndex,
+      };
+    })
+    .filter(Boolean);
+}
+
+function getPlotPairs(xCol, yCol, config = {}) {
+  return getPlotSeries(xCol, yCol, config)
+    .filter((point) => !point.isGap)
+    .map(({ x, y, xError, yError, rowIndex }) => ({ x, y, xError, yError, rowIndex }));
+}
+
+function comparePlotPoints(a, b) {
+  if (a.x !== b.x) {
+    return a.x - b.x;
+  }
+  return (a.rowIndex ?? 0) - (b.rowIndex ?? 0);
 }
 
 function sortPairsByX(pairs) {
-  return pairs.slice().sort((a, b) => {
-    if (a.x === b.x) {
-      return a.y - b.y;
-    }
-    return a.x - b.x;
-  });
+  return pairs.slice().sort(comparePlotPoints);
+}
+
+function sortPlotSeriesByX(points) {
+  return points.slice().sort(comparePlotPoints);
+}
+
+function shouldPreservePlotGaps(chartType) {
+  return chartType === "line" || chartType === "line_marker" || chartType === "area";
+}
+
+function countPlotGaps(points) {
+  return points.reduce((count, point) => count + (point.isGap ? 1 : 0), 0);
+}
+
+function describePlotGapHint(chartType, gapCount) {
+  if (!gapCount) {
+    return "";
+  }
+  if (shouldPreservePlotGaps(chartType)) {
+    return `有 ${gapCount} 个缺失值，折线会在对应位置断开。`;
+  }
+  return `有 ${gapCount} 个缺失值，已从图中跳过。`;
 }
 
 function getSelectedCurveSummary() {
@@ -48,6 +98,48 @@ function readOutputSize() {
   };
 }
 
+function readAxisRangeControls(xAxisScale, yAxisScale) {
+  return {
+    x: readSingleAxisRange("#xAxisMin", "#xAxisMax", "X 轴", xAxisScale),
+    y: readSingleAxisRange("#yAxisMin", "#yAxisMax", "Y 轴", yAxisScale),
+  };
+}
+
+function readSingleAxisRange(minSelector, maxSelector, axisName, scaleType) {
+  const min = parseOptionalNumber(getControlValue(minSelector), `${axisName}最小值`);
+  const max = parseOptionalNumber(getControlValue(maxSelector), `${axisName}最大值`);
+
+  if (min !== null && max !== null && min >= max) {
+    throw new Error(`${axisName}最小值必须小于最大值。`);
+  }
+  if (scaleType === "log") {
+    if (min !== null && min <= 0) {
+      throw new Error(`${axisName}对数刻度的最小值必须大于 0。`);
+    }
+    if (max !== null && max <= 0) {
+      throw new Error(`${axisName}对数刻度的最大值必须大于 0。`);
+    }
+  }
+
+  return { min, max };
+}
+
+function readReferenceControls(xAxisScale, yAxisScale) {
+  const x = parseOptionalNumber(getControlValue("#xReferenceValue"), "X 参考线");
+  const y = parseOptionalNumber(getControlValue("#yReferenceValue"), "Y 参考线");
+  if (xAxisScale === "log" && x !== null && x <= 0) {
+    throw new Error("X 参考线在对数刻度下必须大于 0。");
+  }
+  if (yAxisScale === "log" && y !== null && y <= 0) {
+    throw new Error("Y 参考线在对数刻度下必须大于 0。");
+  }
+  return {
+    label: cellText(getControlValue("#referenceLabel")),
+    x,
+    y,
+  };
+}
+
 function getPendingReadiness(status, hint, overrides = {}) {
   return {
     level: "neutral",
@@ -61,27 +153,34 @@ function getPendingReadiness(status, hint, overrides = {}) {
 
 function inspectPlotReadiness() {
   if (!state.data.length || !state.numericColumns.length) {
-    return getPendingReadiness("等待数据", "上传或载入示例数据后再生成图像。");
+    return getPendingReadiness("等待数据", "先导入数据或载入示例。");
   }
 
   const xCol = getControlValue("#xCol");
   const yCols = getSelectedCurveSummary();
+  const chartType = getControlValue("#chartType") || "line_marker";
   const fitType = getControlValue("#fitType");
   const xAxisScale = getControlValue("#xAxisScale") || "linear";
   const yAxisScale = getControlValue("#yAxisScale") || "linear";
 
   if (!xCol || !yCols.length) {
-    return getPendingReadiness("等待选择绘图列", "选择 X 轴和至少一条 Y 轴曲线。");
+    return getPendingReadiness("等待选择列", "选择 X 轴和至少一条 Y 轴。");
   }
   if (!AXIS_SCALE_TYPES[xAxisScale] || !AXIS_SCALE_TYPES[yAxisScale]) {
-    return getPendingReadiness("坐标轴设置需要检查", "请选择正确的 X/Y 轴刻度。", {
+    return getPendingReadiness("检查坐标轴", "请选择正确的 X/Y 轴刻度。", {
+      level: "danger",
+      fit: "待检查",
+    });
+  }
+  if (!CHART_TYPES[chartType]) {
+    return getPendingReadiness("检查图表类型", "请选择正确的图表类型。", {
       level: "danger",
       fit: "待检查",
     });
   }
 
   if (yCols.includes(xCol)) {
-    return getPendingReadiness("列选择有冲突", "X 轴和 Y 轴不能使用同一列。", {
+    return getPendingReadiness("列选择冲突", "X 轴和 Y 轴不能使用同一列。", {
       level: "danger",
       fit: "不可用",
     });
@@ -90,8 +189,10 @@ function inspectPlotReadiness() {
   let outputSize;
   try {
     outputSize = readOutputSize();
+    readAxisRangeControls(xAxisScale, yAxisScale);
+    readReferenceControls(xAxisScale, yAxisScale);
   } catch (error) {
-    return getPendingReadiness("导出尺寸需要检查", error.message, {
+    return getPendingReadiness("检查绘图参数", error.message, {
       level: "danger",
       fit: "待检查",
     });
@@ -99,21 +200,24 @@ function inspectPlotReadiness() {
 
   const curveInfos = yCols.map((yCol) => {
     const pairs = getPlotPairs(xCol, yCol);
+    const series = getPlotSeries(xCol, yCol);
     const uniqueX = new Set(pairs.map((point) => point.x));
-    return { yCol, pairs, uniqueX };
+    return { yCol, pairs, series, uniqueX };
   });
   const validCounts = curveInfos.map((info) => info.pairs.length);
   const minPoints = Math.min(...validCounts);
+  const gapCount = curveInfos.reduce((sum, info) => sum + countPlotGaps(info.series), 0);
+  const gapHint = describePlotGapHint(chartType, gapCount);
   const pointLabel = yCols.length > 1
-    ? `${validCounts.join(" / ")} 点`
-    : `${minPoints} 点`;
+    ? `${validCounts.join(" / ")} 点${gapCount ? `，${gapCount} 个缺失值` : ""}`
+    : `${minPoints} 点${gapCount ? `，${gapCount} 个缺失值` : ""}`;
 
   if (minPoints <= 0) {
     return {
       level: "danger",
       canGenerate: false,
       status: "没有可绘制数据",
-      hint: "所选 X/Y 列中没有成对的数值数据。",
+      hint: "所选列没有成对数值。",
       points: pointLabel,
       fit: "不可用",
       exportSize: `${outputSize.width} × ${outputSize.height}px`,
@@ -149,8 +253,8 @@ function inspectPlotReadiness() {
     return {
       level: "warning",
       canGenerate: true,
-      status: "多曲线绘图就绪",
-      hint: "多曲线模式会生成图像，但暂不输出拟合结果。",
+      status: "多曲线就绪",
+      hint: gapHint || "可生成图，但不输出拟合。",
       points: pointLabel,
       fit: MULTI_Y_FIT_LABEL,
       exportSize: `${outputSize.width} × ${outputSize.height}px`,
@@ -159,8 +263,8 @@ function inspectPlotReadiness() {
 
   const onlyCurve = curveInfos[0];
   let fitLabel = FIT_TYPES[fitType] || "待选择";
-  let level = "ready";
-  let hint = "数据点和导出设置已通过检查。";
+  let level = gapHint ? "warning" : "ready";
+  let hint = gapHint || "数据和导出设置已通过检查。";
   let canGenerate = true;
 
   if (fitType === "linear" && (onlyCurve.pairs.length < 2 || onlyCurve.uniqueX.size < 2)) {
@@ -174,13 +278,13 @@ function inspectPlotReadiness() {
     fitLabel = "二次拟合不可用";
     hint = "二次拟合至少需要 3 个不同的 X 值。";
   } else if (fitType === "none") {
-    fitLabel = "不拟合，只绘图";
+    fitLabel = "不拟合";
   }
 
   return {
     level,
     canGenerate,
-    status: canGenerate ? "可以生成" : "暂不能生成",
+    status: canGenerate ? "可以生成" : "不能生成",
     hint,
     points: pointLabel,
     fit: fitLabel,
@@ -225,8 +329,9 @@ function updatePlotReadiness() {
 
   const info = inspectPlotReadiness();
   box.className = `plot-readiness ${info.level}`;
-  qs("#plotReadyStatus").textContent = info.status;
-  qs("#plotReadyHint").textContent = info.hint;
+  const message = qs("#plotReadinessMessage");
+  renderContextNotification(message, info.level, info.hint, info.status);
+  message?.classList.add("plot-readiness-message");
   qs("#plotReadyPoints").textContent = info.points;
   qs("#plotReadyFit").textContent = info.fit;
   qs("#plotReadyExport").textContent = info.exportSize;
@@ -237,16 +342,17 @@ function updatePlotReadiness() {
 
 function setPlotProgress(text, visible = true) {
   const progress = qs("#plotProgress");
-  const progressText = qs("#plotProgressText");
-  if (!progress || !progressText) {
+  if (!progress) {
     return;
   }
 
-  progressText.textContent = text;
+  progress.description = text;
+  progress.setAttribute("description", text);
+  progress.setAttribute("status", visible ? "active" : "inactive");
   progress.classList.toggle("is-hidden", !visible);
 }
 
-function setPlotGenerating(isGenerating, text = "正在生成") {
+function setPlotGenerating(isGenerating, text = "生成中") {
   state.isPlotGenerating = isGenerating;
   const submitButton = qs("#plotSubmitButton");
   const plotForm = qs("#plotForm");

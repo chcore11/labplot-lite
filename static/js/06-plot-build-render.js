@@ -1,5 +1,89 @@
 "use strict";
 
+function escapePlotlyText(value) {
+  return cellText(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function getPlotSourceColumns(xCol, curveConfigs) {
+  const columns = [xCol];
+  curveConfigs.forEach((config) => {
+    [config.yCol, config.yErrorCol, config.xErrorCol].forEach((column) => {
+      if (column && !columns.includes(column)) {
+        columns.push(column);
+      }
+    });
+  });
+  return columns;
+}
+
+function makeRowsFromPairs(xCol, config, pairs, extraFields = null) {
+  return pairs.map((point, index) => {
+    const row = {
+      [xCol]: point.x,
+      [config.yCol]: point.y,
+    };
+    if (config.yErrorCol) {
+      row[config.yErrorCol] = point.yError ?? "";
+    }
+    if (config.xErrorCol) {
+      row[config.xErrorCol] = point.xError ?? "";
+    }
+    return extraFields ? { ...row, ...extraFields(point, index) } : row;
+  });
+}
+
+function hasCurveErrorBars(config) {
+  return Boolean(config.xErrorCol || config.yErrorCol);
+}
+
+function getErrorBarLabel(curveConfigs) {
+  const count = curveConfigs.filter(hasCurveErrorBars).length;
+  if (!count) {
+    return "未使用";
+  }
+  return `${count} 条曲线`;
+}
+
+function formatSettingNumber(value) {
+  if (!Number.isFinite(value)) {
+    return "";
+  }
+  if (value === 0) {
+    return "0";
+  }
+
+  const absValue = Math.abs(value);
+  if (absValue < 0.01 || absValue >= 10000) {
+    return value.toExponential(3);
+  }
+  return String(Number(value.toPrecision(6)));
+}
+
+function getAxisRangeLabel(range) {
+  if (!range || (range.min === null && range.max === null)) {
+    return "自动";
+  }
+  const min = range.min === null ? "自动" : formatSettingNumber(range.min);
+  const max = range.max === null ? "自动" : formatSettingNumber(range.max);
+  return `${min} ~ ${max}`;
+}
+
+function getReferenceLinesLabel(referenceLines) {
+  const parts = [];
+  if (referenceLines?.x !== null && referenceLines?.x !== undefined) {
+    parts.push(`X=${formatSettingNumber(referenceLines.x)}`);
+  }
+  if (referenceLines?.y !== null && referenceLines?.y !== undefined) {
+    parts.push(`Y=${formatSettingNumber(referenceLines.y)}`);
+  }
+  return parts.length ? parts.join("，") : "未添加";
+}
+
 function buildPlotPayload() {
   const xCol = getControlValue("#xCol");
   const curveConfigs = getCurveConfigsFromForm();
@@ -32,10 +116,21 @@ function buildPlotPayload() {
   const showGrid = getControlChecked("#showGrid");
   const xAxisScale = getControlValue("#xAxisScale") || "linear";
   const yAxisScale = getControlValue("#yAxisScale") || "linear";
+  const legendMode = getControlValue("#legendMode") || "auto";
+  const dataLabelMode = getControlValue("#dataLabelMode") || "none";
 
   if (!AXIS_SCALE_TYPES[xAxisScale] || !AXIS_SCALE_TYPES[yAxisScale]) {
     throw new Error("请选择正确的坐标轴刻度。");
   }
+  if (!LEGEND_MODES[legendMode]) {
+    throw new Error("请选择正确的图例位置。");
+  }
+  if (!DATA_LABEL_MODES[dataLabelMode]) {
+    throw new Error("请选择正确的数据标签。");
+  }
+
+  const axisRanges = readAxisRangeControls(xAxisScale, yAxisScale);
+  const referenceLines = readReferenceControls(xAxisScale, yAxisScale);
 
   const xLabel = cellText(getControlValue("#xLabel")) || xCol;
   const yLabel = cellText(getControlValue("#yLabel")) || (curveConfigs.length > 1 ? uniqueYCols.join(" / ") : yCols[0]);
@@ -48,39 +143,45 @@ function buildPlotPayload() {
   const allPairs = [];
   let fitResult = null;
   let originRows = [];
+  let missingPointCount = 0;
+  const plotSourceColumns = getPlotSourceColumns(xCol, curveConfigs);
 
   if (curveConfigs.length > 1) {
     fitType = "none";
 
     curveConfigs.forEach((config) => {
-      const pairs = sortPairsByX(getPlotPairs(xCol, config.yCol));
+      const plotData = getCurvePlotData(xCol, config, chartType);
+      const { pairs } = plotData;
+      missingPointCount += plotData.gapCount;
       if (!pairs.length) {
         return;
       }
       allPairs.push(...pairs.map((point) => ({ ...point, yCol: config.yCol })));
-      datasets.push(makeChartDataset(config.yCol, pairs, config, chartType));
+      datasets.push(plotData.dataset);
     });
 
     if (!datasets.length) {
-      throw new Error("所选 X/Y 列中没有可用于绘图的成对数值数据。");
+      throw new Error("所选列没有可绘图的成对数值。");
     }
 
     originRows = state.data.map((row) => {
-      const item = { [xCol]: row[xCol] };
-      uniqueYCols.forEach((column) => {
+      const item = {};
+      plotSourceColumns.forEach((column) => {
         item[column] = row[column];
       });
       return item;
     });
   } else {
     const config = curveConfigs[0];
-    const pairs = sortPairsByX(getPlotPairs(xCol, config.yCol));
+    const plotData = getCurvePlotData(xCol, config, chartType);
+    const { pairs } = plotData;
+    missingPointCount += plotData.gapCount;
     if (!pairs.length) {
-      throw new Error("所选 X/Y 列中没有可用的数值数据，请检查表格内容。");
+      throw new Error("所选列没有可用数值。请检查表格。");
     }
 
     allPairs.push(...pairs.map((point) => ({ ...point, yCol: config.yCol })));
-    originRows = pairs.map((point) => ({ [xCol]: point.x, [config.yCol]: point.y }));
+    originRows = makeRowsFromPairs(xCol, config, pairs);
 
     if (fitType === "linear") {
       fitResult = linearFit(pairs);
@@ -91,7 +192,9 @@ function buildPlotPayload() {
     if (fitResult) {
       datasets.push({
         label: "Data",
+        chartType: "scatter",
         data: pairs,
+        traceData: pairs,
         showLine: false,
         pointRadius: 4.2,
         pointHoverRadius: 5.2,
@@ -99,32 +202,36 @@ function buildPlotPayload() {
         pointBorderColor: "rgb(252, 252, 249)",
         borderColor: config.color,
         backgroundColor: config.color,
+        xErrorCol: config.xErrorCol,
+        yErrorCol: config.yErrorCol,
       });
       datasets.push({
         label: fitType === "linear" ? "Linear Fit" : "Quadratic Fit",
+        chartType: "line",
         data: fitResult.fitPoints,
+        traceData: fitResult.fitPoints,
+        isFitLine: true,
         showLine: true,
         pointRadius: 0,
         borderColor: "rgb(31, 41, 55)",
         backgroundColor: "rgb(31, 41, 55)",
         borderWidth: Math.max(config.lineWidth + 0.5, 2),
         borderDash: [9, 5],
+        lineShape: "linear",
       });
 
       const fitColumn = fitType === "linear" ? "linear_fit_y" : "quadratic_fit_y";
-      originRows = pairs.map((point, index) => {
+      originRows = makeRowsFromPairs(xCol, config, pairs, (point, index) => {
         const fitted = fitResult.yPred[index];
         const residual = point.y - fitted;
         return {
-          [xCol]: point.x,
-          [config.yCol]: point.y,
           [fitColumn]: fitted,
           residual,
           abs_residual: Math.abs(residual),
         };
       });
     } else {
-      datasets.push(makeChartDataset(config.yCol, pairs, config, chartType));
+      datasets.push(plotData.dataset);
     }
   }
 
@@ -172,6 +279,15 @@ function buildPlotPayload() {
     y_axis_scale: yAxisScale,
     x_axis_scale_label: AXIS_SCALE_TYPES[xAxisScale],
     y_axis_scale_label: AXIS_SCALE_TYPES[yAxisScale],
+    x_axis_range_label: getAxisRangeLabel(axisRanges.x),
+    y_axis_range_label: getAxisRangeLabel(axisRanges.y),
+    legend_mode: legendMode,
+    legend_mode_label: LEGEND_MODES[legendMode],
+    data_label_mode: dataLabelMode,
+    data_label_mode_label: DATA_LABEL_MODES[dataLabelMode],
+    reference_lines_label: getReferenceLinesLabel(referenceLines),
+    reference_label: referenceLines.label,
+    error_bar_count_label: getErrorBarLabel(curveConfigs),
     max_value: formatShortNumber(maxValue),
     min_value: formatShortNumber(minValue),
     avg_value: formatShortNumber(avgValue),
@@ -206,6 +322,8 @@ function buildPlotPayload() {
     label_fontsize: labelFontsize,
     legend_fontsize: legendFontsize,
     show_grid: showGrid,
+    missing_points: String(missingPointCount),
+    missing_points_label: missingPointCount ? `${missingPointCount} 个缺失值` : "0",
   };
 
   const xName = safeFilenamePart(xCol);
@@ -227,8 +345,13 @@ function buildPlotPayload() {
     labelFontsize,
     legendFontsize,
     showGrid,
+    legendMode,
+    dataLabelMode,
+    axisRanges,
+    referenceLines,
     xAxisScale,
     yAxisScale,
+    chartType,
     xMin,
     xMax,
     yMin: minValue,
@@ -248,7 +371,26 @@ function buildPlotPayload() {
   };
 }
 
-function makeChartDataset(label, pairs, config, chartType) {
+function getCurvePlotData(xCol, config, chartType) {
+  const pairs = sortPairsByX(getPlotPairs(xCol, config.yCol, config));
+  const series = getPlotSeries(xCol, config.yCol, config);
+  return {
+    dataset: pairs.length
+      ? makeChartDataset(config.yCol, pairs, config, chartType, getTraceDataForChart(pairs, series, chartType))
+      : null,
+    gapCount: countPlotGaps(series),
+    pairs,
+  };
+}
+
+function getTraceDataForChart(pairs, series, chartType) {
+  if (!shouldPreservePlotGaps(chartType)) {
+    return pairs;
+  }
+  return sortPlotSeriesByX(series);
+}
+
+function makeChartDataset(label, pairs, config, chartType, traceData = pairs) {
   const isScatter = chartType === "scatter";
   const isLineOnly = chartType === "line";
   const isArea = chartType === "area";
@@ -258,6 +400,7 @@ function makeChartDataset(label, pairs, config, chartType) {
     label,
     chartType,
     data: pairs,
+    traceData,
     showLine: !isScatter && !isBar,
     pointRadius: isLineOnly || isArea || isBar ? 0 : 3.6,
     pointHoverRadius: isLineOnly || isArea || isBar ? 0 : 4.8,
@@ -268,8 +411,11 @@ function makeChartDataset(label, pairs, config, chartType) {
     borderWidth: Math.max(config.lineWidth, 1.7),
     borderDash: LINE_DASHES[config.lineStyle],
     lineStyle: config.lineStyle,
+    lineShape: LINE_SHAPES[config.lineShape] ? config.lineShape : "linear",
+    xErrorCol: config.xErrorCol,
+    yErrorCol: config.yErrorCol,
     tension: 0,
-    spanGaps: true,
+    spanGaps: false,
   };
 }
 
@@ -283,6 +429,10 @@ function shouldAxisStartAtZero(minValue, maxValue) {
     return minValue === 0;
   }
   return minValue <= range * 0.08;
+}
+
+function shouldUseZeroYBaseline(chartType) {
+  return chartType === "bar" || chartType === "area";
 }
 
 function nicePositiveAxisMax(maxValue) {
@@ -310,6 +460,15 @@ function nicePositiveAxisMax(maxValue) {
     niceNormalized = 10;
   }
   return niceNormalized * magnitude;
+}
+
+function niceNegativeAxisMin(minValue) {
+  if (!Number.isFinite(minValue) || minValue >= 0) {
+    return undefined;
+  }
+
+  const axisMax = nicePositiveAxisMax(Math.abs(minValue));
+  return Number.isFinite(axisMax) ? -axisMax : undefined;
 }
 
 function getThemeColors() {
@@ -354,7 +513,7 @@ function getPlotPreviewSize(target, payload) {
 function getPlotTarget(selector) {
   const target = qs(selector);
   if (!target) {
-    throw new Error("图像预览容器不存在。");
+    throw new Error("预览容器不存在。");
   }
   return target;
 }
@@ -365,6 +524,56 @@ function clearRenderedPlot(target) {
   }
   target._labPlotGraphDiv = null;
   target.replaceChildren();
+}
+
+function shouldShowLegend(payload) {
+  if (payload.legendMode === "hidden") {
+    return false;
+  }
+  if (payload.legendMode && payload.legendMode !== "auto") {
+    return true;
+  }
+  return payload.datasets.length > 1 && payload.dataLabelMode !== "last";
+}
+
+function getLegendLayout(payload, scale, colors) {
+  const base = {
+    bgcolor: "rgba(0,0,0,0)",
+    font: {
+      color: colors.text,
+      size: payload.legendFontsize * scale,
+    },
+  };
+
+  const mode = payload.legendMode === "auto" ? "top" : payload.legendMode;
+  if (mode === "right") {
+    return {
+      ...base,
+      orientation: "v",
+      x: 1.02,
+      xanchor: "left",
+      y: 1,
+      yanchor: "top",
+    };
+  }
+  if (mode === "bottom") {
+    return {
+      ...base,
+      orientation: "h",
+      x: 0,
+      xanchor: "left",
+      y: -0.2,
+      yanchor: "top",
+    };
+  }
+  return {
+    ...base,
+    orientation: "h",
+    x: 0,
+    xanchor: "left",
+    y: 1.12,
+    yanchor: "bottom",
+  };
 }
 
 function estimateLegendRows(datasets, width, margins, scale, fontSize) {
@@ -398,19 +607,41 @@ function getPlotlyMargins(payload, width, scale) {
     b: 64 * scale,
     l: 78 * scale,
   };
+  if (!shouldShowLegend(payload)) {
+    return margins;
+  }
+
+  const legendMode = payload.legendMode === "auto" ? "top" : payload.legendMode;
+  if (legendMode === "right") {
+    margins.r += 150 * scale;
+    return margins;
+  }
+
   const legendRows = estimateLegendRows(payload.datasets, width, margins, scale, payload.legendFontsize * scale);
-  if (legendRows) {
+  if (!legendRows) {
+    return margins;
+  }
+  if (legendMode === "bottom") {
+    margins.b += (legendRows * 25 * scale) + (12 * scale);
+  } else {
     margins.t += (legendRows * 25 * scale) + (10 * scale);
   }
   return margins;
 }
 
-function makePlotDomain(minValue, maxValue, axisMaxValue) {
+function makePlotDomain(minValue, maxValue, options = {}) {
   if (!Number.isFinite(minValue) || !Number.isFinite(maxValue)) {
     return undefined;
   }
+  const { axisMaxValue, includeZero = false } = options;
   const range = maxValue - minValue;
   const pad = range > 0 ? range * 0.04 : Math.max(Math.abs(maxValue) * 0.04, 1);
+  if (includeZero && minValue >= 0) {
+    return [0, axisMaxValue || maxValue + pad];
+  }
+  if (includeZero && maxValue <= 0) {
+    return [niceNegativeAxisMin(minValue) || minValue - pad, 0];
+  }
   if (shouldAxisStartAtZero(minValue, maxValue)) {
     return [0, axisMaxValue || maxValue + pad];
   }
@@ -421,8 +652,20 @@ function isLogScale(scaleType) {
   return scaleType === "log";
 }
 
-function getAxisRange(scaleType, minValue, maxValue, axisMaxValue) {
-  return isLogScale(scaleType) ? undefined : makePlotDomain(minValue, maxValue, axisMaxValue);
+function getAxisRange(scaleType, minValue, maxValue, options) {
+  const manualRange = options?.manualRange;
+  if (manualRange && (manualRange.min !== null || manualRange.max !== null)) {
+    const autoRange = isLogScale(scaleType)
+      ? [minValue, maxValue]
+      : (makePlotDomain(minValue, maxValue, options) || [minValue, maxValue]);
+    const range = [
+      manualRange.min === null ? autoRange[0] : manualRange.min,
+      manualRange.max === null ? autoRange[1] : manualRange.max,
+    ];
+    return isLogScale(scaleType) ? range.map((value) => Math.log10(value)) : range;
+  }
+
+  return isLogScale(scaleType) ? undefined : makePlotDomain(minValue, maxValue, options);
 }
 
 function getHoverMode(payload) {
@@ -447,7 +690,7 @@ function getFitAnnotation(payload, scale, colors) {
     },
     opacity: 1,
     showarrow: false,
-    text: payload.fitText.replace(/\n/g, "<br>"),
+    text: escapePlotlyText(payload.fitText).replace(/\n/g, "<br>"),
     x: 0.02,
     xanchor: "left",
     xref: "paper",
@@ -455,6 +698,92 @@ function getFitAnnotation(payload, scale, colors) {
     yanchor: "top",
     yref: "paper",
   }];
+}
+
+function getReferenceShapes(payload, colors) {
+  const shapes = [];
+  const referenceLines = payload.referenceLines || {};
+  const line = {
+    color: "rgba(75, 85, 99, 0.76)",
+    dash: "dash",
+    width: 1.1,
+  };
+
+  if (referenceLines.x !== null && referenceLines.x !== undefined) {
+    shapes.push({
+      line,
+      type: "line",
+      x0: referenceLines.x,
+      x1: referenceLines.x,
+      xref: "x",
+      y0: 0,
+      y1: 1,
+      yref: "paper",
+    });
+  }
+
+  if (referenceLines.y !== null && referenceLines.y !== undefined) {
+    shapes.push({
+      line: { ...line, color: "rgba(0, 114, 178, 0.72)" },
+      type: "line",
+      x0: 0,
+      x1: 1,
+      xref: "paper",
+      y0: referenceLines.y,
+      y1: referenceLines.y,
+      yref: "y",
+    });
+  }
+
+  return shapes;
+}
+
+function getReferenceAnnotations(payload, scale, colors) {
+  const referenceLines = payload.referenceLines || {};
+  const hasX = referenceLines.x !== null && referenceLines.x !== undefined;
+  const hasY = referenceLines.y !== null && referenceLines.y !== undefined;
+  const label = cellText(referenceLines.label);
+  if (!label || (!hasX && !hasY)) {
+    return [];
+  }
+
+  const base = {
+    bgcolor: colors.fitLabelBg,
+    bordercolor: colors.fitLabelBorder,
+    borderpad: 5 * scale,
+    borderwidth: 0.8 * scale,
+    font: {
+      color: colors.muted,
+      size: Math.max((payload.legendFontsize - 1) * scale, 8 * scale),
+    },
+    showarrow: false,
+  };
+  const annotations = [];
+  if (hasX) {
+    annotations.push({
+      ...base,
+      text: escapePlotlyText(hasY ? `${label} X=${formatSettingNumber(referenceLines.x)}` : label),
+      x: referenceLines.x,
+      xanchor: "left",
+      xref: "x",
+      y: 0.98,
+      yanchor: "top",
+      yref: "paper",
+    });
+  }
+  if (hasY) {
+    annotations.push({
+      ...base,
+      text: escapePlotlyText(hasX ? `${label} Y=${formatSettingNumber(referenceLines.y)}` : label),
+      x: 0.98,
+      xanchor: "right",
+      xref: "paper",
+      y: referenceLines.y,
+      yanchor: "bottom",
+      yref: "y",
+    });
+  }
+  return annotations;
 }
 
 function plotlyDashStyle(dataset) {
@@ -499,33 +828,97 @@ function getTraceMode(dataset) {
   return "markers";
 }
 
+function getPlotlyErrorConfig(traceData, key, color, scale) {
+  if (!traceData.some((point) => Number.isFinite(point[key]) && point[key] > 0)) {
+    return undefined;
+  }
+
+  return {
+    array: traceData.map((point) => Number.isFinite(point[key]) && point[key] >= 0 ? point[key] : 0),
+    color,
+    symmetric: true,
+    thickness: Math.max(1 * scale, 1),
+    type: "data",
+    visible: true,
+    width: 3 * scale,
+  };
+}
+
+function appendTextMode(mode) {
+  return mode.includes("text") ? mode : `${mode}+text`;
+}
+
+function getLastVisiblePointIndex(traceData) {
+  for (let index = traceData.length - 1; index >= 0; index -= 1) {
+    if (Number.isFinite(traceData[index].x) && Number.isFinite(traceData[index].y)) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+function applyTraceLabels(trace, dataset, payload, traceData) {
+  if (payload.dataLabelMode === "none" || dataset.isFitLine) {
+    return trace;
+  }
+
+  let text = [];
+  if (payload.dataLabelMode === "all") {
+    text = traceData.map((point) => Number.isFinite(point.y) ? formatShortNumber(point.y) : "");
+  } else if (payload.dataLabelMode === "last") {
+    const lastIndex = getLastVisiblePointIndex(traceData);
+    text = traceData.map((_, index) => index === lastIndex ? dataset.label : "");
+  }
+
+  if (!text.some(Boolean)) {
+    return trace;
+  }
+
+  trace.text = text.map(escapePlotlyText);
+  trace.textposition = trace.type === "bar" ? "outside" : (payload.dataLabelMode === "last" ? "middle right" : "top center");
+  trace.cliponaxis = false;
+  if (trace.type === "scatter") {
+    trace.mode = appendTextMode(trace.mode);
+  }
+  return trace;
+}
+
 function makePlotlyTraces(payload, scale, colors) {
   return payload.datasets.map((dataset) => {
     const stroke = dataset.borderColor || colors.axis;
     const fill = dataset.backgroundColor || stroke;
+    const traceLabel = escapePlotlyText(dataset.label || "Series");
+    const xLabel = escapePlotlyText(payload.xLabel);
+    const traceData = dataset.traceData || dataset.data;
 
     if (dataset.chartType === "bar") {
-      return {
-        hovertemplate: `${payload.xLabel}: %{x}<br>${dataset.label}: %{y}<extra></extra>`,
+      const trace = {
+        error_x: getPlotlyErrorConfig(traceData, "xError", stroke, scale),
+        error_y: getPlotlyErrorConfig(traceData, "yError", stroke, scale),
+        hovertemplate: `${xLabel}: %{x}<br>${traceLabel}: %{y}<extra></extra>`,
         marker: {
           color: fill,
           line: { color: stroke, width: Math.max((dataset.borderWidth || 1) * 0.4, 0.5) },
         },
-        name: dataset.label || "Series",
+        name: traceLabel,
         type: "bar",
-        x: dataset.data.map((point) => point.x),
-        y: dataset.data.map((point) => point.y),
+        x: traceData.map((point) => point.x),
+        y: traceData.map((point) => point.y),
       };
+      return applyTraceLabels(trace, dataset, payload, traceData);
     }
 
-    return {
+    const trace = {
+      connectgaps: false,
+      error_x: getPlotlyErrorConfig(traceData, "xError", stroke, scale),
+      error_y: getPlotlyErrorConfig(traceData, "yError", stroke, scale),
       fill: dataset.chartType === "area" && !isLogScale(payload.yAxisScale) ? "tozeroy" : undefined,
       fillcolor: dataset.chartType === "area" && !isLogScale(payload.yAxisScale) ? plotlyFillColor(fill) : undefined,
-      hovertemplate: `${payload.xLabel}: %{x}<br>${dataset.label}: %{y}<extra></extra>`,
+      hovertemplate: `${xLabel}: %{x}<br>${traceLabel}: %{y}<extra></extra>`,
       line: {
         color: stroke,
         dash: plotlyDashStyle(dataset),
-        shape: "linear",
+        shape: dataset.lineShape || "linear",
         width: Math.max((dataset.borderWidth || 1.7) * scale, 1),
       },
       marker: {
@@ -537,11 +930,12 @@ function makePlotlyTraces(payload, scale, colors) {
         size: Math.max((dataset.pointRadius || 0) * 2 * scale, 3 * scale),
       },
       mode: getTraceMode(dataset),
-      name: dataset.label || "Series",
+      name: traceLabel,
       type: "scatter",
-      x: dataset.data.map((point) => point.x),
-      y: dataset.data.map((point) => point.y),
+      x: traceData.map((point) => point.x),
+      y: traceData.map((point) => point.y),
     };
+    return applyTraceLabels(trace, dataset, payload, traceData);
   });
 }
 
@@ -570,7 +964,10 @@ async function renderPlotlyChart(payload, selector) {
   const colors = getThemeColors();
   const scale = 1;
   const margin = getPlotlyMargins(payload, previewSize.width, scale);
-  const yAxisMax = !isLogScale(payload.yAxisScale) && shouldAxisStartAtZero(payload.yMin, payload.yMax)
+  const forceYZeroBaseline = shouldUseZeroYBaseline(payload.chartType);
+  const yAxisMax = !isLogScale(payload.yAxisScale)
+    && payload.yMax >= 0
+    && (forceYZeroBaseline || shouldAxisStartAtZero(payload.yMin, payload.yMax))
     ? nicePositiveAxisMax(payload.yMax)
     : undefined;
 
@@ -583,7 +980,10 @@ async function renderPlotlyChart(payload, selector) {
   setPlotPreviewSize(target, graphDiv, previewSize, outputSize);
 
   const layout = {
-    annotations: getFitAnnotation(payload, scale, colors),
+    annotations: [
+      ...getFitAnnotation(payload, scale, colors),
+      ...getReferenceAnnotations(payload, scale, colors),
+    ],
     autosize: false,
     font: {
       color: colors.text,
@@ -598,22 +998,12 @@ async function renderPlotlyChart(payload, selector) {
       font: { color: colors.text },
     },
     hovermode: getHoverMode(payload),
-    legend: {
-      bgcolor: "rgba(0,0,0,0)",
-      font: {
-        color: colors.text,
-        size: payload.legendFontsize * scale,
-      },
-      orientation: "h",
-      x: 0,
-      xanchor: "left",
-      y: 1.12,
-      yanchor: "bottom",
-    },
+    legend: getLegendLayout(payload, scale, colors),
     margin,
     paper_bgcolor: colors.surface,
     plot_bgcolor: colors.surface,
-    showlegend: payload.datasets.length > 1,
+    shapes: getReferenceShapes(payload, colors),
+    showlegend: shouldShowLegend(payload),
     width: previewSize.width,
     xaxis: {
       automargin: true,
@@ -622,7 +1012,9 @@ async function renderPlotlyChart(payload, selector) {
       linecolor: colors.axis,
       linewidth: 1.05 * scale,
       mirror: true,
-      range: getAxisRange(payload.xAxisScale, payload.xMin, payload.xMax),
+      range: getAxisRange(payload.xAxisScale, payload.xMin, payload.xMax, {
+        manualRange: payload.axisRanges.x,
+      }),
       showgrid: payload.showGrid,
       showline: true,
       showspikes: true,
@@ -637,7 +1029,7 @@ async function renderPlotlyChart(payload, selector) {
         automargin: true,
         font: { color: colors.text, size: payload.labelFontsize * scale },
         standoff: 12 * scale,
-        text: payload.xLabel,
+        text: escapePlotlyText(payload.xLabel),
       },
       type: payload.xAxisScale,
       zeroline: false,
@@ -649,7 +1041,11 @@ async function renderPlotlyChart(payload, selector) {
       linecolor: colors.axis,
       linewidth: 1.05 * scale,
       mirror: true,
-      range: getAxisRange(payload.yAxisScale, payload.yMin, payload.yMax, yAxisMax),
+      range: getAxisRange(payload.yAxisScale, payload.yMin, payload.yMax, {
+        axisMaxValue: yAxisMax,
+        includeZero: forceYZeroBaseline,
+        manualRange: payload.axisRanges.y,
+      }),
       showgrid: payload.showGrid,
       showline: true,
       showspikes: true,
@@ -664,10 +1060,10 @@ async function renderPlotlyChart(payload, selector) {
         automargin: true,
         font: { color: colors.text, size: payload.labelFontsize * scale },
         standoff: 12 * scale,
-        text: payload.yLabel,
+        text: escapePlotlyText(payload.yLabel),
       },
       type: payload.yAxisScale,
-      zeroline: false,
+      zeroline: forceYZeroBaseline && !isLogScale(payload.yAxisScale),
     },
   };
 

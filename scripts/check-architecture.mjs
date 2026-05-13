@@ -123,6 +123,19 @@ files.forEach((filePath) => {
       }
     }
   }
+
+  if (repoPath === "index.html" || repoPath === "workbench.html") {
+    if (!source.includes("Content-Security-Policy")) {
+      addFailure(filePath, 1, "Static pages must declare a Content-Security-Policy meta tag.");
+    }
+
+    for (const match of source.matchAll(/<script[^>]+src=["']https:\/\/[^"']+["'][^>]*>/gi)) {
+      const tag = match[0];
+      if (!/\bintegrity=["'][^"']+["']/.test(tag) || !/\bcrossorigin=["']anonymous["']/.test(tag)) {
+        addFailure(filePath, lineNumber(source, match.index || 0), "External scripts must use SRI and crossorigin=\"anonymous\".");
+      }
+    }
+  }
 });
 
 if (failures.length) {

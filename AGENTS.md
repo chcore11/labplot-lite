@@ -15,6 +15,15 @@ Use the Carbon + Plotly architecture for all frontend work:
 
 If Carbon or Plotly already covers the behavior, do not hand-write it.
 
+## Carbon-First Rule
+
+For any generic UI addition, the default answer is Carbon first, custom code second:
+
+- Check IBM Carbon Web Components and existing `cds-*` usage before adding markup, CSS, or JavaScript.
+- If Carbon has the component or behavior, use Carbon and write only the LabPlot-specific state glue.
+- If Carbon cannot cover the need, document the exception in the same change: what Carbon option was checked, why it does not fit, and how the custom code stays small.
+- Any UI patch with net code growth should explain what old code was deleted or why the growth is unavoidable.
+
 ## Collaboration Norms
 
 The user expects concrete completion, not only proposals. When the request is actionable, make the change, verify it, commit it when appropriate, and push when the task asks for completion on `main` or continues an already-pushing workflow.
@@ -37,11 +46,13 @@ For non-trivial repo work, follow this loop:
 
 1. Inspect: run `git status --short --branch`, read the relevant docs, and inspect existing code before deciding.
 2. Align: identify whether the change affects product, design, UI components, plotting, parsing, fitting, export, deployment, or docs.
-3. Reuse: look for existing helpers, Carbon components, Plotly options, and established module boundaries before adding code.
+3. Reuse: look for Carbon components, Plotly options, existing helpers, and established module boundaries before adding code.
 4. Edit: keep the patch scoped. Prefer replacing or deleting old code over layering new code on top.
 5. Verify: run static checks and the smallest real user flow that proves the change works.
 6. Review: inspect `git diff --stat` and key diffs. Confirm the change did not add redundant UI or duplicate chart logic.
 7. Publish: if the task requires completion on the remote, commit with a clear message and push to `origin main`.
+
+For larger changes, use `docs/project-change-workflow.md` before editing. Larger changes include cross-file work, user-flow changes, UI/plot/export/sample changes, dependency or architecture changes, and any request that asks for planning, cleanup, self-review, or strict project compliance.
 
 ## UI And Design Workflow
 
@@ -90,6 +101,8 @@ Read these files before non-trivial changes:
 - `PRODUCT.md`: product purpose, anti-references, implementation contract.
 - `DESIGN.md`: visual system and component ownership rules.
 - `.impeccable/design.json`: machine-readable design-system contract.
+- `docs/design/carbon-resources.md`: official Carbon / IBM resource map for component, design-language, data-visualization, and brand-boundary decisions.
+- `docs/project-change-workflow.md`: required workflow for larger project changes, including plan-first and subtraction-first self-review.
 
 For UI, design, layout, or interaction work, use the project-local impeccable flow first:
 
@@ -105,12 +118,14 @@ Use Carbon Web Components for generic UI:
 - `cds-progress-indicator` / `cds-progress-step` for workflow steps.
 - `cds-file-uploader` and `cds-file-uploader-button` for file selection.
 - `cds-select`, `cds-text-input`, `cds-textarea`, `cds-number-input`, `cds-checkbox` for forms.
-- `cds-actionable-notification` for status, success, warning, and error messaging.
+- `cds-actionable-notification` / `cds-inline-notification` for status, success, warning, and error messaging.
 - `cds-table` for spreadsheet preview.
 - `cds-accordion` for advanced or progressive settings.
 - `cds-tag` for compact metadata and column labels.
 
 Do not add new native `input`, `select`, `textarea`, `button`, `details`, or `table` controls to `workbench.html` unless there is a specific browser/platform reason and the alternative is documented in the same change.
+
+Use `docs/design/carbon-resources.md` as the resource map before adding or replacing generic UI. It points to official Carbon component pages, Carbon Web Components guidance, IBM Design Language resources, and the assets that must stay out of LabPlot Lite because they are IBM brand identity rather than reusable system guidance.
 
 ## Plot Ownership
 
@@ -125,11 +140,13 @@ Use Plotly for chart work:
 
 Do not write a custom canvas or SVG chart engine for scientific plots.
 
+Use the IBM / Carbon data visualization links in `docs/design/carbon-resources.md` before changing axes, labels, legends, grid density, chart color, direct labels, or missing-data treatment. Apply that guidance through Plotly trace, layout, and config rather than a parallel chart layer.
+
 ## File Responsibilities
 
-- `workbench.html`: static app shell, Carbon component imports, Carbon component markup.
-- `static/js/00-config-state.js`: constants and shared state.
-- `static/js/01-dom-workflow-utils.js`: DOM helpers, Carbon control read/write helpers, workflow utilities.
+- `workbench.html`: static app shell, minimal startup Carbon imports, Carbon component markup.
+- `static/js/00-config-state.js`: constants, shared state, external library and lazy Carbon component manifests.
+- `static/js/01-dom-workflow-utils.js`: DOM helpers, Carbon control read/write helpers, lazy Carbon loading, workflow utilities.
 - `static/js/02-data-parse.js`: CSV / Excel parsing and table normalization.
 - `static/js/03-workbench-ui.js`: workbench UI rendering, preview rows, dynamic Carbon controls.
 - `static/js/04-plot-readiness.js`: validation before plotting.
@@ -155,11 +172,12 @@ When a feature crosses these boundaries, keep each piece in its owner file inste
 
 When adding UI:
 
-1. Search for existing `cds-*` patterns in `workbench.html`.
-2. Use helpers in `static/js/01-dom-workflow-utils.js` for value, checked, disabled, and options handling.
-3. Add only the smallest wrapper code needed to connect Carbon events to app state.
-4. Remove any old native control markup or duplicated styles.
-5. Verify keyboard focus and 390px mobile layout if the change affects visible workflow.
+1. Search Carbon Web Components and existing `cds-*` patterns in `workbench.html`.
+2. Use Carbon markup before writing any native control or custom visual primitive.
+3. Use helpers in `static/js/01-dom-workflow-utils.js` for value, checked, disabled, and options handling.
+4. Add only the smallest wrapper code needed to connect Carbon events to app state.
+5. Remove any old native control markup or duplicated styles.
+6. Verify keyboard focus and 390px mobile layout if the change affects visible workflow.
 
 ## Adding Chart Features
 
@@ -212,12 +230,14 @@ Then test:
 - apply a sample plotting preset
 - generate the Plotly chart
 - confirm result summary appears
-- confirm ZIP and PNG download links are populated
+- confirm PNG / SVG / CSV / TXT download links are populated
+- click the ZIP download once and confirm the lazy ZIP package is generated
 
 ## Commit Hygiene
 
 - Keep changes scoped to the requested behavior.
 - Prefer deleting duplicated code over layering new wrappers.
+- If a UI change adds more code than it deletes, document why Carbon could not absorb more of the work.
 - Do not rewrite product/design docs unless the requested change alters the product contract.
 - Do not revert user or collaborator changes unless explicitly asked.
 - If pushing, use normal `git pull --rebase origin main` before considering any force operation.

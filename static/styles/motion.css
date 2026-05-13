@@ -25,37 +25,6 @@
   }
 }
 
-@keyframes tableRowIn {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes drawChartLine {
-  from {
-    stroke-dashoffset: 560;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes pointPlotIn {
-  from {
-    opacity: 0;
-    transform: scale(0.72);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
 .nav {
   animation: revealDown 0.45s var(--ease-out) both;
 }
@@ -64,89 +33,12 @@
   animation: riseFadeIn 0.55s var(--ease-out) 0.08s both;
 }
 
-.landing-hero .hero-product {
+.landing-hero .hero-showcase {
   animation: measuredScaleIn 0.64s var(--ease-out) 0.16s both;
 }
 
-.simple-mode:not(.is-hidden),
-#advancedMode:not(.is-hidden) .workbench {
-  animation: measuredScaleIn 0.42s var(--ease-out) both;
-}
-
-.landing-hero .mini-table > div:not(.mini-table-head),
-.landing-hero .hero-inspector div {
-  animation: tableRowIn 0.34s var(--ease-out) both;
-}
-
-.landing-hero .mini-table > div:nth-child(2) {
-  animation-delay: 0.34s;
-}
-
-.landing-hero .mini-table > div:nth-child(3) {
-  animation-delay: 0.39s;
-}
-
-.landing-hero .mini-table > div:nth-child(4) {
-  animation-delay: 0.44s;
-}
-
-.landing-hero .mini-table > div:nth-child(5) {
-  animation-delay: 0.49s;
-}
-
-.landing-hero .mini-table > div:nth-child(6) {
-  animation-delay: 0.54s;
-}
-
-.landing-hero .hero-inspector div:nth-child(1) {
-  animation-delay: 0.42s;
-}
-
-.landing-hero .hero-inspector div:nth-child(2) {
-  animation-delay: 0.47s;
-}
-
-.landing-hero .hero-inspector div:nth-child(3) {
-  animation-delay: 0.52s;
-}
-
-.landing-hero .hero-inspector div:nth-child(4) {
-  animation-delay: 0.57s;
-}
-
-.landing-hero .report-chart .chart-fit-line {
-  stroke-dasharray: 560;
-  stroke-dashoffset: 560;
-  animation: drawChartLine 0.82s var(--ease-out) 0.54s both;
-}
-
-.landing-hero .report-chart .chart-points circle {
-  opacity: 0;
-  animation: pointPlotIn 0.28s var(--ease-out) both;
-}
-
-.landing-hero .report-chart .chart-points circle:nth-child(1) {
-  animation-delay: 0.62s;
-}
-
-.landing-hero .report-chart .chart-points circle:nth-child(2) {
-  animation-delay: 0.68s;
-}
-
-.landing-hero .report-chart .chart-points circle:nth-child(3) {
-  animation-delay: 0.74s;
-}
-
-.landing-hero .report-chart .chart-points circle:nth-child(4) {
-  animation-delay: 0.8s;
-}
-
-.landing-hero .report-chart .chart-points circle:nth-child(5) {
-  animation-delay: 0.86s;
-}
-
-.landing-hero .report-chart .chart-points circle:nth-child(6) {
-  animation-delay: 0.92s;
+.simple-mode:not(.is-hidden) {
+  animation: measuredScaleIn 0.32s var(--ease-out) both;
 }
 
 html.motion-ready [data-reveal] {
@@ -175,20 +67,6 @@ html.motion-ready .workflow-list[data-reveal].is-visible li {
   transform: translateY(0);
 }
 
-html.motion-ready .workflow-list[data-reveal].is-visible li:nth-child(2),
-html.motion-ready .sample-chart-card[data-reveal].is-visible:nth-child(2) {
-  transition-delay: 0.06s;
-}
-
-html.motion-ready .workflow-list[data-reveal].is-visible li:nth-child(3),
-html.motion-ready .sample-chart-card[data-reveal].is-visible:nth-child(3) {
-  transition-delay: 0.12s;
-}
-
-html.motion-ready .workflow-list[data-reveal].is-visible li:nth-child(4) {
-  transition-delay: 0.18s;
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -197,12 +75,6 @@ html.motion-ready .workflow-list[data-reveal].is-visible li:nth-child(4) {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
-  }
-
-  .sample-chart-card:hover,
-  .hero-actions cds-button:hover,
-  .hero-actions cds-button:active {
-    transform: none;
   }
 
   html.motion-ready [data-reveal],

@@ -45,6 +45,13 @@
   padding: clamp(20px, 3vw, 30px);
 }
 
+.simple-mode > *,
+.simple-mode-head > div,
+.simple-upload-panel {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .simple-mode > .message {
   margin: 0;
 }
@@ -61,9 +68,8 @@
 .simple-upload-panel {
   min-width: 0;
   padding: clamp(22px, 3vw, 34px);
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-md);
-  background: var(--surface-soft);
+  border-top: 1px solid var(--line-soft);
+  background: var(--surface-panel);
 }
 
 .simple-upload-panel cds-file-uploader {
@@ -95,32 +101,17 @@
   font-weight: 700;
 }
 
-.simple-result-meta span,
-.simple-meta-grid span {
+.simple-result-meta span {
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 650;
 }
 
-.simple-meta-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1px;
-  overflow: hidden;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-sm);
-  background: var(--line-soft);
+.simple-meta-list {
+  width: 100%;
 }
 
-.simple-meta-grid div {
-  display: grid;
-  gap: 5px;
-  min-width: 0;
-  padding: 12px;
-  background: var(--surface);
-}
-
-.simple-meta-grid strong {
+.simple-meta-list strong {
   color: var(--text-main);
   font-family: var(--font-mono);
   font-size: 13px;
@@ -285,17 +276,10 @@
 }
 
 .form-card,
-.sample-card,
 .result-figure,
-.summary-card,
-.download-panel,
-.info-box,
 .file-banner,
 .columns-box,
-.warning-box,
-.metric-box,
-.calc-card,
-.plot-readiness {
+.calc-card {
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
   background: var(--surface-soft);
@@ -333,10 +317,7 @@
   gap: 15px;
 }
 
-.sample-card,
-.result-figure,
-.summary-card,
-.download-panel {
+.result-figure {
   padding: var(--surface-pad);
 }
 
@@ -397,20 +378,8 @@ code {
   margin: 18px 26px 0;
 }
 
-.info-box,
-.warning-box,
-.plot-readiness.warning,
-.plot-readiness.danger {
-  color: var(--tone-text);
-  border-color: var(--tone-border);
-  background: var(--tone-bg);
-}
-
 .file-banner,
-.info-box,
-.columns-box,
-.warning-box,
-.metric-box {
+.columns-box {
   margin-bottom: 16px;
   padding: var(--callout-pad);
   color: var(--text-soft);
@@ -418,33 +387,24 @@ code {
 }
 
 .file-banner strong,
-.info-box strong,
-.warning-box strong,
 .metric-box strong {
   color: var(--text-main);
   font-weight: 700;
 }
 
-.info-box {
-  --tone-text: var(--info-text);
-  --tone-border: var(--info-border);
-  --tone-bg: var(--info-bg);
-}
-
-.info-box p,
-.warning-box p,
 .metric-box p {
   margin: 7px 0 0;
 }
 
-.warning-box {
-  --tone-text: var(--warning-text);
-  --tone-border: var(--warning-border);
-  --tone-bg: var(--warning-bg);
+.context-note,
+.metric-box {
+  width: 100%;
+  margin-bottom: 16px;
 }
 
 .sample-list {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 8px;
   margin-top: 14px;
 }

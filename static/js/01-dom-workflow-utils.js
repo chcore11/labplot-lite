@@ -107,24 +107,16 @@ function getCarbonButtonSize(className = "") {
 }
 
 function createLabeledControl(labelText, control) {
-  if (control?.tagName?.includes("-")) {
-    if (control.tagName.toLowerCase() === "cds-select") {
-      control.setAttribute("label-text", labelText);
-    } else if (!control.hasAttribute("label")) {
-      control.setAttribute("label", labelText);
-    }
+  if (!control) {
     return control;
   }
 
-  return createElement("div", {
-    children: [
-      createElement("label", {
-        attributes: { htmlFor: control.id },
-        textContent: labelText,
-      }),
-      control,
-    ],
-  });
+  if (control.tagName.toLowerCase() === "cds-select") {
+    control.setAttribute("label-text", labelText);
+  } else if (!control.hasAttribute("label")) {
+    control.setAttribute("label", labelText);
+  }
+  return control;
 }
 
 function getControl(target) {
@@ -222,23 +214,62 @@ function ensureExternalLibrary(key) {
   state.libraryPromises[key] = new Promise((resolve, reject) => {
     const script = document.createElement("script");
     script.async = true;
+    script.crossOrigin = "anonymous";
     script.src = library.src;
+    if (library.integrity) {
+      script.integrity = library.integrity;
+    }
     script.onload = () => {
       if (library.isLoaded()) {
         resolve();
       } else {
         delete state.libraryPromises[key];
-        reject(new Error(`${library.label}加载后不可用，请检查网络后重试。`));
+        reject(new Error(`${library.label}加载后不可用。请检查网络。`));
       }
     };
     script.onerror = () => {
       delete state.libraryPromises[key];
-      reject(new Error(`${library.label}加载失败，请检查网络后重试。`));
+      reject(new Error(`${library.label}加载失败。请检查网络。`));
     };
     document.head.appendChild(script);
   });
 
   return state.libraryPromises[key];
+}
+
+function loadCarbonComponent(component) {
+  if (customElements.get(component.tag)) {
+    return Promise.resolve();
+  }
+
+  const key = `carbon:${component.tag}`;
+  if (state.libraryPromises[key]) {
+    return state.libraryPromises[key];
+  }
+
+  state.libraryPromises[key] = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.dataset.carbonComponent = component.tag;
+    if (component.integrity) {
+      script.integrity = component.integrity;
+    }
+    script.src = component.src;
+    script.type = "module";
+    script.onload = () => resolve();
+    script.onerror = () => {
+      delete state.libraryPromises[key];
+      reject(new Error("Carbon 组件加载失败。请检查网络。"));
+    };
+    document.head.appendChild(script);
+  });
+
+  return state.libraryPromises[key];
+}
+
+function ensureAdvancedCarbonComponents() {
+  return Promise.all(CARBON_ADVANCED_COMPONENTS.map(loadCarbonComponent));
 }
 
 function getWorkflowPanel(step) {
@@ -362,7 +393,7 @@ function setActiveStep(step, options = {}) {
 
 function showMessage(type, text) {
   const box = qs("#statusMessage");
-  renderNotification(box, type, text);
+  renderNotification(box, type, text, getNotificationTitle(type));
 }
 
 function clearMessage() {
@@ -370,12 +401,28 @@ function clearMessage() {
   clearNotification(box);
 }
 
-function renderNotification(box, type, text, title = "状态") {
+function renderNotification(box, type, text, title = "提示") {
   if (!box) {
     return;
   }
 
-  const kind = type === "error" ? "error" : type === "warning" ? "warning" : type === "success" ? "success" : "info";
+  setNotificationState(box, type, text, title);
+  box.className = `message ${type}`;
+  show(box);
+}
+
+function renderContextNotification(box, type, text, title = "提示") {
+  if (!box) {
+    return;
+  }
+
+  setNotificationState(box, type, text, title);
+  box.className = `context-note ${type}`;
+  show(box);
+}
+
+function setNotificationState(box, type, text, title) {
+  const kind = getNotificationKind(type);
   box.kind = kind;
   box.title = title;
   box.subtitle = text;
@@ -383,8 +430,20 @@ function renderNotification(box, type, text, title = "状态") {
   box.setAttribute("title", title);
   box.setAttribute("subtitle", text);
   box.setAttribute("open", "");
-  box.className = `message ${type}`;
-  show(box);
+}
+
+function getNotificationKind(type) {
+  if (type === "error" || type === "danger") return "error";
+  if (type === "warning") return "warning";
+  if (type === "success" || type === "ready") return "success";
+  return "info";
+}
+
+function getNotificationTitle(type) {
+  if (type === "error" || type === "danger") return "未完成";
+  if (type === "warning") return "需要检查";
+  if (type === "success" || type === "ready") return "已完成";
+  return "提示";
 }
 
 function clearNotification(box) {
@@ -480,6 +539,20 @@ function parsePositiveFloat(value, fallback, label, minValue, maxValue = null) {
   return number;
 }
 
+function parseOptionalNumber(value, label) {
+  const text = cellText(value);
+  if (!text) {
+    return null;
+  }
+
+  const number = toNumber(text);
+  if (!Number.isFinite(number)) {
+    throw new Error(`${label}必须是数字：${text}`);
+  }
+
+  return number;
+}
+
 function safeFilenamePart(text) {
   const cleaned = cellText(text)
     .replace(/[^\w\u4e00-\u9fff]+/g, "_")
@@ -498,10 +571,9 @@ function setOptions(select, entries, selectedValue = null) {
 
   const effectiveSelectedValue = selectedValue ?? entries[0]?.value ?? "";
   entries.forEach((entry) => {
-    const isCarbonSelect = select.tagName.toLowerCase() === "cds-select";
-    select.appendChild(createElement(isCarbonSelect ? "cds-select-item" : "option", {
+    select.appendChild(createElement("cds-select-item", {
       attributes: {
-        label: isCarbonSelect ? entry.label : undefined,
+        label: entry.label,
         selected: entry.value === effectiveSelectedValue,
         value: entry.value,
       },
