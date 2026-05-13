@@ -23,6 +23,10 @@ function initHeroShowcase(reduceMotion) {
     return;
   }
 
+  cards.forEach((card) => {
+    card.dataset.heroHref = card.getAttribute("href") || "";
+  });
+
   let activeIndex = cards.findIndex((card) => card.dataset.heroActive === "true");
   if (activeIndex < 0) {
     activeIndex = 0;
@@ -52,11 +56,19 @@ function initHeroShowcase(reduceMotion) {
       card.classList.remove(...positionClasses);
       card.removeAttribute("data-hero-active");
       card.removeAttribute("aria-current");
+      card.removeAttribute("href");
+      card.setAttribute("aria-hidden", "true");
+      card.setAttribute("tabindex", "-1");
 
       if (isActive) {
         card.classList.add("hero-showcase-card-main");
         card.dataset.heroActive = "true";
         card.setAttribute("aria-current", "true");
+        if (card.dataset.heroHref) {
+          card.setAttribute("href", card.dataset.heroHref);
+        }
+        card.removeAttribute("aria-hidden");
+        card.removeAttribute("tabindex");
       } else if (isPrevious) {
         card.classList.add("hero-showcase-card-side", "hero-showcase-card-left");
       } else if (isFarPrevious) {
@@ -70,17 +82,6 @@ function initHeroShowcase(reduceMotion) {
       scrollActiveCard();
     }
   }
-
-  cards.forEach((card, index) => {
-    card.addEventListener("click", (event) => {
-      if (index === activeIndex) {
-        return;
-      }
-
-      event.preventDefault();
-      setActiveCard(index, true);
-    });
-  });
 
   prevControl?.addEventListener("click", () => setActiveCard(activeIndex - 1, true));
   nextControl?.addEventListener("click", () => setActiveCard(activeIndex + 1, true));
