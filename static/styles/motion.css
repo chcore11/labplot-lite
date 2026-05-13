@@ -59,9 +59,8 @@
   animation: measuredScaleIn 0.64s var(--ease-out) 0.16s both;
 }
 
-.simple-mode:not(.is-hidden),
-#advancedMode:not(.is-hidden) .workbench {
-  animation: measuredScaleIn 0.42s var(--ease-out) both;
+.simple-mode:not(.is-hidden) {
+  animation: measuredScaleIn 0.32s var(--ease-out) both;
 }
 
 .landing-hero .mini-table > div:not(.mini-table-head),
