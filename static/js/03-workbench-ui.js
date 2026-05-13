@@ -76,7 +76,7 @@ function applySamplePreset(options = {}) {
   const yCols = preset.yCols || [preset.yCol].filter(Boolean);
   if (!columnOptionExists(preset.xCol) || yCols.some((column) => !columnOptionExists(column))) {
     if (!options.silent) {
-      showMessage("error", "推荐绘图列不存在，请重新确认数据范围。");
+      showMessage("error", "推荐列不可用，请检查数据范围。");
     }
     return false;
   }
@@ -234,8 +234,8 @@ function getCurveConfigsFromForm() {
 }
 
 function renderDataControls() {
-  renderColumnsBox(qs("#numericColumnsBox"), "当前可用数值列：");
-  renderColumnsBox(qs("#plotColumnsBox"), "当前识别到的数值列：");
+  renderColumnsBox(qs("#numericColumnsBox"), "数值列：");
+  renderColumnsBox(qs("#plotColumnsBox"), "数值列：");
 
   const numericOptions = state.numericColumns.map((column) => ({ value: column, label: column }));
   setOptions(qs("#firstCol"), numericOptions);
@@ -250,7 +250,7 @@ function renderDataControls() {
   } else {
     hide(qs("#calcSection"));
     hide(qs("#plotSection"));
-    showMessage("error", `至少需要两列数值数据才能绘图。当前可用数值列：${state.numericColumns.join("、") || "无"}`);
+    showMessage("error", `至少需要两列数值数据。当前数值列：${state.numericColumns.join("、") || "无"}`);
   }
 
   updateWorkflowNav();
@@ -285,7 +285,7 @@ function resetWorkflow() {
   setControlValue("#dataEndRow", "");
   setText("#selectedFileHint", "尚未选择文件。");
   qs("#currentFileName").textContent = "";
-  renderContextNotification(qs("#headerGuessBox"), "info", "", "自动识别提示");
+  renderContextNotification(qs("#headerGuessBox"), "info", "", "识别结果");
   qs("#previewHeaderRow").replaceChildren(createElement("cds-table-header-cell", { textContent: "行" }));
   qs("#previewBody").replaceChildren();
   qs("#numericColumnsBox").replaceChildren();
@@ -309,7 +309,7 @@ function resetWorkflow() {
 
   renderStaticOptions();
   clearMessage();
-  showMessage("success", "已清空当前数据。可以重新上传文件，或载入一份示例数据。");
+  showMessage("success", "已清空。可重新上传或载入示例。");
   updateWorkflowNav();
   setActiveStep("upload", { scroll: true });
 }
@@ -334,7 +334,7 @@ function reloadDataFromRange(showSuccess = false) {
       clearMessage();
       setActiveStep("plot", { scroll: true });
     } else {
-      showMessage("success", "已按新的表头和数据范围重新读取。");
+      showMessage("success", "已更新表头和数据范围。");
     }
   }
 
@@ -352,7 +352,7 @@ function setDataset(rows, fileName) {
 
   const guess = guessHeaderAndDataRows(state.rawRows);
   qs("#currentFileName").textContent = fileName;
-  renderContextNotification(qs("#headerGuessBox"), "info", guess.message, "自动识别提示");
+  renderContextNotification(qs("#headerGuessBox"), "info", guess.message, "识别结果");
   setControlValue("#headerRow", String(guess.headerRow));
   setControlValue("#dataStartRow", String(guess.dataStartRow));
   setControlValue("#dataEndRow", "");
@@ -392,7 +392,7 @@ function calculateColumn() {
     throw new Error("请输入新列名。");
   }
   if (state.columns.includes(newColName)) {
-    throw new Error(`新列名已经存在：${newColName}。请换一个名字。`);
+    throw new Error(`新列名已存在：${newColName}。`);
   }
   if (!CALC_TEMPLATES[calcTemplate]) {
     throw new Error("请选择正确的计算类型。");
@@ -412,7 +412,7 @@ function calculateColumn() {
       throw new Error(`常数 k 必须是数字：${cellText(constantKText)}`);
     }
     if (calcTemplate === "divide_const" && k === 0) {
-      throw new Error("常数 k 不能为 0，否则会出现除以 0。");
+      throw new Error("常数 k 不能为 0。");
     }
   }
 
@@ -445,10 +445,10 @@ function calculateColumn() {
   });
 
   if (!result.some(Number.isFinite)) {
-    throw new Error("计算结果没有可用数值，请检查所选列或常数。");
+    throw new Error("计算结果没有可用数值。请检查列或常数。");
   }
   if (result.some((value) => value === Infinity || value === -Infinity)) {
-    throw new Error("计算结果出现无穷大，可能存在除以 0、log 非法输入或数值过大。");
+    throw new Error("计算结果包含无穷大。请检查除以 0、log 输入或数值范围。");
   }
 
   state.columns.push(newColName);

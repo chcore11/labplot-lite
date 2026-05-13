@@ -151,7 +151,7 @@ function parsePastedTable(text) {
 
 async function parseFile(file) {
   if (file.size > DATA_LIMITS.maxFileBytes) {
-    throw new Error(`建议单个文件不超过 ${Math.round(DATA_LIMITS.maxFileBytes / 1024 / 1024)}MB。`);
+    throw new Error(`文件超过 ${Math.round(DATA_LIMITS.maxFileBytes / 1024 / 1024)}MB，请先精简。`);
   }
 
   const extension = file.name.split(".").pop().toLowerCase();
@@ -214,7 +214,7 @@ function guessHeaderAndDataRows(rows) {
     success: false,
     headerRow: 1,
     dataStartRow: 2,
-    message: "暂未可靠识别表头和数据起始行，请根据预览手动填写。",
+    message: "未识别出表头和数据起始行，请按预览填写。",
   };
 
   const analyses = rows.slice(0, 100).map(analyzeRawRow);
@@ -270,7 +270,7 @@ function guessHeaderAndDataRows(rows) {
     success: true,
     headerRow: best.headerRow,
     dataStartRow: best.dataStartRow,
-    message: "系统已自动猜测表头行和数据起始行，如不准确可手动修改。",
+    message: "已识别表头行和数据起始行。必要时可修改。",
   };
 }
 
@@ -291,7 +291,7 @@ function makeUniqueColumns(row) {
 
 function loadDataFromRawRows(headerRow, dataStartRow, dataEndRow) {
   if (!state.rawRows.length) {
-    throw new Error("请先上传 CSV / Excel 文件。");
+    throw new Error("请先选择 CSV / Excel 文件。");
   }
 
   if (dataStartRow <= headerRow) {

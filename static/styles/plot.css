@@ -307,6 +307,18 @@
   overflow-wrap: anywhere;
 }
 
+.result-table cds-table-header-cell:first-child,
+.result-table cds-table-cell:first-child {
+  inline-size: 72px;
+  min-inline-size: 72px;
+  white-space: nowrap;
+  word-break: keep-all;
+}
+
+.result-table cds-table-cell:last-child {
+  overflow-wrap: anywhere;
+}
+
 .result-row-large cds-table-cell:last-child {
   line-height: 1.55;
 }

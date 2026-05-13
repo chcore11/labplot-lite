@@ -71,7 +71,7 @@ function buildPlotPayload() {
     });
 
     if (!datasets.length) {
-      throw new Error("所选 X/Y 列中没有可用于绘图的成对数值数据。");
+      throw new Error("所选列没有可绘图的成对数值。");
     }
 
     originRows = state.data.map((row) => {
@@ -85,7 +85,7 @@ function buildPlotPayload() {
     const config = curveConfigs[0];
     const pairs = sortPairsByX(getPlotPairs(xCol, config.yCol));
     if (!pairs.length) {
-      throw new Error("所选 X/Y 列中没有可用的数值数据，请检查表格内容。");
+      throw new Error("所选列没有可用数值。请检查表格。");
     }
 
     allPairs.push(...pairs.map((point) => ({ ...point, yCol: config.yCol })));
@@ -363,7 +363,7 @@ function getPlotPreviewSize(target, payload) {
 function getPlotTarget(selector) {
   const target = qs(selector);
   if (!target) {
-    throw new Error("图像预览容器不存在。");
+    throw new Error("预览容器不存在。");
   }
   return target;
 }

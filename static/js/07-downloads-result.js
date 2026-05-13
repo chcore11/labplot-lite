@@ -24,32 +24,32 @@ function rowsToCsv(rows, columns) {
 
 function buildFitReport(stats, title) {
   const lines = [];
-  lines.push("LabPlot Lite 拟合报告");
+  lines.push("LabPlot Lite 图表报告");
   lines.push("================================");
   lines.push("");
-  lines.push("一、图表信息");
+  lines.push("一、图表");
   lines.push(`图表标题：${title || "未填写"}`);
   lines.push(`X 数据列：${stats.x_col}`);
   lines.push(`Y 数据列：${stats.y_col}`);
-  lines.push(`X 轴显示名称：${stats.x_label}`);
-  lines.push(`Y 轴显示名称：${stats.y_label}`);
+  lines.push(`X 轴标题：${stats.x_label}`);
+  lines.push(`Y 轴标题：${stats.y_label}`);
   lines.push(`X 轴刻度：${stats.x_axis_scale_label}`);
   lines.push(`Y 轴刻度：${stats.y_axis_scale_label}`);
   lines.push(`图表类型：${stats.chart_type}`);
   lines.push(`数据点数：${stats.points}`);
   lines.push("");
-  lines.push("二、数据范围");
+  lines.push("二、范围");
   lines.push(`表头行：第 ${stats.header_row} 行`);
   lines.push(`数据起始行：第 ${stats.data_start_row} 行`);
   lines.push(`数据结束行：${stats.data_end_row}`);
   lines.push("");
-  lines.push("三、基础统计");
+  lines.push("三、统计");
   lines.push(`Y 最大值：${stats.max_value}`);
   lines.push(`Y 最小值：${stats.min_value}`);
   lines.push(`Y 平均值：${stats.avg_value}`);
   lines.push(`峰值对应 X：${stats.peak_x}`);
   lines.push("");
-  lines.push("四、拟合结果");
+  lines.push("四、拟合");
   lines.push(`拟合方式：${stats.fit_type_label}`);
 
   if (stats.has_fit) {
@@ -64,22 +64,22 @@ function buildFitReport(stats, title) {
       lines.push(`常数项 c：${stats.fit_c}`);
     }
     lines.push("");
-    lines.push("五、拟合指标");
+    lines.push("五、指标");
     stats.metric_display.forEach((metric) => {
       lines.push(`${metric.label}：${metric.value}`);
     });
   } else {
-    lines.push("本次未进行拟合。");
+    lines.push("本次未拟合。");
     lines.push("");
-    lines.push("五、拟合指标");
-    lines.push(stats.multi_y ? "多曲线模式下暂不进行拟合。" : "未进行拟合，因此没有拟合误差指标。");
+    lines.push("五、指标");
+    lines.push(stats.multi_y ? "多曲线暂不拟合。" : "未拟合，无拟合误差指标。");
   }
 
   lines.push("");
-  lines.push("六、提醒");
-  lines.push("R² 只能反映拟合程度，不能单独证明物理模型正确。");
-  lines.push("RMSE、MAE、最大绝对误差可以辅助判断拟合误差大小。");
-  lines.push("请结合实验原理判断一次拟合或二次拟合是否合理。");
+  lines.push("六、说明");
+  lines.push("R² 只反映拟合程度，不能证明模型正确。");
+  lines.push("RMSE、MAE、最大绝对误差可辅助判断误差大小。");
+  lines.push("请结合实验原理判断模型。");
 
   return lines.join("\n");
 }
@@ -157,7 +157,7 @@ function getRenderedPlotlySize(target, payload) {
 async function dataUrlToBlob(dataUrl) {
   const response = await fetch(dataUrl);
   if (!response.ok) {
-    throw new Error("图像导出失败。");
+    throw new Error("图表导出失败。");
   }
   return response.blob();
 }
@@ -184,7 +184,7 @@ function loadImage(url) {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error("SVG 图像转换失败。"));
+    image.onerror = () => reject(new Error("SVG 转换失败。"));
     image.src = url;
   });
 }
@@ -228,7 +228,7 @@ async function renderedPlotToPngBlob(selector, payload) {
   const svg = getRenderedSvg(target);
   const svgBlob = svgToBlob(svg);
   if (!svg || !svgBlob) {
-    throw new Error("没有找到可导出的图像。");
+    throw new Error("没有可导出的图表。");
   }
 
   const width = Math.round(Number(svg.getAttribute("width")) || payload.figWidth * payload.figDpi);
@@ -332,7 +332,7 @@ async function renderSimpleDownloads(payload) {
 async function generateZipDownload() {
   const packageInfo = state.pendingZipPackage;
   if (!packageInfo) {
-    throw new Error("请先生成图表，再下载 ZIP 素材包。");
+    throw new Error("请先生成图表，再下载 ZIP。");
   }
   if (!window.JSZip) {
     await ensureExternalLibrary("jszip");
@@ -386,7 +386,7 @@ function addStat(body, label, value) {
 
 function renderResult(payload) {
   const stats = payload.stats;
-  qs("#resultFigureTitle").textContent = payload.plotTitle || "未命名图像";
+  qs("#resultFigureTitle").textContent = payload.plotTitle || "未命名";
   qs("#resultFigureMeta").textContent = `${stats.fig_width} × ${stats.fig_height} in / ${stats.fig_dpi} DPI`;
   qs("#resultFigureCurves").textContent = `${stats.curve_count} 条曲线`;
 
@@ -398,24 +398,24 @@ function renderResult(payload) {
     addSummaryRow(summary, "R²", stats.core_metrics.r2);
     addSummaryRow(summary, "RMSE", stats.core_metrics.rmse);
     addSummaryRow(summary, "MAE", stats.core_metrics.mae);
-    addSummaryRow(summary, "数据点数", stats.points);
-    addSummaryRow(summary, "拟合判断", stats.fit_quality, true);
+    addSummaryRow(summary, "点数", stats.points);
+    addSummaryRow(summary, "判断", stats.fit_quality, true);
   } else {
-    addSummaryRow(summary, "拟合方式", stats.fit_type_label);
-    addSummaryRow(summary, "数据点数", stats.points);
+    addSummaryRow(summary, "拟合", stats.fit_type_label);
+    addSummaryRow(summary, "点数", stats.points);
     if (stats.multi_y) {
       addSummaryRow(summary, "提示", stats.fit_notice, true);
     }
   }
   addSummaryRow(summary, "X 轴", stats.x_col);
   addSummaryRow(summary, "Y 轴", stats.y_cols_label || stats.y_col);
-  addSummaryRow(summary, "曲线数量", stats.curve_count);
-  addSummaryRow(summary, "图表类型", stats.chart_type);
+  addSummaryRow(summary, "曲线数", stats.curve_count);
+  addSummaryRow(summary, "类型", stats.chart_type);
 
   const statsGrid = qs("#statsBody");
   statsGrid.replaceChildren();
-  addStat(statsGrid, "X 轴显示名称", stats.x_label);
-  addStat(statsGrid, "Y 轴显示名称", stats.y_label);
+  addStat(statsGrid, "X 轴标题", stats.x_label);
+  addStat(statsGrid, "Y 轴标题", stats.y_label);
   addStat(statsGrid, "X 轴刻度", stats.x_axis_scale_label);
   addStat(statsGrid, "Y 轴刻度", stats.y_axis_scale_label);
   addStat(statsGrid, "Y 最大值", stats.max_value);
@@ -425,7 +425,7 @@ function renderResult(payload) {
   addStat(statsGrid, "表头行", `第 ${stats.header_row} 行`);
   addStat(statsGrid, "数据起始行", `第 ${stats.data_start_row} 行`);
   addStat(statsGrid, "数据结束行", stats.data_end_row);
-  addStat(statsGrid, "图片尺寸", `${stats.fig_width} × ${stats.fig_height} inch`);
+  addStat(statsGrid, "导出尺寸", `${stats.fig_width} × ${stats.fig_height} inch`);
   addStat(statsGrid, "图片 DPI", String(stats.fig_dpi));
   addStat(statsGrid, "网格线", stats.show_grid ? "显示" : "隐藏");
 

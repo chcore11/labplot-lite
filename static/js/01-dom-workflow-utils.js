@@ -224,12 +224,12 @@ function ensureExternalLibrary(key) {
         resolve();
       } else {
         delete state.libraryPromises[key];
-        reject(new Error(`${library.label}加载后不可用，请检查网络后重试。`));
+        reject(new Error(`${library.label}加载后不可用。请检查网络。`));
       }
     };
     script.onerror = () => {
       delete state.libraryPromises[key];
-      reject(new Error(`${library.label}加载失败，请检查网络后重试。`));
+      reject(new Error(`${library.label}加载失败。请检查网络。`));
     };
     document.head.appendChild(script);
   });
@@ -260,7 +260,7 @@ function loadCarbonComponent(component) {
     script.onload = () => resolve();
     script.onerror = () => {
       delete state.libraryPromises[key];
-      reject(new Error("Carbon 组件加载失败，请检查网络后重试。"));
+      reject(new Error("Carbon 组件加载失败。请检查网络。"));
     };
     document.head.appendChild(script);
   });
@@ -393,7 +393,7 @@ function setActiveStep(step, options = {}) {
 
 function showMessage(type, text) {
   const box = qs("#statusMessage");
-  renderNotification(box, type, text);
+  renderNotification(box, type, text, getNotificationTitle(type));
 }
 
 function clearMessage() {
@@ -401,7 +401,7 @@ function clearMessage() {
   clearNotification(box);
 }
 
-function renderNotification(box, type, text, title = "状态") {
+function renderNotification(box, type, text, title = "提示") {
   if (!box) {
     return;
   }
@@ -411,7 +411,7 @@ function renderNotification(box, type, text, title = "状态") {
   show(box);
 }
 
-function renderContextNotification(box, type, text, title = "状态") {
+function renderContextNotification(box, type, text, title = "提示") {
   if (!box) {
     return;
   }
@@ -437,6 +437,13 @@ function getNotificationKind(type) {
   if (type === "warning") return "warning";
   if (type === "success" || type === "ready") return "success";
   return "info";
+}
+
+function getNotificationTitle(type) {
+  if (type === "error" || type === "danger") return "未完成";
+  if (type === "warning") return "需要检查";
+  if (type === "success" || type === "ready") return "已完成";
+  return "提示";
 }
 
 function clearNotification(box) {

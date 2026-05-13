@@ -120,21 +120,21 @@
       "name": "Primary Button",
       "kind": "button",
       "description": "Carbon primary button for the main next step. Visual treatment belongs to Carbon; project CSS only handles placement and width.",
-      "html": "<cds-button kind=\"primary\" class=\"form-button\">生成图像与拟合结果</cds-button>",
+      "html": "<cds-button kind=\"primary\" class=\"form-button\">生成图表</cds-button>",
       "css": ".form-button { width: fit-content; }"
     },
     {
       "name": "Instrument Panel",
       "kind": "panel",
       "description": "Neutral workbench panel with light border and compact padding.",
-      "html": "<section class=\"panel\"><h2>配置图像与拟合</h2></section>",
+      "html": "<section class=\"panel\"><h2>配置图表</h2></section>",
       "css": ".panel { padding: 20px; border: 1px solid oklch(21% 0.014 255 / 0.10); border-radius: 8px; background: oklch(99.2% 0.004 255); }"
     },
     {
       "name": "Step Nav Item",
       "kind": "navigation",
-      "description": "Carbon progress indicator for the upload, describe, visualize, and export path.",
-      "html": "<cds-progress-indicator><cds-progress-step label-text=\"Upload Data\" secondary-label-text=\"粘贴、上传或示例\"></cds-progress-step></cds-progress-indicator>",
+      "description": "Carbon progress indicator for the import, check, chart, and export path.",
+      "html": "<cds-progress-indicator><cds-progress-step label-text=\"导入数据\" secondary-label-text=\"粘贴 / 上传\"></cds-progress-step></cds-progress-indicator>",
       "css": ".workflow-progress { width: 100%; }"
     },
     {
@@ -153,7 +153,7 @@
     }
   ],
   "narrative": {
-    "northStar": "报告纸上的轻量仪器面板",
+    "northStar": "报告纸上的仪器面板",
     "overview": "LabPlot Lite uses a light report-paper surface, calm instrument panels, clear task steps, and report-ready chart output. Carbon Web Components own generic workbench UI, Plotly owns scientific charts and image export, and project code owns lab-data workflow logic. The system borrows structure from Carbon, professional tool density from Spectrum, form clarity from GOV.UK, and chart workflow from Datawrapper and Prism.",
     "implementationContract": {
       "ui": "Use IBM Carbon Web Components for buttons, progress, upload, form controls, notifications, data tables, accordions, tags, checkboxes, and download actions.",

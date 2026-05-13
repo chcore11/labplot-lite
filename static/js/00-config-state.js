@@ -78,7 +78,7 @@ const AVAILABLE_METRICS = {
 
 const BASIC_METRICS = ["r2", "rmse", "mae", "max_abs_error"];
 const MULTI_Y_FIT_LABEL = "多曲线不拟合";
-const MULTI_Y_FIT_NOTICE = "多曲线模式下暂不进行拟合，如需拟合请只保留一条曲线。";
+const MULTI_Y_FIT_NOTICE = "多曲线暂不拟合。需要拟合时保留一条曲线。";
 
 const DATA_LIMITS = {
   maxCells: 200000,
@@ -228,7 +228,7 @@ const WORKFLOW_PANELS = {
 };
 
 const EMPTY_RESULT_STATE = {
-  title: "等待生成图像",
+  title: "等待生成",
   meta: "待生成",
   curves: "待生成",
 };

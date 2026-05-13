@@ -40,15 +40,15 @@ function describeFitQuality(metrics) {
     return "";
   }
   if (metrics.r2 >= 0.99) {
-    return "拟合度很高，请仍结合实验原理判断。";
+    return "拟合度很高，仍需结合实验原理。";
   }
   if (metrics.r2 >= 0.95) {
-    return "拟合度较高，建议同时查看残差和实验原理。";
+    return "拟合度较高，查看残差。";
   }
   if (metrics.r2 >= 0.85) {
-    return "拟合度一般，建议检查模型选择或异常点。";
+    return "拟合度一般，检查模型或异常点。";
   }
-  return "拟合度偏低，建议先查看散点分布。";
+  return "拟合度偏低，先看散点分布。";
 }
 
 function formatLinearEquation(a, b) {
@@ -80,7 +80,7 @@ function linearFit(pairs) {
 
   const uniqueX = new Set(pairs.map((point) => point.x));
   if (uniqueX.size < 2) {
-    throw new Error("X 轴数据至少需要两个不同的数值，才能进行一次线性拟合。");
+    throw new Error("一次拟合至少需要 2 个不同 X 值。");
   }
 
   const n = pairs.length;
@@ -119,7 +119,7 @@ function solveLinearSystem(matrix, vector) {
     }
 
     if (Math.abs(augmented[maxRow][pivot]) < 1e-12) {
-      throw new Error("二次拟合失败：数据矩阵不可逆，请检查 X 轴数据。");
+      throw new Error("二次拟合失败：数据矩阵不可逆。");
     }
 
     [augmented[pivot], augmented[maxRow]] = [augmented[maxRow], augmented[pivot]];
@@ -150,7 +150,7 @@ function quadraticFit(pairs) {
 
   const uniqueX = new Set(pairs.map((point) => point.x));
   if (uniqueX.size < 3) {
-    throw new Error("X 轴数据至少需要三个不同的数值，才能进行二次拟合。");
+    throw new Error("二次拟合至少需要 3 个不同 X 值。");
   }
 
   const n = pairs.length;
@@ -193,4 +193,3 @@ function autoTitle(title, xLabel, yLabel) {
   }
   return cleaned;
 }
-

@@ -1,31 +1,31 @@
 "use strict";
 
 async function handlePlotSubmit() {
-  setPlotProgress("正在检查绘图设置...");
+  setPlotProgress("检查绘图设置...");
   await nextFrame();
 
   const payload = buildPlotPayload();
   state.lastPlotPayload = payload;
   clearResultDownloadLinks();
-  setPlotProgress(window.Plotly ? "正在绘制图像..." : "正在加载绘图库...");
+  setPlotProgress(window.Plotly ? "绘制图表..." : "加载绘图库...");
   show(qs("#resultSection"));
   setActiveStep("result");
   await nextFrame();
   await renderChart(payload);
 
-  setPlotProgress("正在整理结果摘要...");
+  setPlotProgress("整理摘要...");
   renderResult(payload);
   setActiveStep("result", { scroll: true });
-  showMessage("success", "图像已生成，正在准备下载素材。");
+  showMessage("success", "图表已生成。准备下载文件。");
   await nextFrame();
 
-  setPlotProgress("正在准备下载文件...");
+  setPlotProgress("准备下载文件...");
   await renderDownloads(payload);
-  showMessage("success", "已生成图像、CSV 和拟合报告。ZIP 会在点击下载时打包。");
+  showMessage("success", "图表、CSV 和 TXT 已就绪。ZIP 点击后打包。");
 }
 
 async function loadSample(url) {
-  showMessage("info", "正在加载示例数据...");
+  showMessage("info", "加载示例...");
   await nextFrame();
 
   const fileName = url.split("/").pop();
@@ -35,7 +35,7 @@ async function loadSample(url) {
     : Promise.resolve();
   const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) {
-    throw new Error("示例文件加载失败，请确认正在通过本地服务器或 GitHub Pages 访问页面。");
+    throw new Error("示例文件加载失败。请通过本地服务器或 GitHub Pages 访问。");
   }
 
   const buffer = await response.arrayBuffer();
@@ -43,7 +43,7 @@ async function loadSample(url) {
   const rows = parseBuffer(buffer, extension);
   setDataset(rows, fileName);
   scrollToElement(qs("#upload-section"));
-  showMessage("success", `已加载示例数据：${fileName}`);
+  showMessage("success", `已载入示例：${fileName}`);
 }
 
 function getInitialSampleUrl() {
@@ -121,7 +121,7 @@ function getFileFromUploadEvent(event, uploaderButton = qs("#dataFile")) {
 
 function syncPendingUploadFile(file) {
   state.pendingUploadFile = file || null;
-  setText("#selectedFileHint", file ? `已选择：${file.name}` : "尚未选择文件。");
+  setText("#selectedFileHint", file ? `已选：${file.name}` : "尚未选择文件。");
 }
 
 function getFileSignature(file) {
@@ -165,7 +165,7 @@ async function loadInitialModeFromUrl() {
 }
 
 function setSimpleMessage(type, text) {
-  renderNotification(qs("#simpleMessage"), type, text, "简易模式");
+  renderNotification(qs("#simpleMessage"), type, text, "单图模式");
 }
 
 function clearSimpleMessage() {
@@ -187,13 +187,13 @@ function isLikelyXColumn(column) {
 
 function chooseSimpleXYColumns() {
   if (state.numericColumns.length < 2) {
-    throw new Error("无法自动识别 X/Y，请进入功能模式手动选择。");
+    throw new Error("未识别出 X/Y。请在功能模式选择。");
   }
 
   const xCol = state.numericColumns.find(isLikelyXColumn) || state.numericColumns[0];
   const yCol = state.numericColumns.find((column) => column !== xCol);
   if (!yCol) {
-    throw new Error("无法自动识别 X/Y，请进入功能模式手动选择。");
+    throw new Error("未识别出 X/Y。请在功能模式选择。");
   }
 
   return { xCol, yCol };
@@ -210,7 +210,7 @@ function loadSimpleRows(rows, fileName) {
 
   const guess = guessHeaderAndDataRows(state.rawRows);
   qs("#currentFileName").textContent = fileName;
-  renderContextNotification(qs("#headerGuessBox"), "info", guess.message, "自动识别提示");
+  renderContextNotification(qs("#headerGuessBox"), "info", guess.message, "识别结果");
   setControlValue("#headerRow", String(guess.headerRow));
   setControlValue("#dataStartRow", String(guess.dataStartRow));
   setControlValue("#dataEndRow", "");
@@ -252,7 +252,7 @@ async function renderSimplePlotFromColumns(xCol, yCol, successMessage = "", opti
   const payload = buildPlotPayload();
   state.simplePlotPayload = payload;
   state.lastPlotPayload = payload;
-  setSimpleMessage("info", "正在绘制图像...");
+  setSimpleMessage("info", "绘制图表...");
   await plotReady;
   await renderChart(payload, "#simplePlotCanvas");
   await renderSimpleDownloads(payload);
@@ -274,7 +274,7 @@ async function handleSimpleFile(file) {
     throw new Error("请先选择 CSV / Excel 文件。");
   }
 
-  setSimpleMessage("info", "正在准备文件解析和绘图环境...");
+  setSimpleMessage("info", "准备解析与绘图...");
   const parserReady = fileNeedsSpreadsheetLibrary(file.name)
     ? ensureExternalLibrary("xlsx")
     : Promise.resolve();
@@ -282,27 +282,27 @@ async function handleSimpleFile(file) {
   await nextFrame();
   await parserReady;
 
-  setSimpleMessage("info", "正在读取文件并识别绘图列...");
+  setSimpleMessage("info", "读取文件，识别列...");
   const rows = await parseFile(file);
   loadSimpleRows(rows, file.name);
   const { xCol, yCol } = chooseSimpleXYColumns();
 
-  await renderSimplePlotFromColumns(xCol, yCol, `已自动生成基础图：${file.name}`, { plotReady });
+  await renderSimplePlotFromColumns(xCol, yCol, `已生成基础图：${file.name}`, { plotReady });
 }
 
 async function swapSimpleAxes() {
   const payload = state.simplePlotPayload;
   if (!payload?.stats?.x_col || !payload?.stats?.y_col) {
-    throw new Error("请先在简易模式生成基础图，再交换 X/Y 轴。");
+    throw new Error("请先生成基础图，再交换 X/Y。");
   }
 
   const nextXCol = payload.stats.y_col;
   const nextYCol = payload.stats.x_col;
   if (!state.numericColumns.includes(nextXCol) || !state.numericColumns.includes(nextYCol)) {
-    throw new Error("当前数据列无法交换，请进入功能模式手动调整。");
+    throw new Error("当前列不可交换。请在功能模式调整。");
   }
 
-  await renderSimplePlotFromColumns(nextXCol, nextYCol, "已交换 X/Y 轴，并更新 PNG 下载。");
+  await renderSimplePlotFromColumns(nextXCol, nextYCol, "已交换 X/Y，PNG 已更新。");
 }
 
 function setupModeEvents() {
@@ -310,7 +310,7 @@ function setupModeEvents() {
     button.addEventListener("click", async () => {
       await showMode("advanced");
       if (state.rawRows.length) {
-        showMessage("success", "已进入功能模式。可继续手动确认数据范围和绘图配置。");
+        showMessage("success", "已打开功能模式。可继续调整范围和图表。");
       }
     });
   });
@@ -393,7 +393,7 @@ function setupEvents() {
     try {
       const rows = parsePastedTable(getControlValue("#pasteData"));
       setDataset(rows, "pasted-data.csv");
-      showMessage("success", "已读取粘贴数据。请检查表头和数据范围。");
+      showMessage("success", "已读取粘贴数据。请检查表头和范围。");
     } catch (error) {
       showMessage("error", error.message);
     }
@@ -417,14 +417,14 @@ function setupEvents() {
       const file = state.pendingUploadFile || getFileFromUploaderButton(dataFileButton);
       syncPendingUploadFile(file);
       if (!file) {
-        throw new Error("请先上传 CSV / Excel 文件。");
+        throw new Error("请先选择 CSV / Excel 文件。");
       }
 
-      showMessage("info", fileNeedsSpreadsheetLibrary(file.name) ? "正在加载 Excel 解析库并读取文件..." : "正在读取 CSV 文件...");
+      showMessage("info", fileNeedsSpreadsheetLibrary(file.name) ? "加载 Excel 解析库并读取文件..." : "读取 CSV...");
       await nextFrame();
       const rows = await parseFile(file);
       setDataset(rows, file.name);
-      showMessage("success", `已读取文件：${file.name}`);
+      showMessage("success", `已读取：${file.name}`);
     } catch (error) {
       showMessage("error", error.message);
     }
@@ -457,13 +457,13 @@ function setupEvents() {
     clearMessage();
 
     try {
-      setPlotGenerating(true, "正在检查绘图设置...");
+      setPlotGenerating(true, "检查绘图设置...");
       await handlePlotSubmit();
     } catch (error) {
       showMessage("error", error.message);
     } finally {
       setPlotGenerating(false);
-      setPlotProgress("生成完成", false);
+      setPlotProgress("完成", false);
     }
   });
 
@@ -544,10 +544,10 @@ function setupEvents() {
 
     event.preventDefault();
     try {
-      showMessage("info", window.JSZip ? "正在打包 ZIP 素材包..." : "正在加载 ZIP 打包库...");
+      showMessage("info", window.JSZip ? "打包 ZIP..." : "加载 ZIP 打包库...");
       const zip = await generateZipDownload();
       triggerDownload(zip.url, zip.filename);
-      showMessage("success", "ZIP 素材包已生成并开始下载。");
+      showMessage("success", "ZIP 已生成，开始下载。");
     } catch (error) {
       showMessage("error", error.message);
     }
