@@ -99,6 +99,7 @@ Read these files before non-trivial changes:
 - `PRODUCT.md`: product purpose, anti-references, implementation contract.
 - `DESIGN.md`: visual system and component ownership rules.
 - `.impeccable/design.json`: machine-readable design-system contract.
+- `docs/design/carbon-resources.md`: official Carbon / IBM resource map for component, design-language, data-visualization, and brand-boundary decisions.
 
 For UI, design, layout, or interaction work, use the project-local impeccable flow first:
 
@@ -121,6 +122,8 @@ Use Carbon Web Components for generic UI:
 
 Do not add new native `input`, `select`, `textarea`, `button`, `details`, or `table` controls to `workbench.html` unless there is a specific browser/platform reason and the alternative is documented in the same change.
 
+Use `docs/design/carbon-resources.md` as the resource map before adding or replacing generic UI. It points to official Carbon component pages, Carbon Web Components guidance, IBM Design Language resources, and the assets that must stay out of LabPlot Lite because they are IBM brand identity rather than reusable system guidance.
+
 ## Plot Ownership
 
 Use Plotly for chart work:
@@ -133,6 +136,8 @@ Use Plotly for chart work:
 - Keep download payloads in `static/js/07-downloads-result.js`.
 
 Do not write a custom canvas or SVG chart engine for scientific plots.
+
+Use the IBM / Carbon data visualization links in `docs/design/carbon-resources.md` before changing axes, labels, legends, grid density, chart color, direct labels, or missing-data treatment. Apply that guidance through Plotly trace, layout, and config rather than a parallel chart layer.
 
 ## File Responsibilities
 

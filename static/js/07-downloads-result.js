@@ -37,6 +37,9 @@ function buildFitReport(stats, title) {
   lines.push(`Y 轴刻度：${stats.y_axis_scale_label}`);
   lines.push(`图表类型：${stats.chart_type}`);
   lines.push(`数据点数：${stats.points}`);
+  if (hasMissingPoints(stats)) {
+    lines.push(`缺失值处理：${stats.missing_points_label}`);
+  }
   lines.push("");
   lines.push("二、范围");
   lines.push(`表头行：第 ${stats.header_row} 行`);
@@ -384,6 +387,16 @@ function addStat(body, label, value) {
   addResultTableRow(body, label, value);
 }
 
+function hasMissingPoints(stats) {
+  return Number(stats.missing_points) > 0;
+}
+
+function addMissingSummaryRow(body, stats) {
+  if (hasMissingPoints(stats)) {
+    addSummaryRow(body, "缺失值", stats.missing_points_label, true);
+  }
+}
+
 function renderResult(payload) {
   const stats = payload.stats;
   qs("#resultFigureTitle").textContent = payload.plotTitle || "未命名";
@@ -399,10 +412,12 @@ function renderResult(payload) {
     addSummaryRow(summary, "RMSE", stats.core_metrics.rmse);
     addSummaryRow(summary, "MAE", stats.core_metrics.mae);
     addSummaryRow(summary, "点数", stats.points);
+    addMissingSummaryRow(summary, stats);
     addSummaryRow(summary, "判断", stats.fit_quality, true);
   } else {
     addSummaryRow(summary, "拟合", stats.fit_type_label);
     addSummaryRow(summary, "点数", stats.points);
+    addMissingSummaryRow(summary, stats);
     if (stats.multi_y) {
       addSummaryRow(summary, "提示", stats.fit_notice, true);
     }
@@ -421,6 +436,9 @@ function renderResult(payload) {
   addStat(statsGrid, "Y 最大值", stats.max_value);
   addStat(statsGrid, "Y 最小值", stats.min_value);
   addStat(statsGrid, "Y 平均值", stats.avg_value);
+  if (hasMissingPoints(stats)) {
+    addStat(statsGrid, "缺失值", stats.missing_points_label);
+  }
   addStat(statsGrid, "峰值对应 X", stats.peak_x);
   addStat(statsGrid, "表头行", `第 ${stats.header_row} 行`);
   addStat(statsGrid, "数据起始行", `第 ${stats.data_start_row} 行`);

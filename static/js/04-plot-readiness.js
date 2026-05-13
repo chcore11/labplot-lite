@@ -12,22 +12,61 @@ function normalizeSelectedMetrics() {
   return selected.length ? selected : BASIC_METRICS.slice();
 }
 
-function getPlotPairs(xCol, yCol) {
+function getPlotSeries(xCol, yCol) {
   return state.data
-    .map((row) => ({
-      x: toNumber(row[xCol]),
-      y: toNumber(row[yCol]),
-    }))
-    .filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+    .map((row, rowIndex) => {
+      const x = toNumber(row[xCol]);
+      const y = toNumber(row[yCol]);
+      if (!Number.isFinite(x)) {
+        return null;
+      }
+      return {
+        x,
+        y: Number.isFinite(y) ? y : null,
+        isGap: !Number.isFinite(y),
+        rowIndex,
+      };
+    })
+    .filter(Boolean);
+}
+
+function getPlotPairs(xCol, yCol) {
+  return getPlotSeries(xCol, yCol)
+    .filter((point) => !point.isGap)
+    .map(({ x, y, rowIndex }) => ({ x, y, rowIndex }));
+}
+
+function comparePlotPoints(a, b) {
+  if (a.x !== b.x) {
+    return a.x - b.x;
+  }
+  return (a.rowIndex ?? 0) - (b.rowIndex ?? 0);
 }
 
 function sortPairsByX(pairs) {
-  return pairs.slice().sort((a, b) => {
-    if (a.x === b.x) {
-      return a.y - b.y;
-    }
-    return a.x - b.x;
-  });
+  return pairs.slice().sort(comparePlotPoints);
+}
+
+function sortPlotSeriesByX(points) {
+  return points.slice().sort(comparePlotPoints);
+}
+
+function shouldPreservePlotGaps(chartType) {
+  return chartType === "line" || chartType === "line_marker" || chartType === "area";
+}
+
+function countPlotGaps(points) {
+  return points.reduce((count, point) => count + (point.isGap ? 1 : 0), 0);
+}
+
+function describePlotGapHint(chartType, gapCount) {
+  if (!gapCount) {
+    return "";
+  }
+  if (shouldPreservePlotGaps(chartType)) {
+    return `有 ${gapCount} 个缺失值，折线会在对应位置断开。`;
+  }
+  return `有 ${gapCount} 个缺失值，已从图中跳过。`;
 }
 
 function getSelectedCurveSummary() {
@@ -66,6 +105,7 @@ function inspectPlotReadiness() {
 
   const xCol = getControlValue("#xCol");
   const yCols = getSelectedCurveSummary();
+  const chartType = getControlValue("#chartType") || "line_marker";
   const fitType = getControlValue("#fitType");
   const xAxisScale = getControlValue("#xAxisScale") || "linear";
   const yAxisScale = getControlValue("#yAxisScale") || "linear";
@@ -75,6 +115,12 @@ function inspectPlotReadiness() {
   }
   if (!AXIS_SCALE_TYPES[xAxisScale] || !AXIS_SCALE_TYPES[yAxisScale]) {
     return getPendingReadiness("检查坐标轴", "请选择正确的 X/Y 轴刻度。", {
+      level: "danger",
+      fit: "待检查",
+    });
+  }
+  if (!CHART_TYPES[chartType]) {
+    return getPendingReadiness("检查图表类型", "请选择正确的图表类型。", {
       level: "danger",
       fit: "待检查",
     });
@@ -99,14 +145,17 @@ function inspectPlotReadiness() {
 
   const curveInfos = yCols.map((yCol) => {
     const pairs = getPlotPairs(xCol, yCol);
+    const series = getPlotSeries(xCol, yCol);
     const uniqueX = new Set(pairs.map((point) => point.x));
-    return { yCol, pairs, uniqueX };
+    return { yCol, pairs, series, uniqueX };
   });
   const validCounts = curveInfos.map((info) => info.pairs.length);
   const minPoints = Math.min(...validCounts);
+  const gapCount = curveInfos.reduce((sum, info) => sum + countPlotGaps(info.series), 0);
+  const gapHint = describePlotGapHint(chartType, gapCount);
   const pointLabel = yCols.length > 1
-    ? `${validCounts.join(" / ")} 点`
-    : `${minPoints} 点`;
+    ? `${validCounts.join(" / ")} 点${gapCount ? `，${gapCount} 个缺失值` : ""}`
+    : `${minPoints} 点${gapCount ? `，${gapCount} 个缺失值` : ""}`;
 
   if (minPoints <= 0) {
     return {
@@ -150,7 +199,7 @@ function inspectPlotReadiness() {
       level: "warning",
       canGenerate: true,
       status: "多曲线就绪",
-      hint: "可生成图，但不输出拟合。",
+      hint: gapHint || "可生成图，但不输出拟合。",
       points: pointLabel,
       fit: MULTI_Y_FIT_LABEL,
       exportSize: `${outputSize.width} × ${outputSize.height}px`,
@@ -159,8 +208,8 @@ function inspectPlotReadiness() {
 
   const onlyCurve = curveInfos[0];
   let fitLabel = FIT_TYPES[fitType] || "待选择";
-  let level = "ready";
-  let hint = "数据和导出设置已通过检查。";
+  let level = gapHint ? "warning" : "ready";
+  let hint = gapHint || "数据和导出设置已通过检查。";
   let canGenerate = true;
 
   if (fitType === "linear" && (onlyCurve.pairs.length < 2 || onlyCurve.uniqueX.size < 2)) {

@@ -128,7 +128,14 @@
 
   .landing-hero {
     gap: 28px;
+    overflow: hidden;
     padding: 38px 0 48px;
+  }
+
+  .hero-product {
+    justify-self: stretch;
+    inline-size: 100%;
+    max-inline-size: calc(100vw - 24px);
   }
 
   .hero h1 {
@@ -143,6 +150,7 @@
   .hero-actions,
   .hero-actions cds-button {
     width: 100%;
+    max-width: 100%;
   }
 
   .hero-actions {
@@ -153,8 +161,38 @@
     display: grid;
   }
 
+  .hero-flow li {
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+
   .hero-product-body {
+    display: block;
+    overflow: hidden;
     padding: 10px;
+  }
+
+  .report-preview {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    padding: 12px;
+  }
+
+  .report-preview-head {
+    gap: 8px;
+  }
+
+  .report-preview-head span,
+  .report-preview-head strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .chart-svg {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .mini-table {
@@ -163,6 +201,7 @@
 
   .hero-inspector {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 10px;
   }
 
   .hero-inspector div:nth-child(n+3) {

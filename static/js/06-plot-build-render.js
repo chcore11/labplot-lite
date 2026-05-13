@@ -57,17 +57,20 @@ function buildPlotPayload() {
   const allPairs = [];
   let fitResult = null;
   let originRows = [];
+  let missingPointCount = 0;
 
   if (curveConfigs.length > 1) {
     fitType = "none";
 
     curveConfigs.forEach((config) => {
-      const pairs = sortPairsByX(getPlotPairs(xCol, config.yCol));
+      const plotData = getCurvePlotData(xCol, config, chartType);
+      const { pairs } = plotData;
+      missingPointCount += plotData.gapCount;
       if (!pairs.length) {
         return;
       }
       allPairs.push(...pairs.map((point) => ({ ...point, yCol: config.yCol })));
-      datasets.push(makeChartDataset(config.yCol, pairs, config, chartType));
+      datasets.push(plotData.dataset);
     });
 
     if (!datasets.length) {
@@ -83,7 +86,9 @@ function buildPlotPayload() {
     });
   } else {
     const config = curveConfigs[0];
-    const pairs = sortPairsByX(getPlotPairs(xCol, config.yCol));
+    const plotData = getCurvePlotData(xCol, config, chartType);
+    const { pairs } = plotData;
+    missingPointCount += plotData.gapCount;
     if (!pairs.length) {
       throw new Error("所选列没有可用数值。请检查表格。");
     }
@@ -133,7 +138,7 @@ function buildPlotPayload() {
         };
       });
     } else {
-      datasets.push(makeChartDataset(config.yCol, pairs, config, chartType));
+      datasets.push(plotData.dataset);
     }
   }
 
@@ -215,6 +220,8 @@ function buildPlotPayload() {
     label_fontsize: labelFontsize,
     legend_fontsize: legendFontsize,
     show_grid: showGrid,
+    missing_points: String(missingPointCount),
+    missing_points_label: missingPointCount ? `${missingPointCount} 个缺失值` : "0",
   };
 
   const xName = safeFilenamePart(xCol);
@@ -238,6 +245,7 @@ function buildPlotPayload() {
     showGrid,
     xAxisScale,
     yAxisScale,
+    chartType,
     xMin,
     xMax,
     yMin: minValue,
@@ -257,7 +265,26 @@ function buildPlotPayload() {
   };
 }
 
-function makeChartDataset(label, pairs, config, chartType) {
+function getCurvePlotData(xCol, config, chartType) {
+  const pairs = sortPairsByX(getPlotPairs(xCol, config.yCol));
+  const series = getPlotSeries(xCol, config.yCol);
+  return {
+    dataset: pairs.length
+      ? makeChartDataset(config.yCol, pairs, config, chartType, getTraceDataForChart(pairs, series, chartType))
+      : null,
+    gapCount: countPlotGaps(series),
+    pairs,
+  };
+}
+
+function getTraceDataForChart(pairs, series, chartType) {
+  if (!shouldPreservePlotGaps(chartType)) {
+    return pairs;
+  }
+  return sortPlotSeriesByX(series);
+}
+
+function makeChartDataset(label, pairs, config, chartType, traceData = pairs) {
   const isScatter = chartType === "scatter";
   const isLineOnly = chartType === "line";
   const isArea = chartType === "area";
@@ -267,6 +294,7 @@ function makeChartDataset(label, pairs, config, chartType) {
     label,
     chartType,
     data: pairs,
+    traceData,
     showLine: !isScatter && !isBar,
     pointRadius: isLineOnly || isArea || isBar ? 0 : 3.6,
     pointHoverRadius: isLineOnly || isArea || isBar ? 0 : 4.8,
@@ -278,7 +306,7 @@ function makeChartDataset(label, pairs, config, chartType) {
     borderDash: LINE_DASHES[config.lineStyle],
     lineStyle: config.lineStyle,
     tension: 0,
-    spanGaps: true,
+    spanGaps: false,
   };
 }
 
@@ -292,6 +320,10 @@ function shouldAxisStartAtZero(minValue, maxValue) {
     return minValue === 0;
   }
   return minValue <= range * 0.08;
+}
+
+function shouldUseZeroYBaseline(chartType) {
+  return chartType === "bar" || chartType === "area";
 }
 
 function nicePositiveAxisMax(maxValue) {
@@ -319,6 +351,15 @@ function nicePositiveAxisMax(maxValue) {
     niceNormalized = 10;
   }
   return niceNormalized * magnitude;
+}
+
+function niceNegativeAxisMin(minValue) {
+  if (!Number.isFinite(minValue) || minValue >= 0) {
+    return undefined;
+  }
+
+  const axisMax = nicePositiveAxisMax(Math.abs(minValue));
+  return Number.isFinite(axisMax) ? -axisMax : undefined;
 }
 
 function getThemeColors() {
@@ -414,12 +455,19 @@ function getPlotlyMargins(payload, width, scale) {
   return margins;
 }
 
-function makePlotDomain(minValue, maxValue, axisMaxValue) {
+function makePlotDomain(minValue, maxValue, options = {}) {
   if (!Number.isFinite(minValue) || !Number.isFinite(maxValue)) {
     return undefined;
   }
+  const { axisMaxValue, includeZero = false } = options;
   const range = maxValue - minValue;
   const pad = range > 0 ? range * 0.04 : Math.max(Math.abs(maxValue) * 0.04, 1);
+  if (includeZero && minValue >= 0) {
+    return [0, axisMaxValue || maxValue + pad];
+  }
+  if (includeZero && maxValue <= 0) {
+    return [niceNegativeAxisMin(minValue) || minValue - pad, 0];
+  }
   if (shouldAxisStartAtZero(minValue, maxValue)) {
     return [0, axisMaxValue || maxValue + pad];
   }
@@ -430,8 +478,8 @@ function isLogScale(scaleType) {
   return scaleType === "log";
 }
 
-function getAxisRange(scaleType, minValue, maxValue, axisMaxValue) {
-  return isLogScale(scaleType) ? undefined : makePlotDomain(minValue, maxValue, axisMaxValue);
+function getAxisRange(scaleType, minValue, maxValue, options) {
+  return isLogScale(scaleType) ? undefined : makePlotDomain(minValue, maxValue, options);
 }
 
 function getHoverMode(payload) {
@@ -514,6 +562,7 @@ function makePlotlyTraces(payload, scale, colors) {
     const fill = dataset.backgroundColor || stroke;
     const traceLabel = escapePlotlyText(dataset.label || "Series");
     const xLabel = escapePlotlyText(payload.xLabel);
+    const traceData = dataset.traceData || dataset.data;
 
     if (dataset.chartType === "bar") {
       return {
@@ -524,12 +573,13 @@ function makePlotlyTraces(payload, scale, colors) {
         },
         name: traceLabel,
         type: "bar",
-        x: dataset.data.map((point) => point.x),
-        y: dataset.data.map((point) => point.y),
+        x: traceData.map((point) => point.x),
+        y: traceData.map((point) => point.y),
       };
     }
 
     return {
+      connectgaps: false,
       fill: dataset.chartType === "area" && !isLogScale(payload.yAxisScale) ? "tozeroy" : undefined,
       fillcolor: dataset.chartType === "area" && !isLogScale(payload.yAxisScale) ? plotlyFillColor(fill) : undefined,
       hovertemplate: `${xLabel}: %{x}<br>${traceLabel}: %{y}<extra></extra>`,
@@ -550,8 +600,8 @@ function makePlotlyTraces(payload, scale, colors) {
       mode: getTraceMode(dataset),
       name: traceLabel,
       type: "scatter",
-      x: dataset.data.map((point) => point.x),
-      y: dataset.data.map((point) => point.y),
+      x: traceData.map((point) => point.x),
+      y: traceData.map((point) => point.y),
     };
   });
 }
@@ -581,7 +631,10 @@ async function renderPlotlyChart(payload, selector) {
   const colors = getThemeColors();
   const scale = 1;
   const margin = getPlotlyMargins(payload, previewSize.width, scale);
-  const yAxisMax = !isLogScale(payload.yAxisScale) && shouldAxisStartAtZero(payload.yMin, payload.yMax)
+  const forceYZeroBaseline = shouldUseZeroYBaseline(payload.chartType);
+  const yAxisMax = !isLogScale(payload.yAxisScale)
+    && payload.yMax >= 0
+    && (forceYZeroBaseline || shouldAxisStartAtZero(payload.yMin, payload.yMax))
     ? nicePositiveAxisMax(payload.yMax)
     : undefined;
 
@@ -660,7 +713,10 @@ async function renderPlotlyChart(payload, selector) {
       linecolor: colors.axis,
       linewidth: 1.05 * scale,
       mirror: true,
-      range: getAxisRange(payload.yAxisScale, payload.yMin, payload.yMax, yAxisMax),
+      range: getAxisRange(payload.yAxisScale, payload.yMin, payload.yMax, {
+        axisMaxValue: yAxisMax,
+        includeZero: forceYZeroBaseline,
+      }),
       showgrid: payload.showGrid,
       showline: true,
       showspikes: true,
@@ -678,7 +734,7 @@ async function renderPlotlyChart(payload, selector) {
         text: escapePlotlyText(payload.yLabel),
       },
       type: payload.yAxisScale,
-      zeroline: false,
+      zeroline: forceYZeroBaseline && !isLogScale(payload.yAxisScale),
     },
   };
 
