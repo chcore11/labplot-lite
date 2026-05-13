@@ -15,6 +15,15 @@ Use the Carbon + Plotly architecture for all frontend work:
 
 If Carbon or Plotly already covers the behavior, do not hand-write it.
 
+## Carbon-First Rule
+
+For any generic UI addition, the default answer is Carbon first, custom code second:
+
+- Check IBM Carbon Web Components and existing `cds-*` usage before adding markup, CSS, or JavaScript.
+- If Carbon has the component or behavior, use Carbon and write only the LabPlot-specific state glue.
+- If Carbon cannot cover the need, document the exception in the same change: what Carbon option was checked, why it does not fit, and how the custom code stays small.
+- Any UI patch with net code growth should explain what old code was deleted or why the growth is unavoidable.
+
 ## Collaboration Norms
 
 The user expects concrete completion, not only proposals. When the request is actionable, make the change, verify it, commit it when appropriate, and push when the task asks for completion on `main` or continues an already-pushing workflow.
@@ -37,7 +46,7 @@ For non-trivial repo work, follow this loop:
 
 1. Inspect: run `git status --short --branch`, read the relevant docs, and inspect existing code before deciding.
 2. Align: identify whether the change affects product, design, UI components, plotting, parsing, fitting, export, deployment, or docs.
-3. Reuse: look for existing helpers, Carbon components, Plotly options, and established module boundaries before adding code.
+3. Reuse: look for Carbon components, Plotly options, existing helpers, and established module boundaries before adding code.
 4. Edit: keep the patch scoped. Prefer replacing or deleting old code over layering new code on top.
 5. Verify: run static checks and the smallest real user flow that proves the change works.
 6. Review: inspect `git diff --stat` and key diffs. Confirm the change did not add redundant UI or duplicate chart logic.
@@ -155,11 +164,12 @@ When a feature crosses these boundaries, keep each piece in its owner file inste
 
 When adding UI:
 
-1. Search for existing `cds-*` patterns in `workbench.html`.
-2. Use helpers in `static/js/01-dom-workflow-utils.js` for value, checked, disabled, and options handling.
-3. Add only the smallest wrapper code needed to connect Carbon events to app state.
-4. Remove any old native control markup or duplicated styles.
-5. Verify keyboard focus and 390px mobile layout if the change affects visible workflow.
+1. Search Carbon Web Components and existing `cds-*` patterns in `workbench.html`.
+2. Use Carbon markup before writing any native control or custom visual primitive.
+3. Use helpers in `static/js/01-dom-workflow-utils.js` for value, checked, disabled, and options handling.
+4. Add only the smallest wrapper code needed to connect Carbon events to app state.
+5. Remove any old native control markup or duplicated styles.
+6. Verify keyboard focus and 390px mobile layout if the change affects visible workflow.
 
 ## Adding Chart Features
 
@@ -219,6 +229,7 @@ Then test:
 
 - Keep changes scoped to the requested behavior.
 - Prefer deleting duplicated code over layering new wrappers.
+- If a UI change adds more code than it deletes, document why Carbon could not absorb more of the work.
 - Do not rewrite product/design docs unless the requested change alters the product contract.
 - Do not revert user or collaborator changes unless explicitly asked.
 - If pushing, use normal `git pull --rebase origin main` before considering any force operation.

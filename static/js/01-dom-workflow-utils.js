@@ -107,24 +107,16 @@ function getCarbonButtonSize(className = "") {
 }
 
 function createLabeledControl(labelText, control) {
-  if (control?.tagName?.includes("-")) {
-    if (control.tagName.toLowerCase() === "cds-select") {
-      control.setAttribute("label-text", labelText);
-    } else if (!control.hasAttribute("label")) {
-      control.setAttribute("label", labelText);
-    }
+  if (!control) {
     return control;
   }
 
-  return createElement("div", {
-    children: [
-      createElement("label", {
-        attributes: { htmlFor: control.id },
-        textContent: labelText,
-      }),
-      control,
-    ],
-  });
+  if (control.tagName.toLowerCase() === "cds-select") {
+    control.setAttribute("label-text", labelText);
+  } else if (!control.hasAttribute("label")) {
+    control.setAttribute("label", labelText);
+  }
+  return control;
 }
 
 function getControl(target) {
@@ -558,10 +550,9 @@ function setOptions(select, entries, selectedValue = null) {
 
   const effectiveSelectedValue = selectedValue ?? entries[0]?.value ?? "";
   entries.forEach((entry) => {
-    const isCarbonSelect = select.tagName.toLowerCase() === "cds-select";
-    select.appendChild(createElement(isCarbonSelect ? "cds-select-item" : "option", {
+    select.appendChild(createElement("cds-select-item", {
       attributes: {
-        label: isCarbonSelect ? entry.label : undefined,
+        label: entry.label,
         selected: entry.value === effectiveSelectedValue,
         value: entry.value,
       },

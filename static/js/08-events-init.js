@@ -273,9 +273,6 @@ async function handleSimpleFile(file) {
   if (!file) {
     throw new Error("请先选择 CSV / Excel 文件。");
   }
-  if (file.size > DATA_LIMITS.maxFileBytes) {
-    throw new Error(`建议单个文件不超过 ${Math.round(DATA_LIMITS.maxFileBytes / 1024 / 1024)}MB。`);
-  }
 
   setSimpleMessage("info", "正在准备文件解析和绘图环境...");
   const parserReady = fileNeedsSpreadsheetLibrary(file.name)
@@ -421,9 +418,6 @@ function setupEvents() {
       syncPendingUploadFile(file);
       if (!file) {
         throw new Error("请先上传 CSV / Excel 文件。");
-      }
-      if (file.size > DATA_LIMITS.maxFileBytes) {
-        throw new Error(`建议单个文件不超过 ${Math.round(DATA_LIMITS.maxFileBytes / 1024 / 1024)}MB。`);
       }
 
       showMessage("info", fileNeedsSpreadsheetLibrary(file.name) ? "正在加载 Excel 解析库并读取文件..." : "正在读取 CSV 文件...");
