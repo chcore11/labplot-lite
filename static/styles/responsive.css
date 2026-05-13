@@ -6,7 +6,7 @@
   }
 
   .hero-showcase {
-    min-height: 400px;
+    min-height: 430px;
   }
 
   .hero-showcase-card-main {
@@ -91,16 +91,12 @@
   }
 
   .hero-showcase {
-    display: flex;
-    gap: 12px;
-    align-items: stretch;
-    justify-content: flex-start;
-    width: 100%;
+    display: grid;
+    place-items: center;
     min-height: 0;
-    overflow-x: auto;
-    padding: 4px 2px 14px;
+    overflow: visible;
+    padding: 0 46px;
     perspective: none;
-    scroll-snap-type: x mandatory;
   }
 
   .hero-showcase-card,
@@ -108,29 +104,15 @@
     --card-width: auto;
 
     position: relative;
-    flex: 0 0 min(78vw, 520px);
-    width: auto;
+    width: min(100%, 560px);
     transform: none;
     transform-origin: center;
     opacity: 1;
     filter: none;
-    scroll-snap-align: center;
   }
 
-  .hero-showcase-card-main {
-    order: 0;
-  }
-
-  .hero-showcase-card-left {
-    order: 1;
-  }
-
-  .hero-showcase-card-left-far {
-    order: 2;
-  }
-
-  .hero-showcase-card-right {
-    order: 3;
+  .hero-showcase-card-side {
+    display: none;
   }
 
   .hero-showcase-control {
@@ -214,8 +196,19 @@
 
   .hero-showcase-card,
   .hero-showcase-card-main {
-    flex-basis: min(86vw, 420px);
     padding: 12px;
+  }
+
+  .hero-showcase {
+    padding-inline: 34px;
+  }
+
+  .hero-showcase-control-prev {
+    left: 0;
+  }
+
+  .hero-showcase-control-next {
+    right: 0;
   }
 
   .hero-showcase-card strong {

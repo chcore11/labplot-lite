@@ -100,6 +100,7 @@ Read these files before non-trivial changes:
 - `DESIGN.md`: visual system and component ownership rules.
 - `.impeccable/design.json`: machine-readable design-system contract.
 - `docs/design/carbon-resources.md`: official Carbon / IBM resource map for component, design-language, data-visualization, and brand-boundary decisions.
+- `docs/design/landing-polish-workflow.md`: homepage polish workflow for plan-first, subtraction-first visual changes.
 
 For UI, design, layout, or interaction work, use the project-local impeccable flow first:
 

@@ -16,11 +16,11 @@
 .landing-hero {
   display: grid;
   justify-items: center;
-  gap: 30px;
+  gap: 26px;
   width: min(1360px, calc(100% - 24px));
-  min-height: calc(84svh - 68px);
+  min-height: calc(82svh - 68px);
   overflow: hidden;
-  padding: 52px 0 10px;
+  padding: 44px 0 0;
 }
 
 .site > .landing-hero {
@@ -58,22 +58,22 @@
 
 .hero h1 {
   max-width: 920px;
-  margin: 22px 0 0;
+  margin: 20px 0 0;
   color: var(--text-main);
   font-family: var(--font-display);
-  font-size: 64px;
+  font-size: 58px;
   line-height: 1.08;
-  font-weight: 700;
+  font-weight: 650;
   letter-spacing: 0;
   text-wrap: balance;
   overflow-wrap: anywhere;
 }
 
 .hero-desc {
-  max-width: 54ch;
-  margin: 24px 0 0;
+  max-width: 50ch;
+  margin: 18px 0 0;
   color: var(--text-soft);
-  font-size: 19px;
+  font-size: 18px;
   line-height: 1.68;
 }
 
@@ -83,7 +83,7 @@
   gap: 12px;
   align-items: center;
   justify-content: center;
-  margin-top: 34px;
+  margin-top: 28px;
 }
 
 .hero-actions cds-button {
@@ -109,7 +109,7 @@
   display: grid;
   place-items: center;
   width: 100%;
-  min-height: 410px;
+  min-height: 446px;
   perspective: 1500px;
   isolation: isolate;
 }
@@ -165,7 +165,7 @@
   color: var(--text-main);
   background: var(--surface-raised);
   box-shadow:
-    0 28px 64px oklch(21% 0.014 255 / 0.12),
+    0 24px 56px oklch(21% 0.014 255 / 0.11),
     0 0 0 1px var(--line-soft);
   cursor: default;
   text-decoration: none;
@@ -202,7 +202,7 @@
 }
 
 .hero-showcase-card-main {
-  --card-width: min(560px, 58vw);
+  --card-width: min(560px, 56vw);
 
   z-index: 4;
   cursor: pointer;
@@ -211,11 +211,12 @@
 
 .hero-showcase-card-side {
   z-index: 2;
-  opacity: 0.58;
-  filter: saturate(0.72);
+  opacity: 0.42;
+  filter: saturate(0.62) contrast(0.96);
   pointer-events: none;
 }
 
+.hero-showcase-card-side span,
 .hero-showcase-card-side strong {
   display: none;
 }
@@ -234,7 +235,7 @@
   --card-scale: 0.68;
 
   z-index: 1;
-  opacity: 0.32;
+  opacity: 0.2;
   transform-origin: right center;
 }
 
@@ -277,7 +278,7 @@
 }
 
 .workflow-section {
-  padding-top: 24px;
+  padding-top: 42px;
   margin-bottom: 82px;
 }
 
@@ -292,7 +293,7 @@
   font-family: var(--font-display);
   font-size: 32px;
   line-height: 1.22;
-  font-weight: 700;
+  font-weight: 650;
   letter-spacing: 0;
   text-wrap: balance;
 }
@@ -300,21 +301,17 @@
 .workflow-list {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  overflow: hidden;
+  gap: 24px;
   margin: 0;
   padding: 0;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-md);
-  background: var(--line-soft);
-  box-shadow: 0 10px 28px oklch(21% 0.014 255 / 0.05);
   list-style: none;
 }
 
 .workflow-list li {
+  position: relative;
   min-width: 0;
-  padding: 18px 18px 20px;
-  background: var(--surface-raised);
+  padding: 18px 10px 0 0;
+  border-top: 1px solid var(--line-soft);
 }
 
 .workflow-list span {
@@ -325,7 +322,7 @@
   border: 1px solid var(--accent-border);
   border-radius: var(--radius-pill);
   color: var(--accent);
-  background: var(--surface-raised);
+  background: var(--accent-soft);
   font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 700;

@@ -1,16 +1,14 @@
 "use strict";
 
-function initHeroShowcase(reduceMotion) {
+function initHeroShowcase() {
   const carousel = document.querySelector("[data-hero-carousel]");
   if (!carousel) {
     return;
   }
 
-  const track = carousel.querySelector("[data-hero-track]");
   const cards = Array.from(carousel.querySelectorAll("[data-hero-card]"));
   const prevControl = carousel.querySelector("[data-hero-prev]");
   const nextControl = carousel.querySelector("[data-hero-next]");
-  const mobileQuery = window.matchMedia?.("(max-width: 900px)");
   const positionClasses = [
     "hero-showcase-card-main",
     "hero-showcase-card-side",
@@ -19,7 +17,7 @@ function initHeroShowcase(reduceMotion) {
     "hero-showcase-card-right",
   ];
 
-  if (!track || cards.length < 2) {
+  if (cards.length < 2) {
     return;
   }
 
@@ -32,19 +30,7 @@ function initHeroShowcase(reduceMotion) {
     activeIndex = 0;
   }
 
-  function scrollActiveCard() {
-    if (!mobileQuery?.matches || track.scrollWidth <= track.clientWidth) {
-      return;
-    }
-
-    cards[activeIndex].scrollIntoView({
-      behavior: reduceMotion ? "auto" : "smooth",
-      block: "nearest",
-      inline: "center",
-    });
-  }
-
-  function setActiveCard(nextIndex, shouldScroll = false) {
+  function setActiveCard(nextIndex) {
     activeIndex = (nextIndex + cards.length) % cards.length;
 
     cards.forEach((card, index) => {
@@ -77,14 +63,10 @@ function initHeroShowcase(reduceMotion) {
         card.classList.add("hero-showcase-card-side", "hero-showcase-card-right");
       }
     });
-
-    if (shouldScroll) {
-      scrollActiveCard();
-    }
   }
 
-  prevControl?.addEventListener("click", () => setActiveCard(activeIndex - 1, true));
-  nextControl?.addEventListener("click", () => setActiveCard(activeIndex + 1, true));
+  prevControl?.addEventListener("click", () => setActiveCard(activeIndex - 1));
+  nextControl?.addEventListener("click", () => setActiveCard(activeIndex + 1));
 
   carousel.addEventListener("keydown", (event) => {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
@@ -92,7 +74,7 @@ function initHeroShowcase(reduceMotion) {
     }
 
     event.preventDefault();
-    setActiveCard(activeIndex + (event.key === "ArrowRight" ? 1 : -1), true);
+    setActiveCard(activeIndex + (event.key === "ArrowRight" ? 1 : -1));
   });
 
   setActiveCard(activeIndex);
@@ -102,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const revealTargets = Array.from(document.querySelectorAll("[data-reveal]"));
   const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-  initHeroShowcase(reduceMotion);
+  initHeroShowcase();
 
   if (!revealTargets.length) {
     return;
