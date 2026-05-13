@@ -52,6 +52,8 @@ For non-trivial repo work, follow this loop:
 6. Review: inspect `git diff --stat` and key diffs. Confirm the change did not add redundant UI or duplicate chart logic.
 7. Publish: if the task requires completion on the remote, commit with a clear message and push to `origin main`.
 
+For larger changes, use `docs/project-change-workflow.md` before editing. Larger changes include cross-file work, user-flow changes, UI/plot/export/sample changes, dependency or architecture changes, and any request that asks for planning, cleanup, self-review, or strict project compliance.
+
 ## UI And Design Workflow
 
 For UI, design, layout, interaction, motion, accessibility, or visual cleanup work:
@@ -100,7 +102,7 @@ Read these files before non-trivial changes:
 - `DESIGN.md`: visual system and component ownership rules.
 - `.impeccable/design.json`: machine-readable design-system contract.
 - `docs/design/carbon-resources.md`: official Carbon / IBM resource map for component, design-language, data-visualization, and brand-boundary decisions.
-- `docs/design/landing-polish-workflow.md`: homepage polish workflow for plan-first, subtraction-first visual changes.
+- `docs/project-change-workflow.md`: required workflow for larger project changes, including plan-first and subtraction-first self-review.
 
 For UI, design, layout, or interaction work, use the project-local impeccable flow first:
 
