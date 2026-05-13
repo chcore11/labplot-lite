@@ -95,12 +95,16 @@
     font-size: 44px;
   }
 
+  .hero-showcase-shell {
+    width: min(100%, calc(100vw - 32px));
+  }
+
   .hero-showcase {
     display: flex;
     gap: 12px;
     align-items: stretch;
     justify-content: flex-start;
-    width: min(100%, calc(100vw - 32px));
+    width: 100%;
     min-height: 0;
     overflow-x: auto;
     padding: 4px 2px 14px;
@@ -136,6 +140,20 @@
 
   .hero-showcase-card-right {
     order: 3;
+  }
+
+  .hero-showcase-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .hero-showcase-control-prev {
+    left: 10px;
+  }
+
+  .hero-showcase-control-next {
+    right: 10px;
   }
 
   .upload-layout,
@@ -203,7 +221,7 @@
     max-width: 100%;
   }
 
-  .hero-showcase {
+  .hero-showcase-shell {
     width: calc(100vw - 24px);
   }
 
