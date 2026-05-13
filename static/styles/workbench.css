@@ -404,19 +404,9 @@ code {
 
 .sample-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 8px;
   margin-top: 14px;
-}
-
-.sample-extra-accordion {
-  display: block;
-  margin-top: 12px;
-}
-
-.sample-list-compact {
-  grid-template-columns: 1fr;
-  margin-top: 10px;
 }
 
 .sample-load-button {

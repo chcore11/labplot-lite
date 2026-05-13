@@ -42,7 +42,6 @@ async function loadSample(url) {
   await parserReady;
   const rows = parseBuffer(buffer, extension);
   setDataset(rows, fileName);
-  scrollToElement(qs("#upload-section"));
   showMessage("success", `已载入示例：${fileName}`);
 }
 

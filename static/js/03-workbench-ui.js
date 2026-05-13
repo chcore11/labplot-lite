@@ -414,7 +414,6 @@ function reloadDataFromRange(showSuccess = false) {
   if (showSuccess && state.samplePreset) {
     applySamplePreset({ activate: false, silent: true });
   }
-  hide(qs("#resultSection"));
   if (showSuccess) {
     if (state.numericColumns.length >= 2) {
       clearMessage();

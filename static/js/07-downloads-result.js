@@ -115,9 +115,7 @@ function setDownloadLink(selector, blob, filename) {
   link.download = filename;
   link.setAttribute("href", url);
   link.setAttribute("download", filename);
-  link.removeAttribute("aria-disabled");
-  link.removeAttribute("disabled");
-  link.disabled = false;
+  setControlDisabled(link, false);
 }
 
 function getRenderedPlotlyGraph(target) {
@@ -192,9 +190,7 @@ function clearDownloadLink(selector) {
   }
   link.removeAttribute("download");
   link.removeAttribute("href");
-  link.setAttribute("aria-disabled", "true");
-  link.setAttribute("disabled", "");
-  link.disabled = true;
+  setControlDisabled(link, true);
 }
 
 function clearResultDownloadLinks() {
@@ -254,9 +250,7 @@ async function renderDownloads(payload) {
   zipLink.href = "#";
   zipLink.setAttribute("href", "#");
   zipLink.removeAttribute("download");
-  zipLink.removeAttribute("aria-disabled");
-  zipLink.removeAttribute("disabled");
-  zipLink.disabled = false;
+  setControlDisabled(zipLink, false);
 }
 
 async function renderSimpleDownloads(payload) {
