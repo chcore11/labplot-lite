@@ -36,15 +36,6 @@
   }
 }
 
-@keyframes drawChartLine {
-  from {
-    stroke-dashoffset: 560;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
 @keyframes pointPlotIn {
   from {
     opacity: 0;
@@ -78,42 +69,6 @@
   animation: tableRowIn 0.34s var(--ease-out) both;
 }
 
-.landing-hero .mini-table > div:nth-child(2) {
-  animation-delay: 0.34s;
-}
-
-.landing-hero .mini-table > div:nth-child(3) {
-  animation-delay: 0.39s;
-}
-
-.landing-hero .mini-table > div:nth-child(4) {
-  animation-delay: 0.44s;
-}
-
-.landing-hero .mini-table > div:nth-child(5) {
-  animation-delay: 0.49s;
-}
-
-.landing-hero .mini-table > div:nth-child(6) {
-  animation-delay: 0.54s;
-}
-
-.landing-hero .hero-inspector div:nth-child(1) {
-  animation-delay: 0.42s;
-}
-
-.landing-hero .hero-inspector div:nth-child(2) {
-  animation-delay: 0.47s;
-}
-
-.landing-hero .hero-inspector div:nth-child(3) {
-  animation-delay: 0.52s;
-}
-
-.landing-hero .hero-inspector div:nth-child(4) {
-  animation-delay: 0.57s;
-}
-
 .landing-hero .report-chart .chart-fit-line,
 .landing-hero .report-chart .chart-reference-line,
 .landing-hero .report-chart .chart-errorbars {
@@ -124,30 +79,6 @@
 .landing-hero .report-chart .chart-points circle {
   opacity: 0;
   animation: pointPlotIn 0.28s var(--ease-out) both;
-}
-
-.landing-hero .report-chart .chart-points circle:nth-child(1) {
-  animation-delay: 0.62s;
-}
-
-.landing-hero .report-chart .chart-points circle:nth-child(2) {
-  animation-delay: 0.68s;
-}
-
-.landing-hero .report-chart .chart-points circle:nth-child(3) {
-  animation-delay: 0.74s;
-}
-
-.landing-hero .report-chart .chart-points circle:nth-child(4) {
-  animation-delay: 0.8s;
-}
-
-.landing-hero .report-chart .chart-points circle:nth-child(5) {
-  animation-delay: 0.86s;
-}
-
-.landing-hero .report-chart .chart-points circle:nth-child(6) {
-  animation-delay: 0.92s;
 }
 
 html.motion-ready [data-reveal] {
@@ -176,20 +107,6 @@ html.motion-ready .workflow-list[data-reveal].is-visible li {
   transform: translateY(0);
 }
 
-html.motion-ready .workflow-list[data-reveal].is-visible li:nth-child(2),
-html.motion-ready .sample-chart-card[data-reveal].is-visible:nth-child(2) {
-  transition-delay: 0.06s;
-}
-
-html.motion-ready .workflow-list[data-reveal].is-visible li:nth-child(3),
-html.motion-ready .sample-chart-card[data-reveal].is-visible:nth-child(3) {
-  transition-delay: 0.12s;
-}
-
-html.motion-ready .workflow-list[data-reveal].is-visible li:nth-child(4) {
-  transition-delay: 0.18s;
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -200,9 +117,7 @@ html.motion-ready .workflow-list[data-reveal].is-visible li:nth-child(4) {
     transition-duration: 0.01ms !important;
   }
 
-  .sample-chart-card:hover,
-  .hero-actions cds-button:hover,
-  .hero-actions cds-button:active {
+  .sample-chart-card:hover {
     transform: none;
   }
 

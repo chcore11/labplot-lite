@@ -104,23 +104,6 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .workflow-list::before {
-    display: none;
-  }
-
-  .workflow-list li {
-    border-right: 0;
-    border-bottom: 1px solid var(--line-soft);
-  }
-
-  .workflow-list li:nth-child(odd) {
-    border-right: 1px solid var(--line-soft);
-  }
-
-  .workflow-list li:nth-last-child(-n+2) {
-    border-bottom: 0;
-  }
-
   .sample-chart-grid {
     grid-template-columns: 1fr;
   }
@@ -241,23 +224,6 @@
 
   .workflow-list {
     grid-template-columns: 1fr;
-  }
-
-  .workflow-list li {
-    border-right: 0;
-    border-bottom: 1px solid var(--line-soft);
-  }
-
-  .workflow-list li:nth-child(odd) {
-    border-right: 0;
-  }
-
-  .workflow-list li:nth-last-child(-n+2) {
-    border-bottom: 1px solid var(--line-soft);
-  }
-
-  .workflow-list li:last-child {
-    border-bottom: 0;
   }
 
   .workflow-section,

@@ -102,29 +102,10 @@
   min-width: 146px;
   min-height: 48px;
   --cds-layout-size-height-lg: 48px;
-  transition:
-    transform var(--duration-med) var(--ease-out),
-    box-shadow var(--duration-med) var(--ease-out);
 }
 
 .hero-actions cds-button:first-child {
   min-width: 176px;
-}
-
-.hero-actions cds-button:active {
-  transform: translateY(0);
-  box-shadow: 0 0 0 2px var(--accent-soft);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .hero-actions cds-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 0 2px var(--accent-soft);
-  }
-}
-
-.hero-actions cds-button:focus-visible {
-  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .hero-product {
@@ -318,7 +299,10 @@
 .chart-axis,
 .chart-fit-line,
 .chart-line-a,
-.chart-line-b {
+.chart-line-b,
+.chart-errorbars path,
+.chart-reference-line,
+.chart-legend path {
   fill: none;
   vector-effect: non-scaling-stroke;
 }
@@ -358,18 +342,14 @@
 }
 
 .chart-errorbars path {
-  fill: none;
   stroke: var(--accent);
   stroke-width: 1.5;
-  vector-effect: non-scaling-stroke;
 }
 
 .chart-reference-line {
-  fill: none;
   stroke: var(--data-teal);
   stroke-width: 1.2;
   stroke-dasharray: 8 8;
-  vector-effect: non-scaling-stroke;
 }
 
 .chart-legend circle {
@@ -377,11 +357,9 @@
 }
 
 .chart-legend path {
-  fill: none;
   stroke: var(--paper-ink);
   stroke-width: 2;
   stroke-dasharray: 9 7;
-  vector-effect: non-scaling-stroke;
 }
 
 .chart-svg text {
@@ -416,45 +394,26 @@
 .workflow-list {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0;
-  position: relative;
+  gap: 1px;
   overflow: hidden;
   margin: 0;
   padding: 0;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
-  background: var(--surface-raised);
+  background: var(--line-soft);
   box-shadow: 0 10px 28px oklch(21% 0.014 255 / 0.05);
   list-style: none;
 }
 
-.workflow-list::before {
-  content: "";
-  position: absolute;
-  top: 32px;
-  right: 34px;
-  left: 34px;
-  height: 1px;
-  background: var(--line-soft);
-}
-
 .workflow-list li {
-  position: relative;
   min-width: 0;
   padding: 18px 18px 20px;
-  border-right: 1px solid var(--line-soft);
-  background: transparent;
-}
-
-.workflow-list li:last-child {
-  border-right: 0;
+  background: var(--surface-raised);
 }
 
 .workflow-list span {
   display: inline-grid;
   place-items: center;
-  position: relative;
-  z-index: 1;
   inline-size: 30px;
   block-size: 30px;
   border: 1px solid var(--accent-border);
