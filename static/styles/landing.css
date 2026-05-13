@@ -100,35 +100,8 @@
 .hero-showcase-shell {
   position: relative;
   display: grid;
-  gap: 10px;
   place-items: center;
   width: min(1220px, calc(100vw - 24px));
-}
-
-.hero-showcase-labels {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  width: min(1180px, 100%);
-  gap: 24px;
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 550;
-}
-
-.hero-showcase-labels span {
-  min-width: 0;
-  text-align: center;
-  transition:
-    color var(--duration-fast) var(--ease-out),
-    opacity var(--duration-fast) var(--ease-out);
-}
-
-.hero-showcase-labels span:not([data-hero-label-active="true"]) {
-  opacity: 0.52;
-}
-
-.hero-showcase-labels span[data-hero-label-active="true"] {
-  color: var(--text-soft);
 }
 
 .hero-showcase {
@@ -143,7 +116,7 @@
 
 .hero-showcase-control {
   position: absolute;
-  top: calc(50% + 26px);
+  top: 50%;
   z-index: 8;
   inline-size: 40px;
   block-size: 40px;
@@ -370,68 +343,15 @@
   line-height: 1.55;
 }
 
-.sample-index-section,
 .usecase-section {
   padding-top: 48px;
   margin-bottom: 112px;
 }
 
-.sample-index-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(64px, 10vw, 148px) clamp(48px, 11vw, 150px);
-  margin-top: 90px;
-}
-
-.sample-index-item {
-  display: grid;
-  min-width: 0;
-  padding-top: 18px;
-  border-top: 1px solid var(--line-soft);
-  color: var(--text-main);
-  text-decoration: none;
-}
-
-.sample-index-offset {
-  margin-top: 112px;
-}
-
-.sample-index-item span,
 .usecase-list span {
   color: var(--text-muted);
   font-size: 13px;
   font-weight: 650;
-}
-
-.sample-index-item strong {
-  margin-top: 18px;
-  color: var(--text-main);
-  font-size: 24px;
-  line-height: 1.2;
-  font-weight: 650;
-  text-wrap: balance;
-}
-
-.sample-index-item p {
-  max-width: 58ch;
-  margin: 14px 0 0;
-  color: var(--text-muted);
-  font-size: 15px;
-  line-height: 1.58;
-}
-
-.sample-index-item em {
-  margin-top: 22px;
-  color: var(--accent);
-  font-style: normal;
-  font-size: 14px;
-  font-weight: 650;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .sample-index-item:is(:hover, :focus-visible) strong {
-    color: var(--accent);
-  }
 }
 
 .usecase-list {
