@@ -68,6 +68,27 @@
   line-height: 1.68;
 }
 
+.hero-proof {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 46ch;
+  margin-top: 20px;
+}
+
+.hero-proof span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-pill);
+  color: var(--text-soft);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 650;
+}
+
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
@@ -112,7 +133,9 @@
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
   background: var(--surface-raised);
-  box-shadow: var(--shadow-lg);
+  box-shadow:
+    0 26px 60px oklch(21% 0.014 255 / 0.11),
+    0 0 0 1px var(--line-soft);
   transform-origin: 52% 50%;
 }
 
@@ -225,10 +248,11 @@
 .report-preview {
   grid-area: chart;
   min-width: 0;
-  padding: 14px;
+  padding: 12px;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-sm);
   background: var(--surface-raised);
+  box-shadow: 0 10px 26px oklch(21% 0.014 255 / 0.06);
 }
 
 .report-preview-head {
@@ -310,8 +334,9 @@
 }
 
 .chart-fit-line {
-  stroke: var(--accent);
+  stroke: var(--paper-ink);
   stroke-width: 2.2;
+  stroke-dasharray: 9 7;
 }
 
 .chart-line-a {
@@ -325,11 +350,38 @@
 }
 
 .chart-points circle {
-  fill: var(--paper);
+  fill: var(--accent);
   stroke: var(--accent);
   stroke-width: 2;
   transform-box: fill-box;
   transform-origin: center;
+}
+
+.chart-errorbars path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.chart-reference-line {
+  fill: none;
+  stroke: var(--data-teal);
+  stroke-width: 1.2;
+  stroke-dasharray: 8 8;
+  vector-effect: non-scaling-stroke;
+}
+
+.chart-legend circle {
+  fill: var(--accent);
+}
+
+.chart-legend path {
+  fill: none;
+  stroke: var(--paper-ink);
+  stroke-width: 2;
+  stroke-dasharray: 9 7;
+  vector-effect: non-scaling-stroke;
 }
 
 .chart-svg text {
@@ -364,25 +416,51 @@
 .workflow-list {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
+  gap: 0;
+  position: relative;
   overflow: hidden;
   margin: 0;
   padding: 0;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
-  background: var(--line-soft);
+  background: var(--surface-raised);
+  box-shadow: 0 10px 28px oklch(21% 0.014 255 / 0.05);
   list-style: none;
 }
 
+.workflow-list::before {
+  content: "";
+  position: absolute;
+  top: 32px;
+  right: 34px;
+  left: 34px;
+  height: 1px;
+  background: var(--line-soft);
+}
+
 .workflow-list li {
+  position: relative;
   min-width: 0;
-  padding: 18px;
-  background: var(--surface);
+  padding: 18px 18px 20px;
+  border-right: 1px solid var(--line-soft);
+  background: transparent;
+}
+
+.workflow-list li:last-child {
+  border-right: 0;
 }
 
 .workflow-list span {
-  display: block;
+  display: inline-grid;
+  place-items: center;
+  position: relative;
+  z-index: 1;
+  inline-size: 30px;
+  block-size: 30px;
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-pill);
   color: var(--accent);
+  background: var(--surface-raised);
   font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 700;
@@ -414,7 +492,7 @@
   display: grid;
   gap: 18px;
   min-width: 0;
-  padding: 18px;
+  padding: 18px 18px 16px;
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
   background: var(--surface-raised);

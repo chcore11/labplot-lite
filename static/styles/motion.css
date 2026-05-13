@@ -114,10 +114,11 @@
   animation-delay: 0.57s;
 }
 
-.landing-hero .report-chart .chart-fit-line {
-  stroke-dasharray: 560;
-  stroke-dashoffset: 560;
-  animation: drawChartLine 0.82s var(--ease-out) 0.54s both;
+.landing-hero .report-chart .chart-fit-line,
+.landing-hero .report-chart .chart-reference-line,
+.landing-hero .report-chart .chart-errorbars {
+  opacity: 0;
+  animation: revealDown 0.5s var(--ease-out) 0.54s both;
 }
 
 .landing-hero .report-chart .chart-points circle {

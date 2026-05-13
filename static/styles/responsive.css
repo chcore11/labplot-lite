@@ -104,6 +104,23 @@
     grid-template-columns: 1fr 1fr;
   }
 
+  .workflow-list::before {
+    display: none;
+  }
+
+  .workflow-list li {
+    border-right: 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .workflow-list li:nth-child(odd) {
+    border-right: 1px solid var(--line-soft);
+  }
+
+  .workflow-list li:nth-last-child(-n+2) {
+    border-bottom: 0;
+  }
+
   .sample-chart-grid {
     grid-template-columns: 1fr;
   }
@@ -155,6 +172,16 @@
 
   .hero-actions {
     display: grid;
+  }
+
+  .hero-proof {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: none;
+  }
+
+  .hero-proof span {
+    justify-content: center;
   }
 
   .hero-product-toolbar {
@@ -214,6 +241,23 @@
 
   .workflow-list {
     grid-template-columns: 1fr;
+  }
+
+  .workflow-list li {
+    border-right: 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .workflow-list li:nth-child(odd) {
+    border-right: 0;
+  }
+
+  .workflow-list li:nth-last-child(-n+2) {
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .workflow-list li:last-child {
+    border-bottom: 0;
   }
 
   .workflow-section,
