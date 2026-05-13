@@ -7,6 +7,7 @@ function initHeroShowcase() {
   }
 
   const cards = Array.from(carousel.querySelectorAll("[data-hero-card]"));
+  const labels = Array.from(carousel.querySelectorAll("[data-hero-label]"));
   const prevControl = carousel.querySelector("[data-hero-prev]");
   const nextControl = carousel.querySelector("[data-hero-next]");
   const positionClasses = [
@@ -61,6 +62,14 @@ function initHeroShowcase() {
         card.classList.add("hero-showcase-card-side", "hero-showcase-card-left-far");
       } else {
         card.classList.add("hero-showcase-card-side", "hero-showcase-card-right");
+      }
+    });
+
+    labels.forEach((label, index) => {
+      if (index === activeIndex) {
+        label.dataset.heroLabelActive = "true";
+      } else {
+        label.removeAttribute("data-hero-label-active");
       }
     });
   }

@@ -29,6 +29,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .usecase-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .workbench-main {
     grid-template-columns: 1fr;
   }
@@ -82,6 +86,11 @@
     padding: 0 16px;
   }
 
+  .nav-links {
+    justify-content: end;
+    gap: 20px;
+  }
+
   .hero h1 {
     font-size: 44px;
   }
@@ -97,6 +106,13 @@
     overflow: visible;
     padding: 0 46px;
     perspective: none;
+  }
+
+  .hero-showcase-labels {
+    grid-template-columns: repeat(4, max-content);
+    justify-content: center;
+    gap: 18px;
+    overflow: hidden;
   }
 
   .hero-showcase-card,
@@ -142,6 +158,20 @@
     grid-template-columns: 1fr 1fr;
   }
 
+  .sample-index-list {
+    grid-template-columns: 1fr;
+    gap: 54px;
+    margin-top: 58px;
+  }
+
+  .sample-index-offset {
+    margin-top: 0;
+  }
+
+  .footer {
+    grid-template-columns: 1fr;
+  }
+
 }
 
 @media (max-width: 640px) {
@@ -158,6 +188,11 @@
 
   .brand-text {
     display: none;
+  }
+
+  .nav-links {
+    gap: 16px;
+    font-size: 13px;
   }
 
   .landing-hero {
@@ -194,6 +229,10 @@
     width: calc(100vw - 24px);
   }
 
+  .hero-showcase-labels {
+    display: none;
+  }
+
   .hero-showcase-card,
   .hero-showcase-card-main {
     padding: 12px;
@@ -224,8 +263,23 @@
     margin-bottom: 58px;
   }
 
+  .sample-index-section,
+  .usecase-section {
+    padding-top: 24px;
+    margin-bottom: 72px;
+  }
+
   .section-heading h2 {
     font-size: 26px;
+  }
+
+  .sample-index-item strong {
+    font-size: 21px;
+  }
+
+  .usecase-list {
+    grid-template-columns: 1fr;
+    gap: 22px;
   }
 
   .workbench {
@@ -340,6 +394,9 @@
 
   .footer {
     align-items: flex-start;
-    flex-direction: column;
+  }
+
+  .footer-links {
+    grid-template-columns: 1fr;
   }
 }

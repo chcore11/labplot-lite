@@ -61,6 +61,26 @@
   white-space: nowrap;
 }
 
+.nav-links {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(18px, 4vw, 42px);
+  min-width: 0;
+  color: var(--text-soft);
+  font-size: 14px;
+  font-weight: 550;
+}
+
+.nav-links a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nav-links a:is(:hover, :focus-visible) {
+  color: var(--accent);
+}
+
 .sample-load-button:active {
   transform: translateY(1px);
 }

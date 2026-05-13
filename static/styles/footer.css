@@ -1,9 +1,10 @@
 .footer {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+  align-items: start;
   justify-content: space-between;
-  gap: 18px;
-  padding-top: 28px;
+  gap: 48px;
+  padding-top: 38px;
   border-top: 1px solid var(--line-soft);
   color: var(--text-muted);
 }
@@ -12,6 +13,43 @@
   color: var(--text-main);
 }
 
+.footer-brand-block {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
 .footer p {
   margin: 0;
+  max-width: 28ch;
+}
+
+.footer-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  min-width: 0;
+}
+
+.footer-links div {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-width: 0;
+}
+
+.footer-links strong {
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.footer-links a,
+.footer-links span {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.footer-links a:is(:hover, :focus-visible) {
+  color: var(--accent);
 }
