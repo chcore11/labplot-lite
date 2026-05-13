@@ -117,32 +117,7 @@ function setDownloadLink(selector, blob, filename) {
   link.setAttribute("download", filename);
   link.removeAttribute("aria-disabled");
   link.removeAttribute("disabled");
-}
-
-function canvasToBlob(canvas) {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) {
-        resolve(blob);
-      } else {
-        reject(new Error("PNG 图片生成失败。"));
-      }
-    }, "image/png");
-  });
-}
-
-function getRenderedCanvas(target) {
-  if (target instanceof HTMLCanvasElement) {
-    return target;
-  }
-  return target ? target.querySelector("canvas") : null;
-}
-
-function getRenderedSvg(target) {
-  if (target instanceof SVGSVGElement) {
-    return target;
-  }
-  return target ? target.querySelector("svg") : null;
+  link.disabled = false;
 }
 
 function getRenderedPlotlyGraph(target) {
@@ -171,95 +146,38 @@ async function dataUrlToBlob(dataUrl) {
   return response.blob();
 }
 
-function svgToBlob(svg) {
-  if (!svg) {
-    return null;
-  }
-
-  const clone = svg.cloneNode(true);
-  clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-  if (!clone.getAttribute("width") && svg.viewBox && svg.viewBox.baseVal.width) {
-    clone.setAttribute("width", String(svg.viewBox.baseVal.width));
-  }
-  if (!clone.getAttribute("height") && svg.viewBox && svg.viewBox.baseVal.height) {
-    clone.setAttribute("height", String(svg.viewBox.baseVal.height));
-  }
-
-  const source = new XMLSerializer().serializeToString(clone);
-  return new Blob([source], { type: "image/svg+xml;charset=utf-8" });
-}
-
-function loadImage(url) {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error("SVG 转换失败。"));
-    image.src = url;
-  });
-}
-
-async function svgBlobToPngBlob(svgBlob, width, height) {
-  const url = URL.createObjectURL(svgBlob);
-  try {
-    const image = await loadImage(url);
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const context = canvas.getContext("2d");
-    context.fillStyle = getThemeColors().surface;
-    context.fillRect(0, 0, width, height);
-    context.drawImage(image, 0, 0, width, height);
-    return canvasToBlob(canvas);
-  } finally {
-    URL.revokeObjectURL(url);
-  }
-}
-
 async function renderedPlotToPngBlob(selector, payload) {
   const target = qs(selector);
   const plotlyGraph = getRenderedPlotlyGraph(target);
-  if (plotlyGraph && window.Plotly) {
-    const { outputSize, renderHeight, renderWidth } = getRenderedPlotlySize(target, payload);
-    const dataUrl = await Plotly.toImage(plotlyGraph, {
-      format: "png",
-      height: renderHeight,
-      scale: outputSize.width / renderWidth,
-      width: renderWidth,
-    });
-    return dataUrlToBlob(dataUrl);
-  }
-
-  const canvas = getRenderedCanvas(target);
-  if (canvas) {
-    return canvasToBlob(canvas);
-  }
-
-  const svg = getRenderedSvg(target);
-  const svgBlob = svgToBlob(svg);
-  if (!svg || !svgBlob) {
+  if (!plotlyGraph || !window.Plotly) {
     throw new Error("没有可导出的图表。");
   }
 
-  const width = Math.round(Number(svg.getAttribute("width")) || payload.figWidth * payload.figDpi);
-  const height = Math.round(Number(svg.getAttribute("height")) || payload.figHeight * payload.figDpi);
-  return svgBlobToPngBlob(svgBlob, width, height);
+  const { outputSize, renderHeight, renderWidth } = getRenderedPlotlySize(target, payload);
+  const dataUrl = await Plotly.toImage(plotlyGraph, {
+    format: "png",
+    height: renderHeight,
+    scale: outputSize.width / renderWidth,
+    width: renderWidth,
+  });
+  return dataUrlToBlob(dataUrl);
 }
 
 async function renderedPlotToSvgBlob(selector, payload) {
   const target = qs(selector);
   const plotlyGraph = getRenderedPlotlyGraph(target);
-  if (plotlyGraph && window.Plotly) {
-    const { renderHeight, renderWidth } = getRenderedPlotlySize(target, payload);
-    const dataUrl = await Plotly.toImage(plotlyGraph, {
-      format: "svg",
-      height: renderHeight,
-      scale: 1,
-      width: renderWidth,
-    });
-    return dataUrlToBlob(dataUrl);
+  if (!plotlyGraph || !window.Plotly) {
+    throw new Error("没有可导出的图表。");
   }
 
-  return svgToBlob(getRenderedSvg(target));
+  const { renderHeight, renderWidth } = getRenderedPlotlySize(target, payload);
+  const dataUrl = await Plotly.toImage(plotlyGraph, {
+    format: "svg",
+    height: renderHeight,
+    scale: 1,
+    width: renderWidth,
+  });
+  return dataUrlToBlob(dataUrl);
 }
 
 function clearDownloadLink(selector) {
@@ -272,10 +190,11 @@ function clearDownloadLink(selector) {
     state.objectUrls = state.objectUrls.filter((url) => url !== link.dataset.objectUrl);
     delete link.dataset.objectUrl;
   }
-  link.href = "#";
   link.removeAttribute("download");
-  link.setAttribute("href", "#");
+  link.removeAttribute("href");
   link.setAttribute("aria-disabled", "true");
+  link.setAttribute("disabled", "");
+  link.disabled = true;
 }
 
 function clearResultDownloadLinks() {
@@ -337,6 +256,7 @@ async function renderDownloads(payload) {
   zipLink.removeAttribute("download");
   zipLink.removeAttribute("aria-disabled");
   zipLink.removeAttribute("disabled");
+  zipLink.disabled = false;
 }
 
 async function renderSimpleDownloads(payload) {

@@ -328,6 +328,31 @@ function renderDataControls() {
   updateWorkflowNav();
 }
 
+function clearAdvancedResultState() {
+  state.lastPlotPayload = null;
+  state.pendingZipPackage = null;
+  hide(qs("#resultSection"));
+  qs("#summaryBody").replaceChildren();
+  qs("#statsBody").replaceChildren();
+  resetResultFigure();
+  clearResultDownloadLinks();
+  if (typeof clearRenderedPlot === "function") {
+    clearRenderedPlot(qs("#plotCanvas"));
+  }
+}
+
+function clearSimpleResultState() {
+  state.simplePlotPayload = null;
+  hide(qs("#simpleResult"));
+  setText("#simpleXCol", "待识别");
+  setText("#simpleYCol", "待识别");
+  setText("#simplePointCount", "待生成");
+  clearSimpleDownloadLinks();
+  if (typeof clearRenderedPlot === "function") {
+    clearRenderedPlot(qs("#simplePlotCanvas"));
+  }
+}
+
 function resetWorkflow() {
   revokeDownloadUrls();
 
@@ -363,21 +388,9 @@ function resetWorkflow() {
   qs("#numericColumnsBox").replaceChildren();
   qs("#plotColumnsBox").replaceChildren();
   qs("#curveConfigBox").replaceChildren();
-  qs("#summaryBody").replaceChildren();
-  qs("#statsBody").replaceChildren();
-  resetResultFigure();
-  hide(qs("#simpleResult"));
+  clearAdvancedResultState();
+  clearSimpleResultState();
   clearNotification(qs("#simpleMessage"));
-  setText("#simpleXCol", "待识别");
-  setText("#simpleYCol", "待识别");
-  setText("#simplePointCount", "待生成");
-  clearSimpleDownloadLinks();
-
-  qsa(".download-panel [href]").forEach((link) => {
-    link.removeAttribute("download");
-    link.href = "#";
-    link.setAttribute("href", "#");
-  });
 
   renderStaticOptions();
   clearMessage();
@@ -396,6 +409,7 @@ function reloadDataFromRange(showSuccess = false) {
   state.data = loaded.data;
   state.numericColumns = loaded.numericColumns;
 
+  clearAdvancedResultState();
   renderDataControls();
   if (showSuccess && state.samplePreset) {
     applySamplePreset({ activate: false, silent: true });

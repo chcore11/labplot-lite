@@ -110,8 +110,6 @@
 }
 
 .hero-product {
-  --preview-x: 0px;
-  --preview-y: 0px;
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--line-soft);
@@ -237,10 +235,7 @@
   border-radius: var(--radius-sm);
   background: var(--surface-raised);
   box-shadow: 0 10px 26px oklch(21% 0.014 255 / 0.06);
-  transform: translate3d(0, 0, 0);
-  transition:
-    box-shadow var(--duration-med) var(--ease-out),
-    transform var(--duration-med) var(--ease-out);
+  transition: box-shadow var(--duration-med) var(--ease-out);
 }
 
 .report-preview-head {
@@ -377,16 +372,15 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .hero-product:is(:hover, .is-tracking) .report-preview {
+  .hero-product:hover .report-preview {
     box-shadow: 0 14px 30px oklch(21% 0.014 255 / 0.09);
-    transform: translate3d(var(--preview-x), var(--preview-y), 0);
   }
 
-  .hero-product:is(:hover, .is-tracking) :is(.chart-reference-line, .chart-errorbars path) {
+  .hero-product:hover :is(.chart-reference-line, .chart-errorbars path) {
     stroke-width: 1.9;
   }
 
-  .hero-product:is(:hover, .is-tracking) .report-chart .chart-points circle {
+  .hero-product:hover .report-chart .chart-points circle {
     stroke-width: 2.5;
     transform: scale(1.08);
   }

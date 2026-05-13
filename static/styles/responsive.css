@@ -192,12 +192,22 @@
 
   .report-preview-head {
     gap: 8px;
+    display: grid;
+    align-items: start;
   }
 
   .report-preview-head span,
   .report-preview-head strong {
     min-width: 0;
     overflow-wrap: anywhere;
+  }
+
+  .report-chart .chart-legend {
+    display: none;
+  }
+
+  .report-chart text {
+    font-size: 10px;
   }
 
   .chart-svg {
@@ -252,7 +262,7 @@
   }
 
   .simple-mode h1 {
-    font-size: 32px;
+    font-size: 30px;
   }
 
   .simple-mode-head {
@@ -305,6 +315,8 @@
 
   .sample-card,
   .form-card,
+  .simple-upload-panel,
+  .simple-mode-head > div,
   .sample-list cds-button,
   .hint,
   .sample-card p {

@@ -61,6 +61,14 @@ function getInitialSampleUrl() {
   return `./samples/${fileName}`;
 }
 
+function hasInitialSampleParam() {
+  return new URLSearchParams(window.location.search).has("sample");
+}
+
+function clearInitialUrlParams() {
+  window.history.replaceState(null, "", window.location.pathname);
+}
+
 function getInitialMode() {
   const params = new URLSearchParams(window.location.search);
   const mode = params.get("mode");
@@ -69,7 +77,11 @@ function getInitialMode() {
 
 async function loadInitialSampleFromUrl() {
   const sampleUrl = getInitialSampleUrl();
+  const hasSample = hasInitialSampleParam();
   if (!sampleUrl || getInitialMode() === "simple") {
+    if (hasSample) {
+      clearInitialUrlParams();
+    }
     return false;
   }
 
@@ -77,11 +89,12 @@ async function loadInitialSampleFromUrl() {
   try {
     await showMode("advanced", { skipScroll: true });
     await loadSample(sampleUrl);
-    window.history.replaceState(null, "", window.location.pathname);
     return true;
   } catch (error) {
     showMessage("error", error.message);
     return true;
+  } finally {
+    clearInitialUrlParams();
   }
 }
 
@@ -162,7 +175,7 @@ async function loadInitialModeFromUrl() {
 
   await showMode(mode || "simple", { skipScroll: true });
   if (mode) {
-    window.history.replaceState(null, "", window.location.pathname);
+    clearInitialUrlParams();
   }
 }
 
@@ -281,6 +294,7 @@ async function handleSimpleFile(file) {
     throw new Error("请先选择 CSV / Excel 文件。");
   }
 
+  clearSimpleResultState();
   setSimpleMessage("info", "准备解析与绘图...");
   const parserReady = fileNeedsSpreadsheetLibrary(file.name)
     ? ensureExternalLibrary("xlsx")
@@ -318,6 +332,7 @@ function setupModeEvents() {
     try {
       await handleSimpleFile(file);
     } catch (error) {
+      clearSimpleResultState();
       setSimpleMessage("error", error.message);
     }
   };

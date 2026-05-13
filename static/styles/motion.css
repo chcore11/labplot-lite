@@ -117,7 +117,7 @@ html.motion-ready .workflow-list[data-reveal].is-visible li {
     transition-duration: 0.01ms !important;
   }
 
-  .hero-product:is(:hover, .is-tracking) :is(.report-preview, .report-chart .chart-points circle),
+  .hero-product:hover .report-chart .chart-points circle,
   .sample-chart-card:is(:hover, :focus-visible),
   .sample-chart-card:is(:hover, :focus-visible) .chart-points circle {
     transform: none;
