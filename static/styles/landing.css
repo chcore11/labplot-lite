@@ -16,11 +16,11 @@
 .landing-hero {
   display: grid;
   justify-items: center;
-  gap: 52px;
+  gap: 30px;
   width: min(1360px, calc(100% - 24px));
   min-height: calc(84svh - 68px);
   overflow: hidden;
-  padding: 56px 0 8px;
+  padding: 52px 0 10px;
 }
 
 .site > .landing-hero {
@@ -109,36 +109,41 @@
   display: grid;
   place-items: center;
   width: 100%;
-  min-height: 390px;
+  min-height: 410px;
   perspective: 1500px;
   isolation: isolate;
 }
 
 .hero-showcase-control {
   position: absolute;
-  top: 50%;
+  top: 56%;
   z-index: 8;
-  inline-size: 44px;
-  block-size: 44px;
-  min-inline-size: 44px;
+  inline-size: 40px;
+  block-size: 40px;
+  min-inline-size: 40px;
   transform: translateY(-50%);
-  --cds-layout-size-height-sm: 44px;
+  --cds-layout-size-height-sm: 40px;
 }
 
 .hero-showcase-control::part(button) {
-  inline-size: 44px;
-  min-inline-size: 44px;
+  inline-size: 40px;
+  min-inline-size: 40px;
   padding-inline: 0;
+  border-color: var(--line-soft);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  color: var(--accent);
+  box-shadow: 0 12px 28px oklch(21% 0.014 255 / 0.10);
   justify-content: center;
   font-size: 20px;
 }
 
 .hero-showcase-control-prev {
-  left: calc(50% - 340px);
+  left: calc(50% - 320px);
 }
 
 .hero-showcase-control-next {
-  right: calc(50% - 340px);
+  right: calc(50% - 320px);
 }
 
 .hero-showcase-card {
@@ -147,7 +152,7 @@
   --card-z: 0;
   --card-rot: 0deg;
   --card-scale: 1;
-  --card-width: 360px;
+  --card-width: 380px;
 
   position: absolute;
   display: grid;
@@ -197,7 +202,7 @@
 }
 
 .hero-showcase-card-main {
-  --card-width: min(510px, 58vw);
+  --card-width: min(560px, 58vw);
 
   z-index: 4;
   padding: 14px;
@@ -214,7 +219,7 @@
 }
 
 .hero-showcase-card-left {
-  --card-x: -430px;
+  --card-x: -460px;
   --card-rot: 32deg;
   --card-scale: 0.82;
 
@@ -222,7 +227,7 @@
 }
 
 .hero-showcase-card-left-far {
-  --card-x: -620px;
+  --card-x: -650px;
   --card-rot: 42deg;
   --card-scale: 0.68;
 
@@ -232,7 +237,7 @@
 }
 
 .hero-showcase-card-right {
-  --card-x: 430px;
+  --card-x: 460px;
   --card-rot: -32deg;
   --card-scale: 0.82;
 

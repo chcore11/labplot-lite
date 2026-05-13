@@ -6,23 +6,23 @@
   }
 
   .hero-showcase {
-    min-height: 380px;
+    min-height: 400px;
   }
 
   .hero-showcase-card-main {
-    --card-width: min(510px, 68vw);
+    --card-width: min(540px, 68vw);
   }
 
   .hero-showcase-card-left {
-    --card-x: -350px;
+    --card-x: -370px;
   }
 
   .hero-showcase-card-left-far {
-    --card-x: -500px;
+    --card-x: -520px;
   }
 
   .hero-showcase-card-right {
-    --card-x: 350px;
+    --card-x: 370px;
   }
 
   .workflow-list {
