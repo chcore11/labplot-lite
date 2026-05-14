@@ -145,6 +145,12 @@ http://127.0.0.1:8000/
 
 数据读取、计算、绘图和导出都在浏览器中完成。文件不会保存到仓库，也不会被项目主动上传。
 
+## 版权与第三方库
+
+Copyright © 2026 LabPlot Lite contributors.
+
+本仓库目前未声明开源许可证；复用、分发或二次发布前请先确认授权。页面通过 CDN 使用的 SheetJS、IBM Carbon Web Components、Plotly.js 和 JSZip 遵循各自项目的许可证与署名要求。
+
 ## 前端实现约束
 
 LabPlot Lite 采用 Carbon + Plotly 的职责分工：Carbon 接管通用工作台 UI，Plotly 接管科研绘图和图表导出，项目代码只保留实验数据流程、拟合、指标和导出 payload。
