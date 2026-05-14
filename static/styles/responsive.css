@@ -6,23 +6,31 @@
   }
 
   .hero-showcase {
-    min-height: 430px;
+    min-height: 460px;
   }
 
   .hero-showcase-card-main {
-    --card-width: min(540px, 68vw);
+    --card-width: min(600px, 68vw);
   }
 
   .hero-showcase-card-left {
-    --card-x: -370px;
+    --card-x: -430px;
   }
 
   .hero-showcase-card-left-far {
-    --card-x: -520px;
+    --card-x: -590px;
   }
 
   .hero-showcase-card-right {
-    --card-x: 370px;
+    --card-x: 430px;
+  }
+
+  .hero-showcase-control-prev {
+    left: calc(50% - 330px);
+  }
+
+  .hero-showcase-control-next {
+    right: calc(50% - 330px);
   }
 
   .workflow-list {
@@ -227,10 +235,6 @@
 
   .hero-showcase-control-next {
     right: 0;
-  }
-
-  .hero-showcase-card strong {
-    font-size: 18px;
   }
 
   .workflow-list {

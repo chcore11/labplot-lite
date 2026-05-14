@@ -16,11 +16,11 @@
 .landing-hero {
   display: grid;
   justify-items: center;
-  gap: 32px;
+  gap: 26px;
   width: min(1360px, calc(100% - 24px));
-  min-height: calc(86svh - 68px);
+  min-height: calc(88svh - 68px);
   overflow: hidden;
-  padding: 42px 0 24px;
+  padding: 46px 0 18px;
 }
 
 .site > .landing-hero {
@@ -101,7 +101,7 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: min(1220px, calc(100vw - 24px));
+  width: min(1280px, calc(100vw - 24px));
 }
 
 .hero-showcase {
@@ -109,7 +109,7 @@
   display: grid;
   place-items: center;
   width: 100%;
-  min-height: 460px;
+  min-height: 520px;
   perspective: 1500px;
   isolation: isolate;
 }
@@ -139,11 +139,11 @@
 }
 
 .hero-showcase-control-prev {
-  left: calc(50% - 300px);
+  left: calc(50% - 380px);
 }
 
 .hero-showcase-control-next {
-  right: calc(50% - 300px);
+  right: calc(50% - 380px);
 }
 
 .hero-showcase-card {
@@ -152,11 +152,10 @@
   --card-z: 0;
   --card-rot: 0deg;
   --card-scale: 1;
-  --card-width: min(340px, 40vw, 44svh);
+  --card-width: min(360px, 34vw, 390px);
 
   position: absolute;
   display: grid;
-  gap: 8px;
   width: var(--card-width);
   min-width: 0;
   padding: 12px;
@@ -165,7 +164,7 @@
   color: var(--text-main);
   background: var(--surface-raised);
   box-shadow:
-    0 24px 56px oklch(21% 0.014 255 / 0.11),
+    0 26px 62px oklch(21% 0.014 255 / 0.12),
     0 0 0 1px var(--line-soft);
   cursor: default;
   text-decoration: none;
@@ -183,66 +182,48 @@
     transform var(--duration-fast) var(--ease-out);
 }
 
-.hero-showcase-card span {
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 650;
-}
-
-.hero-showcase-card strong {
-  color: var(--text-main);
-  font-size: 20px;
-  line-height: 1.25;
-  font-weight: 700;
-}
-
 .hero-showcase-card .sample-preview-image {
   background: var(--paper);
   box-shadow: none;
 }
 
 .hero-showcase-card-main {
-  --card-width: min(460px, 46vw, 52svh);
+  --card-width: min(640px, 58vw, 700px);
 
   z-index: 4;
   cursor: pointer;
-  padding: 14px;
+  padding: 16px;
 }
 
 .hero-showcase-card-side {
   z-index: 2;
-  opacity: 0.42;
-  filter: saturate(0.62) contrast(0.96);
+  opacity: 0.26;
+  filter: saturate(0.5) contrast(0.94) brightness(1.02);
   pointer-events: none;
 }
 
-.hero-showcase-card-side span,
-.hero-showcase-card-side strong {
-  display: none;
-}
-
 .hero-showcase-card-left {
-  --card-x: -445px;
-  --card-rot: 32deg;
-  --card-scale: 0.82;
+  --card-x: -560px;
+  --card-rot: 34deg;
+  --card-scale: 0.76;
 
   transform-origin: right center;
 }
 
 .hero-showcase-card-left-far {
-  --card-x: -635px;
+  --card-x: -760px;
   --card-rot: 42deg;
-  --card-scale: 0.68;
+  --card-scale: 0.62;
 
   z-index: 1;
-  opacity: 0.2;
+  opacity: 0.12;
   transform-origin: right center;
 }
 
 .hero-showcase-card-right {
-  --card-x: 445px;
-  --card-rot: -32deg;
-  --card-scale: 0.82;
+  --card-x: 560px;
+  --card-rot: -34deg;
+  --card-scale: 0.76;
 
   transform-origin: left center;
 }
