@@ -3,7 +3,7 @@
   top: 0;
   z-index: 20;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 16px;
   min-height: 68px;
@@ -11,6 +11,11 @@
   border-bottom: 1px solid var(--line-soft);
   background: var(--nav-bg);
   backdrop-filter: blur(16px);
+}
+
+.brand {
+  grid-column: 1;
+  justify-self: start;
 }
 
 .brand,
@@ -62,6 +67,8 @@
 }
 
 .nav-links {
+  grid-column: 2;
+  justify-self: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;

@@ -81,13 +81,13 @@
   }
 
   .nav {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     gap: 12px;
     padding: 0 16px;
   }
 
   .nav-links {
-    justify-content: end;
+    justify-content: center;
     gap: 20px;
   }
 
@@ -179,7 +179,7 @@
   }
 
   .landing-hero {
-    gap: 28px;
+    gap: 30px;
     overflow: hidden;
     padding: 38px 0 48px;
   }
