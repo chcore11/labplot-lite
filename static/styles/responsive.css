@@ -10,19 +10,19 @@
   }
 
   .hero-showcase-card-main {
-    --card-width: min(600px, 68vw);
+    --card-width: min(640px, 70vw);
   }
 
   .hero-showcase-card-left {
-    --card-x: -430px;
+    --card-x: -470px;
   }
 
   .hero-showcase-card-left-far {
-    --card-x: -590px;
+    --card-x: -650px;
   }
 
   .hero-showcase-card-right {
-    --card-x: 430px;
+    --card-x: 470px;
   }
 
   .hero-showcase-control-prev {
@@ -37,8 +37,9 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .usecase-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .landing-result-layout {
+    grid-template-columns: 1fr;
+    gap: 38px;
   }
 
   .workbench-main {
@@ -156,7 +157,7 @@
   }
 
   .workflow-list {
-    grid-template-columns: 1fr 1fr;
+    gap: 54px 36px;
   }
 
   .footer {
@@ -246,7 +247,7 @@
     margin-bottom: 58px;
   }
 
-  .usecase-section {
+  .result-section {
     padding-top: 24px;
     margin-bottom: 72px;
   }
@@ -255,9 +256,18 @@
     font-size: 26px;
   }
 
-  .usecase-list {
+  .landing-result-note {
+    padding-top: 8px;
+  }
+
+  .landing-result-output div {
     grid-template-columns: 1fr;
-    gap: 22px;
+    gap: 10px;
+    padding: 22px 0;
+  }
+
+  .workflow-list li:nth-child(even) {
+    margin-top: 0;
   }
 
   .workbench {

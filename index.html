@@ -21,15 +21,15 @@
       </a>
       <nav class="nav-links" aria-label="首页导航">
         <a href="#workflow">流程</a>
-        <a href="#useCases">场景</a>
+        <a href="#result">结果</a>
       </nav>
     </header>
 
     <section class="hero landing-hero" id="heroSection" aria-labelledby="heroTitle">
       <div class="hero-copy">
         <div class="eyebrow">学生实验绘图工具</div>
-        <h1 id="heroTitle">把实验表做成报告图</h1>
-        <p class="hero-desc">导入 CSV / Excel，检查范围，生成白底图、拟合摘要和 PNG / SVG / ZIP。</p>
+        <h1 id="heroTitle">把实验表做成报告图件</h1>
+        <p class="hero-desc">导入表格后，按报告顺序检查数据、配置图表、确认结果。默认白底图，适合课程实验和基础科研训练。</p>
 
         <div class="hero-actions">
           <cds-button href="./workbench.html?mode=simple" kind="primary" size="lg">开始绘图</cds-button>
@@ -91,37 +91,36 @@
         <li>
           <span>04</span>
           <strong>导出文件</strong>
-          <p>下载 PNG、SVG、CSV、TXT 和 ZIP。</p>
+          <p>确认图件和摘要后导出。</p>
         </li>
       </ol>
     </section>
 
-    <section class="usecase-section" id="useCases" aria-labelledby="useCaseTitle">
+    <section class="result-section" id="result" aria-labelledby="resultTitle">
       <div class="section-heading" data-reveal>
-        <span>场景</span>
-        <h2 id="useCaseTitle">给常见实验报告留一条直路</h2>
+        <span>结果</span>
+        <h2 id="resultTitle">先看图，再带走文件</h2>
       </div>
 
-      <div class="usecase-list" data-reveal>
-        <div>
-          <span>课程实验</span>
-          <strong>从表格到白底图</strong>
-          <p>保留表头识别、范围检查和一键导出。</p>
+      <div class="landing-result-layout" data-reveal>
+        <div class="landing-result-note">
+          <p>结果页把图件、拟合指标和下载放在同一个检查面。确认图和摘要能写进报告后，再下载所需文件。</p>
+          <cds-button href="./workbench.html?sample=sample_03_abs_error.xlsx" kind="tertiary">打开标准曲线样例</cds-button>
         </div>
-        <div>
-          <span>科研训练</span>
-          <strong>先看拟合是否可信</strong>
-          <p>输出 R²、RMSE、MAE 和残差判断依据。</p>
-        </div>
-        <div>
-          <span>竞赛项目</span>
-          <strong>多曲线快速比较</strong>
-          <p>用样品叠图、参考线和图例整理结果。</p>
-        </div>
-        <div>
-          <span>报告提交</span>
-          <strong>打包图件和数据</strong>
-          <p>PNG、SVG、CSV、TXT 和 ZIP 一次带走。</p>
+
+        <div class="landing-result-output" aria-label="结果页输出内容">
+          <div>
+            <span>图件</span>
+            <strong>PNG / SVG</strong>
+          </div>
+          <div>
+            <span>摘要</span>
+            <strong>R² / RMSE / MAE</strong>
+          </div>
+          <div>
+            <span>数据</span>
+            <strong>CSV / TXT / ZIP</strong>
+          </div>
         </div>
       </div>
     </section>
@@ -145,11 +144,6 @@
           <strong>样张</strong>
           <a href="./workbench.html?sample=sample_03_abs_error.xlsx">标准曲线</a>
           <a href="./workbench.html?sample=sample_04_invalid_log.xlsx">拉曼谱峰</a>
-        </div>
-        <div>
-          <strong>输出</strong>
-          <span>PNG / SVG</span>
-          <span>CSV / TXT / ZIP</span>
         </div>
       </nav>
     </footer>
